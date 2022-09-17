@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>只出现一次的数字III</title>
+    <link href="/2022/09/17/%E5%8F%AA%E5%87%BA%E7%8E%B0%E4%B8%80%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97III/"/>
+    <url>/2022/09/17/%E5%8F%AA%E5%87%BA%E7%8E%B0%E4%B8%80%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97III/</url>
+    
+    <content type="html"><![CDATA[<p><a href="https://leetcode.cn/problems/single-number-iii/">LeetCode链接</a></p><p>题目描述如下：</p><blockquote><p>给你一个整数数组 <code>nums</code>，其中恰好有两个元素只出现一次，其余所有元素均出现两次。 找出只出现一次的那两个元素。你可以按 <strong>任意顺序</strong> 返回答案。</p></blockquote><p><strong>思路一</strong>：</p><blockquote><p>Map统计整数数组中元素出现的次数</p></blockquote><p><strong>代码</strong>：</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span>[] singleNumber(<span class="hljs-type">int</span>[] nums) &#123;<br>        Map&lt;Integer,Integer&gt; map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;nums.length;i++) &#123;<br>            map.computeIfPresent(nums[i],(key,value) -&gt; value+<span class="hljs-number">1</span>);<br>            map.putIfAbsent(nums[i],<span class="hljs-number">1</span>);<br>        &#125;<br>        List&lt;Integer&gt; ans = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br>        <span class="hljs-keyword">for</span> (Map.Entry&lt;Integer,Integer&gt; entry:map.entrySet()) &#123;<br>            <span class="hljs-keyword">if</span> (entry.getValue() == <span class="hljs-number">1</span>) &#123;<br>                ans.add(entry.getKey());<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[]&#123;ans.get(<span class="hljs-number">0</span>),ans.get(<span class="hljs-number">1</span>)&#125;;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure><p><strong>复杂度：</strong></p><ul><li>时间复杂度：O(n),其中n为数组长度</li><li>空间复杂度：O(n),n为哈希表使用的空间</li></ul><hr><p><strong>思路二</strong>：</p><blockquote><p>根据异或运算等位运算知识</p></blockquote><p>假设整数数组nums中只出现一次的数字分别为x1和x2、将nums中所有元素异或得到x，那么根据异或运算的性质</p><p>a ^ a &#x3D; 0 可知x1 ^ x2 &#x3D; x并且x1和x2不等(x1和x2都只出现了一次)。</p><p>根据x &amp; (-x)算出x的二进制表示中最低位的1，记为第i位。易知x1和x2的二进制表示的第i位一定不同，即一个数的第i位是0，另一个数的第i位是1</p><p>同时我们可以将nums中的数分为两类，一类数的二进制表示的第i位是0、一类数的二进制表示的第i位是0。</p><p>分别将这两类数的所有元素异或得到y1和y2，由于除了x1和x2其他的数都出现了两次，可以知道y1&#x3D;x1、y2&#x3D;x2</p><p><strong>代码：</strong></p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span>[] singleNumber(<span class="hljs-type">int</span>[] nums) &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">x</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;nums.length;i++) &#123;<br>            x = x ^ nums[i];<br>        &#125;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> x &amp; (-x);<br>        <span class="hljs-type">int</span> <span class="hljs-variable">x1</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>,x2 = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;nums.length;i++) &#123;<br>            <span class="hljs-comment">// 第i位为1</span><br>            <span class="hljs-keyword">if</span> ((nums[i] &amp; t) == t) &#123;<br>                x1 = x1 ^ nums[i];<br>            &#125;<span class="hljs-keyword">else</span> &#123;<br>                x2 = x2 ^ nums[i];<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">int</span>[]&#123;x1,x2&#125;;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure><p><strong>复杂度：</strong></p><ul><li>时间复杂度：O(n),其中n位数组长度</li><li>空间复杂度：O(1),算法用到了常数级别的空间</li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>Leetcode</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Algorithm</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>N皇后问题</title>
     <link href="/2022/08/29/N%E7%9A%87%E5%90%8E/"/>
     <url>/2022/08/29/N%E7%9A%87%E5%90%8E/</url>
@@ -13,14 +38,14 @@
     
     <categories>
       
-      <category>Algorithm</category>
+      <category>Leetcode</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>Leetcode</tag>
+      <tag>Algorithm</tag>
       
     </tags>
     
