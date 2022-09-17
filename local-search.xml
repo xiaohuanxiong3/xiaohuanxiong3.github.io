@@ -4,6 +4,19 @@
   
   
   <entry>
+    <title>优雅的解题思路(持续更新)</title>
+    <link href="/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/"/>
+    <url>/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/</url>
+    
+    <content type="html"><![CDATA[<p><a href="https://leetcode.cn/problems/search-a-2d-matrix-ii/">240. 搜索二维矩阵 II - 力扣（LeetCode）</a></p><p>编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：</p><ul><li>每行的元素从左到右升序排列。</li><li>每列的元素从上到下升序排列。</li></ul><p>思路:</p><p>从矩阵的右上方(0,n-1)开始搜索。在每一步的搜索过程中，如果我们位于位置 (x,y)，那么我们希望在以<em>matrix</em>的左下角为左下角、以(x,y)为右上角的矩阵中进行搜索，即行的范围为 [x,m-1]，列的范围为[0,y]：</p><p>对于位于位置（x,y）的数matrix[x,y],我们将其和target比较</p><ul><li>matrix[x,y] &lt; target 可以推断出target一定不在第x行（第x行的元素都严格小于target），将x+1，然后重新进行比较</li><li>matrix[x,y] &gt; target 同理将y-1后重新进行比较</li><li>matrix[x,y] &#x3D; target 找到target，返回结果</li></ul><p>最后如果x&gt;&#x3D;m 或 y&lt;0，表示矩阵matrix中没有值为target的数</p><hr><p><a href="https://leetcode.cn/problems/factor-combinations/">254. 因子的组合 - 力扣（LeetCode）</a></p><p>请实现一个函数，该函数接收一个整数 <em>n</em> 并返回该整数所有的因子组合。</p><p>思路:</p><ul><li>dfs递归：遍历范围为i&#x3D;2~√n的因子</li><li>单层递归：如果i是n的因子，该层结果中添加一个[i，n&#x2F;&#x2F;i]组合</li><li>递归处理：<ul><li>查看n&#x2F;&#x2F;i能否从因子i开始被拆分成多因子组合sub序列</li><li>如果sub存在，则在该层结果中继续添加sub+[i]为一个新的组合</li></ul></li></ul>]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>只出现一次的数字III</title>
     <link href="/2022/09/17/%E5%8F%AA%E5%87%BA%E7%8E%B0%E4%B8%80%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97III/"/>
     <url>/2022/09/17/%E5%8F%AA%E5%87%BA%E7%8E%B0%E4%B8%80%E6%AC%A1%E7%9A%84%E6%95%B0%E5%AD%97III/</url>
