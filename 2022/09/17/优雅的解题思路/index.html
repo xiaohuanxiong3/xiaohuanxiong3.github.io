@@ -16,18 +16,20 @@
   <meta name="author" content="Handsome Young">
   <meta name="keywords" content="">
   
-    <meta name="description" content="201. 数字范围按位与 - 力扣（LeetCode） todo  215. 数组中的第K个最大元素 - 力扣（LeetCode） todo  220. 存在重复元素 III - 力扣（LeetCode） todo  222. 完全二叉树的节点个数 - 力扣（LeetCode） todo  235. 二叉搜索树的最近公共祖先 - 力扣（LeetCode） todo  240. 搜索二维矩阵 II">
+    <meta name="description" content="215. 数组中的第K个最大元素 - 力扣（LeetCode）假设数组的左边界为left、右边界为right 改造快速排序求解。当通过partition确定选择的元素的位置i之后，判断i和right-k+1的大小  如果 i &lt; right-k+1，在数组左边进行同样的操作（操作之前先更新left、right、k的值） i &gt; right-k+1，在数组右边进行同样的操作（操作之前先">
 <meta property="og:type" content="article">
 <meta property="og:title" content="优雅的解题思路(持续更新)">
 <meta property="og:url" content="https://xiaohuanxiong3.github.io/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/index.html">
 <meta property="og:site_name" content="小浣熊的个人博客">
-<meta property="og:description" content="201. 数字范围按位与 - 力扣（LeetCode） todo  215. 数组中的第K个最大元素 - 力扣（LeetCode） todo  220. 存在重复元素 III - 力扣（LeetCode） todo  222. 完全二叉树的节点个数 - 力扣（LeetCode） todo  235. 二叉搜索树的最近公共祖先 - 力扣（LeetCode） todo  240. 搜索二维矩阵 II">
+<meta property="og:description" content="215. 数组中的第K个最大元素 - 力扣（LeetCode）假设数组的左边界为left、右边界为right 改造快速排序求解。当通过partition确定选择的元素的位置i之后，判断i和right-k+1的大小  如果 i &lt; right-k+1，在数组左边进行同样的操作（操作之前先更新left、right、k的值） i &gt; right-k+1，在数组右边进行同样的操作（操作之前先">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xiaohuanxiong3.github.io/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/1663503015805.png">
 <meta property="article:published_time" content="2022-09-17T10:11:37.000Z">
-<meta property="article:modified_time" content="2022-09-17T10:53:55.075Z">
+<meta property="article:modified_time" content="2022-09-18T16:08:12.745Z">
 <meta property="article:author" content="Handsome Young">
 <meta property="article:tag" content="Algorithm">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://xiaohuanxiong3.github.io/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/1663503015805.png">
   
   
   
@@ -219,7 +221,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          796 字
+          2.1k 字
         
       </span>
     
@@ -230,7 +232,7 @@
         
         
         
-          7 分钟
+          18 分钟
         
       </span>
     
@@ -273,23 +275,63 @@
             
               <div class="markdown-body">
                 
-                <p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/bitwise-and-of-numbers-range/">201. 数字范围按位与 - 力扣（LeetCode）</a></p>
-<p>todo</p>
+                <hr>
+<h5 id="215-数组中的第K个最大元素-力扣（LeetCode）"><a href="#215-数组中的第K个最大元素-力扣（LeetCode）" class="headerlink" title="215. 数组中的第K个最大元素 - 力扣（LeetCode）"></a><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/kth-largest-element-in-an-array/">215. 数组中的第K个最大元素 - 力扣（LeetCode）</a></h5><p>假设数组的左边界为left、右边界为right</p>
+<p>改造快速排序求解。当通过partition确定选择的元素的位置i之后，判断i和right-k+1的大小</p>
+<ul>
+<li>如果 i &lt; right-k+1，在数组左边进行同样的操作（操作之前先更新left、right、k的值）</li>
+<li>i &gt; right-k+1，在数组右边进行同样的操作（操作之前先更新left、right、k的值）</li>
+<li>直到i &#x3D; right-k+1。</li>
+</ul>
 <hr>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/kth-largest-element-in-an-array/">215. 数组中的第K个最大元素 - 力扣（LeetCode）</a></p>
-<p>todo</p>
+<h5 id="220-存在重复元素-III-力扣（LeetCode）"><a href="#220-存在重复元素-III-力扣（LeetCode）" class="headerlink" title="220. 存在重复元素 III - 力扣（LeetCode）"></a><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/contains-duplicate-iii/">220. 存在重复元素 III - 力扣（LeetCode）</a></h5><p>给你一个整数数组 nums 和两个整数 k 和 t 。请你判断是否存在 两个不同下标 i 和 j，使得 abs(nums[i] - nums[j]) &lt;&#x3D; t ，同时又满足 abs(i - j) &lt;&#x3D; k 。</p>
+<p>思路：</p>
+<ul>
+<li>滑动窗口+有序集合<br>维护一个TreeSet（称为set）,set中最多有k个元素，当超过k个元素时，移除set中存在时间最长的元素。<br>对nums中的每个元素nums[i]，判断set中是否有元素在[nums[i]-t,nums[i]+t]范围内。<ul>
+<li>如果存在这样一个元素，直接返回</li>
+<li>如果不存在这样一个元素，将nums[i]加入set后继续检测nums[i+1]</li>
+</ul>
+</li>
+<li>桶<br>对于元素x，其影响的区间为[x-t,x+t]。于是我们可以设定一个大小为t+1的桶。<ul>
+<li>如果两个元素同属一个桶，那么这两个元素必然满足条件</li>
+<li>如果两个元素属于相邻桶，那么我们需要校验这两个元素差值的绝对值是否不超过t</li>
+<li>如果两个元素既不属于同一个桶，也不属于相邻桶，那么这两个元素必然不满足条件</li>
+</ul>
+</li>
+</ul>
 <hr>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/contains-duplicate-iii/">220. 存在重复元素 III - 力扣（LeetCode）</a></p>
-<p>todo</p>
+<h5 id="222-完全二叉树的节点个数-力扣（LeetCode）"><a href="#222-完全二叉树的节点个数-力扣（LeetCode）" class="headerlink" title="222. 完全二叉树的节点个数 - 力扣（LeetCode）"></a><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/count-complete-tree-nodes/">222. 完全二叉树的节点个数 - 力扣（LeetCode）</a></h5><p>二分查找 + 位运算</p>
+<p>假设完全二叉树的层数为h，则完全二叉树的节点数量在[2^h,2^(h+1)-1]之间</p>
+<ul>
+<li>在区间内使用二分查找算法，得到需要判断的数k</li>
+<li>判断第k个节点是否存在：<ul>
+<li>第k个节点位于第h层，则k有h+1位。</li>
+<li>除掉最高位的1之后，从根节点开始，按照从高到低遍历k的二进制位。</li>
+<li>如果二进制位为0，表示移动到左子节点；如果二进制位为1，表示移动到右子节点。</li>
+<li>当移动到倒数第二位时，其下一个要移动到的子节点就是第k个节点。由此可以知道第k个节点是否存在</li>
+</ul>
+</li>
+<li>如果第k个节点存在，则节点个数一定大于或等于k。如果第k个节点不存在，则节点个数一定小于k</li>
+<li>得到新的节点个数区间后回到第一步继续进行二分查找直到得到节点个数</li>
+</ul>
 <hr>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/count-complete-tree-nodes/">222. 完全二叉树的节点个数 - 力扣（LeetCode）</a></p>
-<p>todo</p>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-search-tree/">235. 二叉搜索树的最近公共祖先 - 力扣（LeetCode）</a></p>
-<p>todo</p>
-<hr>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-a-2d-matrix-ii/">240. 搜索二维矩阵 II - 力扣（LeetCode）</a></p>
-<p>编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：</p>
+<h5 id="235-二叉搜索树的最近公共祖先-力扣（LeetCode）"><a href="#235-二叉搜索树的最近公共祖先-力扣（LeetCode）" class="headerlink" title="235. 二叉搜索树的最近公共祖先 - 力扣（LeetCode）"></a><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-search-tree/">235. 二叉搜索树的最近公共祖先 - 力扣（LeetCode）</a></h5><p>给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。</p>
+<p>百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”</p>
+<p>思路：</p>
+<ul>
+<li>找二叉树的最近公共祖先<ul>
+<li>定义fx表示x节点的子树中是否包含p节点或q节点，如果包含则为true，否则为false。 那么p和q的最近公共祖先一定满足条件<br><img src="/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/1663503015805.png" srcset="/img/loading.gif" lazyload class><br>
+当x的左子树和右子树分别包含p和q、x就是p或q并且x的左子树或右子树包含另一个节点时，x为二叉树的最近公共祖先。这两个条件分别对应上面的两个表达式。<br>找到最近公共祖先后，由fx的定义可以保证不会误找出新的最近公共祖先</li>
+<li>记录每个节点的父节点，可以得到p和q到达根节点的路径，两条路径从下往上第一个交点就是p和q的最近公共祖先</li>
+</ul>
+</li>
+<li>找二叉搜索树的最近公共祖先<ul>
+<li>根据二叉搜索树的性质可以直接得到p和q到达根节点的路径，然后算出最近公共祖先</li>
+<li>如果p和q分别在x的两边（包括x就是p或q），那么x就是p和q的最近公共祖先。根据二叉搜索树的性质可以通过p、q和节点root的值进行比较快速找到x</li>
+</ul>
+</li>
+</ul>
+<h5 id="240-搜索二维矩阵-II-力扣（LeetCode）"><a href="#240-搜索二维矩阵-II-力扣（LeetCode）" class="headerlink" title="240. 搜索二维矩阵 II - 力扣（LeetCode）"></a><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/search-a-2d-matrix-ii/">240. 搜索二维矩阵 II - 力扣（LeetCode）</a></h5><p>编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：</p>
 <ul>
 <li>每行的元素从左到右升序排列。</li>
 <li>每列的元素从上到下升序排列。</li>
@@ -304,8 +346,7 @@
 </ul>
 <p>最后如果x&gt;&#x3D;m 或 y&lt;0，表示矩阵matrix中没有值为target的数</p>
 <hr>
-<p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/factor-combinations/">254. 因子的组合 - 力扣（LeetCode）</a></p>
-<p>请实现一个函数，该函数接收一个整数 <em>n</em> 并返回该整数所有的因子组合。</p>
+<h5 id="254-因子的组合-力扣（LeetCode）"><a href="#254-因子的组合-力扣（LeetCode）" class="headerlink" title="254. 因子的组合 - 力扣（LeetCode）"></a><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/factor-combinations/">254. 因子的组合 - 力扣（LeetCode）</a></h5><p>请实现一个函数，该函数接收一个整数 <em>n</em> 并返回该整数所有的因子组合。</p>
 <p>思路:</p>
 <ul>
 <li><p>dfs递归：遍历范围为i&#x3D;2~√n的因子</p>
@@ -319,7 +360,6 @@
 </ul>
 </li>
 </ul>
-<hr>
 
                 
               </div>
