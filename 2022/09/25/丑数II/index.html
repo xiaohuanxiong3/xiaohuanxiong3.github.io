@@ -16,25 +16,22 @@
   <meta name="author" content="Handsome Young">
   <meta name="keywords" content="">
   
-    <meta name="description" content="给定两个整数left和right,表示区间[left,right],返回此区间内所有数字按位与的结果（包含left、right端点）。  根据按位与运算的性质。对于一系列的位，例如[1,1,0,1,1]，只要有一个零值的位，那么这一系列位的按位与运算结果都将为零。    如上图所示，可以猜测，对所有数字执行按位与运算的结果是所有对应二进制字符串的公共前缀再用零补上后面的剩余位  证明：假设对于所有">
+    <meta name="description" content="给你一个正整数n，请你找出并返回第n个丑数 丑数就是只包含质因数2、3和5的正整数 方法一：最小堆初始时堆为空。首先将最小的丑数1加入堆中。 每次取出堆顶元素x，则x是堆中最小的丑数，由于2x、3x、5x也是丑数，因此将2x、3x、5x加入堆。 在这个过程中可能会有重复的元素，需要用一个set进行去重，避免某个丑数多次加入堆 第n次从堆顶取出来的元素就是第n个丑数 代码： 123456789101">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数字范围按位与">
-<meta property="og:url" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/index.html">
+<meta property="og:title" content="丑数II">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2022/09/25/%E4%B8%91%E6%95%B0II/index.html">
 <meta property="og:site_name" content="小浣熊的个人博客">
-<meta property="og:description" content="给定两个整数left和right,表示区间[left,right],返回此区间内所有数字按位与的结果（包含left、right端点）。  根据按位与运算的性质。对于一系列的位，例如[1,1,0,1,1]，只要有一个零值的位，那么这一系列位的按位与运算结果都将为零。    如上图所示，可以猜测，对所有数字执行按位与运算的结果是所有对应二进制字符串的公共前缀再用零补上后面的剩余位  证明：假设对于所有">
+<meta property="og:description" content="给你一个正整数n，请你找出并返回第n个丑数 丑数就是只包含质因数2、3和5的正整数 方法一：最小堆初始时堆为空。首先将最小的丑数1加入堆中。 每次取出堆顶元素x，则x是堆中最小的丑数，由于2x、3x、5x也是丑数，因此将2x、3x、5x加入堆。 在这个过程中可能会有重复的元素，需要用一个set进行去重，避免某个丑数多次加入堆 第n次从堆顶取出来的元素就是第n个丑数 代码： 123456789101">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664016806021.png">
-<meta property="og:image" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664037916734.png">
-<meta property="article:published_time" content="2022-09-18T16:20:23.000Z">
-<meta property="article:modified_time" content="2022-09-24T16:58:48.542Z">
+<meta property="article:published_time" content="2022-09-24T17:00:54.000Z">
+<meta property="article:modified_time" content="2022-09-25T14:41:16.968Z">
 <meta property="article:author" content="Handsome Young">
 <meta property="article:tag" content="Algorithm">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664016806021.png">
   
   
   
-  <title>数字范围按位与 - 小浣熊的个人博客</title>
+  <title>丑数II - 小浣熊的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +196,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="数字范围按位与"></span>
+            <span id="subtitle" data-typed-text="丑数II"></span>
           
         </div>
 
@@ -210,8 +207,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-09-19 00:20" pubdate>
-          2022年9月19日 凌晨
+        <time datetime="2022-09-25 01:00" pubdate>
+          2022年9月25日 凌晨
         </time>
       </span>
     
@@ -222,7 +219,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.4k 字
+          1.7k 字
         
       </span>
     
@@ -233,7 +230,7 @@
         
         
         
-          12 分钟
+          15 分钟
         
       </span>
     
@@ -271,50 +268,32 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">数字范围按位与</h1>
+            <h1 style="display: none">丑数II</h1>
             
             
               <div class="markdown-body">
                 
-                <p>给定两个整数left和right,表示区间[left,right],返回此区间内所有数字按位与的结果（包含left、right端点）。</p>
-<blockquote>
-<p>根据按位与运算的性质。对于一系列的位，例如[1,1,0,1,1]，只要有一个零值的位，那么这一系列位的按位与运算结果都将为零。</p>
-</blockquote>
-<img src="/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664016806021.png" srcset="/img/loading.gif" lazyload class>
-
-<p><br>如上图所示，可以猜测，对所有数字执行按位与运算的结果是所有对应二进制字符串的公共前缀再用零补上后面的剩余位</p>
-<blockquote>
-<p>证明：假设对于所有这些二进制串，前i位均相同，第i+1位开始不同，由于[m,n]连续，所以第i+1位在[m,n]的数字范围从小到大枚举出来一定是前面全是0，后面全是1。并且一定存在连续的两个数x和x+1，满足x的第i+1位为0，后面全为1；x+1的第i+1位为1，后面全为0。这种形如0111…和1000…的二进制串按位与的结果一定为0000…,因此按位与结果的第i+1位开始的剩余位均为0，前i位由于均相同，按位与结果不变。最终的答案即为二进制字符串的公共前缀再用零补上后面的剩余位</p>
-</blockquote>
-<p>进一步来说，所有这些二进制字符串的公共前缀也指指定范围的起始和结束数字m和n的公共前缀</p>
-<p>因此我们可以将问题转换成求两个整数对应的二进制字符串的公共前缀</p>
-<h4 id="方法一：位移"><a href="#方法一：位移" class="headerlink" title="方法一：位移"></a>方法一：位移</h4><blockquote>
-<p>将两个数字不断向右移动，直到数字相等，即数字被缩减为它们的公共前缀。然后，通过将公共前缀向左移动，将零添加到公共前缀的右边以获得最终结果</p>
-</blockquote>
+                <p>给你一个正整数n，请你找出并返回第n个丑数</p>
+<p>丑数就是只包含质因数2、3和5的正整数</p>
+<h4 id="方法一：最小堆"><a href="#方法一：最小堆" class="headerlink" title="方法一：最小堆"></a>方法一：最小堆</h4><p>初始时堆为空。首先将最小的丑数1加入堆中。</p>
+<p>每次取出堆顶元素x，则x是堆中最小的丑数，由于2x、3x、5x也是丑数，因此将2x、3x、5x加入堆。</p>
+<p>在这个过程中可能会有重复的元素，需要用一个set进行去重，避免某个丑数多次加入堆</p>
+<p>第n次从堆顶取出来的元素就是第n个丑数</p>
 <p>代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">rangeBitwiseAnd</span><span class="hljs-params">(<span class="hljs-type">int</span> m, <span class="hljs-type">int</span> n)</span> &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">shift</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-comment">// 找到公共前缀</span><br>        <span class="hljs-keyword">while</span> (m &lt; n) &#123;<br>            m &gt;&gt;= <span class="hljs-number">1</span>;<br>            n &gt;&gt;= <span class="hljs-number">1</span>;<br>            ++shift;<br>        &#125;<br>        <span class="hljs-keyword">return</span> m &lt;&lt; shift;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">nthUglyNumber</span><span class="hljs-params">(<span class="hljs-type">int</span> n)</span> &#123;<br>        Set&lt;Long&gt; set = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;();<br>        PriorityQueue&lt;Long&gt; minHeap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">PriorityQueue</span>&lt;&gt;();<br>        set.add(<span class="hljs-number">1L</span>);<br>        minHeap.add(<span class="hljs-number">1L</span>);<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;n;i++) &#123;<br>            <span class="hljs-type">long</span> <span class="hljs-variable">t</span> <span class="hljs-operator">=</span> minHeap.poll();<br>            <span class="hljs-keyword">if</span> (!set.contains(<span class="hljs-number">2</span>*t)) &#123;<br>                set.add(<span class="hljs-number">2</span>*t);<br>                minHeap.add(<span class="hljs-number">2</span>*t);<br>            &#125;<br>            <span class="hljs-keyword">if</span> (!set.contains(<span class="hljs-number">3</span>*t)) &#123;<br>                set.add(<span class="hljs-number">3</span>*t);<br>                minHeap.add(<span class="hljs-number">3</span>*t);<br>            &#125;<br>            <span class="hljs-keyword">if</span> (!set.contains(<span class="hljs-number">5</span>*t)) &#123;<br>                set.add(<span class="hljs-number">5</span>*t);<br>                minHeap.add(<span class="hljs-number">5</span>*t);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> minHeap.peek().intValue();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>复杂度分析</p>
-<ul>
-<li>时间复杂度：O(logn)。算法的时间复杂度取决于m和n的二进制位数，由于m&lt;&#x3D;n，因此时间复杂度取决于n的二进制位数</li>
-<li>空间复杂度：O(1)。我们只需要常数空间存放若干变量</li>
-</ul>
-<h4 id="方法二：Brain-Kernighan算法"><a href="#方法二：Brain-Kernighan算法" class="headerlink" title="方法二：Brain Kernighan算法"></a>方法二：Brain Kernighan算法</h4><p>Brian Kernighan算法用于清除二进制串最右边的1。</p>
+<h4 id="方法二：动态规划"><a href="#方法二：动态规划" class="headerlink" title="方法二：动态规划"></a>方法二：动态规划</h4><p>定义数组dp，其中dp[i]表示第i个丑数，第n个丑数即为dp[n]。</p>
+<p>由于最小的丑数是1，因此dp[1]&#x3D;1。</p>
+<p>定义三个指针p2、p3、p5，表示下一个丑数是当前指针指向的丑数乘以对应的质因数。初始时，三个指针的值都是1。</p>
+<p>当2&lt;&#x3D;i&lt;&#x3D;n时，令dp[i]&#x3D;min(dp[p2]x2,dp[p3]x3,dp[p5]x5)，然后分别比较dp[i]和dp[p2]x2,dp[p3]x3,dp[p5]x5是否相等，如果相等则将相应的指针加1。</p>
+<p>正确性证明：</p>
 <blockquote>
-<p>每次对 number 和 number-1 之间进行按位与运算后，number中最右边的1会被抹去变成0</p>
+<p>对于i&gt;1，在计算dp[i]时，指针px(x∈{2,3,5})的含义是使得dp[j] × x &gt; dp[i-1]的最小的下标j.即当j&gt;&#x3D;px时dp[j] × x &gt; dp[i-1],当j&lt;px时dp[j] × x &lt;&#x3D; dp[i-1]。</p>
+<p>因此，对于i&gt;1，在计算dp[i]时，dp[p2]×2,dp[p3]×3,dp[p5]×5都大于dp[i-1],dp[p2-1]×2,dp[p3-1]×3,dp[p5-1]×5都小于或等于dp[i-1]。令dp[i] &#x3D; min(dp[p2]×2,dp[p3]×3,dp[p5]×5),则dp[i]是大于dp[i-1]的最小的丑数，即dp[i]是第i个丑数</p>
+<p>在计算dp[i]之后，会更新三个指针p2、p3、p5，更新之后的指针将用于计算dp[i+1]，同样满足dp[i+1]是大于dp[i]的最小的丑数，即dp[i+1]是第i+1个丑数</p>
 </blockquote>
-<img src="/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664037916734.png" srcset="/img/loading.gif" lazyload class>
-
-<p><br>基于上述技巧，我们可以用它来计算两个二进制字符串的公共前缀。</p>
-<p>其思想是，对于给定范围[m,n]（m&lt;n）,我们可以对数字n迭代地应用上述技巧，清除最右边的1，直到它小于或等于m，此时非公共前缀部分的1均被消去。因此最后我们返回n即可。</p>
-<p>代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">rangeBitwiseAnd</span><span class="hljs-params">(<span class="hljs-type">int</span> m, <span class="hljs-type">int</span> n)</span> &#123;<br>        <span class="hljs-keyword">while</span> (m &lt; n) &#123;<br>            <span class="hljs-comment">// 抹去最右边的 1</span><br>            n = n &amp; (n - <span class="hljs-number">1</span>);<br>        &#125;<br>        <span class="hljs-keyword">return</span> n;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>复杂度分析：</p>
-<ul>
-<li>时间复杂度：O(logn)。和位移方法类似，算法的时间复杂度取决于m和n二进制展开的位数。尽管和位移方法具有相同的渐进复杂度，但Brain Kernighan算法需要的迭代次数会更少，因为它跳过了两个数字之间的所有零位</li>
-<li>空间复杂度：O(1)。我们只需要常数空间存放若干变量</li>
-</ul>
+<p>代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">nthUglyNumber</span><span class="hljs-params">(<span class="hljs-type">int</span> n)</span> &#123;<br>        <span class="hljs-type">long</span>[] dp = <span class="hljs-keyword">new</span> <span class="hljs-title class_">long</span>[n];<br>        <span class="hljs-type">int</span> <span class="hljs-variable">p2</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>,p3 = <span class="hljs-number">0</span>,p5 = <span class="hljs-number">0</span>;<br>        dp[<span class="hljs-number">0</span>] = <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;n;i++) &#123;<br>            dp[i] = Math.min(dp[p2]*<span class="hljs-number">2</span>,Math.min(dp[p3]*<span class="hljs-number">3</span>,dp[p5]*<span class="hljs-number">5</span>));<br>            <span class="hljs-keyword">if</span> (dp[i] == dp[p2]*<span class="hljs-number">2</span>) &#123;<br>                p2++;<br>            &#125;<br>            <span class="hljs-keyword">if</span> (dp[i] == dp[p3]*<span class="hljs-number">3</span>) &#123;<br>                p3++;<br>            &#125;<br>            <span class="hljs-keyword">if</span> (dp[i] == dp[p5]*<span class="hljs-number">5</span>) &#123;<br>                p5++;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> (<span class="hljs-type">int</span>)dp[n-<span class="hljs-number">1</span>];<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -360,8 +339,8 @@
 
   <div class="license-box my-3">
 <!--    <div class="license-title">-->
-<!--      <div>数字范围按位与</div>-->
-<!--      <div>https://xiaohuanxiong3.github.io/2022/09/19/数字范围按位与/</div>-->
+<!--      <div>丑数II</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2022/09/25/丑数II/</div>-->
 <!--    </div>-->
     <div class="license-meta">
       
@@ -373,7 +352,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年9月19日</div>
+          <div>2022年9月25日</div>
         </div>
       
       
@@ -396,9 +375,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/09/25/%E4%B8%91%E6%95%B0II/" title="丑数II">
+                      <a href="/2022/09/25/%E4%BC%9A%E8%AE%AE%E5%AE%A4II/" title="会议室II">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">丑数II</span>
+                        <span class="hidden-mobile">会议室II</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -406,8 +385,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="优雅的解题思路(持续更新)">
-                        <span class="hidden-mobile">优雅的解题思路(持续更新)</span>
+                      <a href="/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/" title="数字范围按位与">
+                        <span class="hidden-mobile">数字范围按位与</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
