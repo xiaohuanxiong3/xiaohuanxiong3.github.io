@@ -16,25 +16,22 @@
   <meta name="author" content="Handsome Young">
   <meta name="keywords" content="">
   
-    <meta name="description" content="给定两个整数left和right,表示区间[left,right],返回此区间内所有数字按位与的结果（包含left、right端点）。  根据按位与运算的性质。对于一系列的位，例如[1,1,0,1,1]，只要有一个零值的位，那么这一系列位的按位与运算结果都将为零。    如上图所示，可以猜测，对所有数字执行按位与运算的结果是所有对应二进制字符串的公共前缀再用零补上后面的剩余位  证明：假设对于所有">
+    <meta name="description" content="说在前面    前段时间粗略地过了一遍mybatis源码。有些地方懂了、有些地方没懂。想着复习一下，加深一下理解、加上自己也想多写写博客，所以有了这个Mybatis源码解析系列 说明 我是跟着github上一个仓库（tuguangquan&#x2F;mybatis: mybatis源码中文注释 (github.com)）进行得源码阅读，因此mybatis源码版本不是最新的（3.3.0-SNAPSH">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数字范围按位与">
-<meta property="og:url" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/index.html">
+<meta property="og:title" content="0-前言">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/05/02/0-%E5%89%8D%E8%A8%80/index.html">
 <meta property="og:site_name" content="小浣熊的个人博客">
-<meta property="og:description" content="给定两个整数left和right,表示区间[left,right],返回此区间内所有数字按位与的结果（包含left、right端点）。  根据按位与运算的性质。对于一系列的位，例如[1,1,0,1,1]，只要有一个零值的位，那么这一系列位的按位与运算结果都将为零。    如上图所示，可以猜测，对所有数字执行按位与运算的结果是所有对应二进制字符串的公共前缀再用零补上后面的剩余位  证明：假设对于所有">
+<meta property="og:description" content="说在前面    前段时间粗略地过了一遍mybatis源码。有些地方懂了、有些地方没懂。想着复习一下，加深一下理解、加上自己也想多写写博客，所以有了这个Mybatis源码解析系列 说明 我是跟着github上一个仓库（tuguangquan&#x2F;mybatis: mybatis源码中文注释 (github.com)）进行得源码阅读，因此mybatis源码版本不是最新的（3.3.0-SNAPSH">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664016806021.png">
-<meta property="og:image" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664037916734.png">
-<meta property="article:published_time" content="2022-09-18T16:20:23.000Z">
-<meta property="article:modified_time" content="2022-09-24T16:58:48.542Z">
+<meta property="article:published_time" content="2023-05-02T15:28:43.000Z">
+<meta property="article:modified_time" content="2023-05-02T16:01:06.860Z">
 <meta property="article:author" content="Handsome Young">
-<meta property="article:tag" content="Algorithm">
+<meta property="article:tag" content="Mybatis">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://xiaohuanxiong3.github.io/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664016806021.png">
   
   
   
-  <title>数字范围按位与 - 小浣熊的个人博客</title>
+  <title>0-前言 - 小浣熊的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -171,6 +168,18 @@
             </li>
           
         
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/complaint/">
+                <i class="iconfont icon-user-fill"></i>
+                日常吐槽
+              </a>
+            </li>
+          
+        
         
           <li class="nav-item" id="search-btn">
             <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
@@ -199,7 +208,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="数字范围按位与"></span>
+            <span id="subtitle" data-typed-text="0-前言"></span>
           
         </div>
 
@@ -210,8 +219,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-09-19 00:20" pubdate>
-          2022年9月19日 凌晨
+        <time datetime="2023-05-02 23:28" pubdate>
+          2023年5月2日 晚上
         </time>
       </span>
     
@@ -222,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.4k 字
+          554 字
         
       </span>
     
@@ -233,7 +242,7 @@
         
         
         
-          12 分钟
+          5 分钟
         
       </span>
     
@@ -271,50 +280,18 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">数字范围按位与</h1>
+            <h1 style="display: none">0-前言</h1>
             
             
               <div class="markdown-body">
                 
-                <p>给定两个整数left和right,表示区间[left,right],返回此区间内所有数字按位与的结果（包含left、right端点）。</p>
-<blockquote>
-<p>根据按位与运算的性质。对于一系列的位，例如[1,1,0,1,1]，只要有一个零值的位，那么这一系列位的按位与运算结果都将为零。</p>
-</blockquote>
-<img src="/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664016806021.png" srcset="/img/loading.gif" lazyload class>
-
-<p><br>如上图所示，可以猜测，对所有数字执行按位与运算的结果是所有对应二进制字符串的公共前缀再用零补上后面的剩余位</p>
-<blockquote>
-<p>证明：假设对于所有这些二进制串，前i位均相同，第i+1位开始不同，由于[m,n]连续，所以第i+1位在[m,n]的数字范围从小到大枚举出来一定是前面全是0，后面全是1。并且一定存在连续的两个数x和x+1，满足x的第i+1位为0，后面全为1；x+1的第i+1位为1，后面全为0。这种形如0111…和1000…的二进制串按位与的结果一定为0000…,因此按位与结果的第i+1位开始的剩余位均为0，前i位由于均相同，按位与结果不变。最终的答案即为二进制字符串的公共前缀再用零补上后面的剩余位</p>
-</blockquote>
-<p>进一步来说，所有这些二进制字符串的公共前缀也指指定范围的起始和结束数字m和n的公共前缀</p>
-<p>因此我们可以将问题转换成求两个整数对应的二进制字符串的公共前缀</p>
-<h4 id="方法一：位移"><a href="#方法一：位移" class="headerlink" title="方法一：位移"></a>方法一：位移</h4><blockquote>
-<p>将两个数字不断向右移动，直到数字相等，即数字被缩减为它们的公共前缀。然后，通过将公共前缀向左移动，将零添加到公共前缀的右边以获得最终结果</p>
-</blockquote>
-<p>代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">rangeBitwiseAnd</span><span class="hljs-params">(<span class="hljs-type">int</span> m, <span class="hljs-type">int</span> n)</span> &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">shift</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>        <span class="hljs-comment">// 找到公共前缀</span><br>        <span class="hljs-keyword">while</span> (m &lt; n) &#123;<br>            m &gt;&gt;= <span class="hljs-number">1</span>;<br>            n &gt;&gt;= <span class="hljs-number">1</span>;<br>            ++shift;<br>        &#125;<br>        <span class="hljs-keyword">return</span> m &lt;&lt; shift;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>复杂度分析</p>
-<ul>
-<li>时间复杂度：O(logn)。算法的时间复杂度取决于m和n的二进制位数，由于m&lt;&#x3D;n，因此时间复杂度取决于n的二进制位数</li>
-<li>空间复杂度：O(1)。我们只需要常数空间存放若干变量</li>
-</ul>
-<h4 id="方法二：Brain-Kernighan算法"><a href="#方法二：Brain-Kernighan算法" class="headerlink" title="方法二：Brain Kernighan算法"></a>方法二：Brain Kernighan算法</h4><p>Brian Kernighan算法用于清除二进制串最右边的1。</p>
-<blockquote>
-<p>每次对 number 和 number-1 之间进行按位与运算后，number中最右边的1会被抹去变成0</p>
-</blockquote>
-<img src="/2022/09/19/%E6%95%B0%E5%AD%97%E8%8C%83%E5%9B%B4%E6%8C%89%E4%BD%8D%E4%B8%8E/1664037916734.png" srcset="/img/loading.gif" lazyload class>
-
-<p><br>基于上述技巧，我们可以用它来计算两个二进制字符串的公共前缀。</p>
-<p>其思想是，对于给定范围[m,n]（m&lt;n）,我们可以对数字n迭代地应用上述技巧，清除最右边的1，直到它小于或等于m，此时非公共前缀部分的1均被消去。因此最后我们返回n即可。</p>
-<p>代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">rangeBitwiseAnd</span><span class="hljs-params">(<span class="hljs-type">int</span> m, <span class="hljs-type">int</span> n)</span> &#123;<br>        <span class="hljs-keyword">while</span> (m &lt; n) &#123;<br>            <span class="hljs-comment">// 抹去最右边的 1</span><br>            n = n &amp; (n - <span class="hljs-number">1</span>);<br>        &#125;<br>        <span class="hljs-keyword">return</span> n;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>复杂度分析：</p>
-<ul>
-<li>时间复杂度：O(logn)。和位移方法类似，算法的时间复杂度取决于m和n二进制展开的位数。尽管和位移方法具有相同的渐进复杂度，但Brain Kernighan算法需要的迭代次数会更少，因为它跳过了两个数字之间的所有零位</li>
-<li>空间复杂度：O(1)。我们只需要常数空间存放若干变量</li>
-</ul>
+                <h3 id="说在前面"><a href="#说在前面" class="headerlink" title="说在前面"></a>说在前面</h3><p>    前段时间粗略地过了一遍mybatis源码。有些地方懂了、有些地方没懂。想着复习一下，加深一下理解、加上自己也想多写写博客，所以有了这个Mybatis源码解析系列</p>
+<h4 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h4><ol>
+<li><p>我是跟着github上一个仓库（<a target="_blank" rel="noopener" href="https://github.com/tuguangquan/mybatis">tuguangquan&#x2F;mybatis: mybatis源码中文注释 (github.com)</a>）进行得源码阅读，因此mybatis源码版本不是最新的（3.3.0-SNAPSHOT）</p>
+</li>
+<li><p>上面仓库里说的导入mybatis-parent模块只需要在pom文件中配置一下<parent>标签即可</parent></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">parent</span>&gt;</span><br>    <span class="hljs-comment">&lt;!-- groupId、artifactId、version均可在</span><br><span class="hljs-comment">parentPom.xml中找到--&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mybatis<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mybatis-parent<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>38-SNAPSHOT<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><br>    <span class="hljs-comment">&lt;!-- parentPom文件的相对路径--&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">relativePath</span>&gt;</span>parentPom.xml<span class="hljs-tag">&lt;/<span class="hljs-name">relativePath</span>&gt;</span><br> <span class="hljs-tag">&lt;/<span class="hljs-name">parent</span>&gt;</span><br></code></pre></td></tr></table></figure></li>
+</ol>
 
                 
               </div>
@@ -333,7 +310,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Leetcode/" class="category-chain-item">Leetcode</a>
+  <a href="/categories/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">Mybatis源码解析</a>
   
   
 
@@ -348,7 +325,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Algorithm/">#Algorithm</a>
+        <a href="/tags/Mybatis/">#Mybatis</a>
       
     </div>
   
@@ -360,8 +337,8 @@
 
   <div class="license-box my-3">
 <!--    <div class="license-title">-->
-<!--      <div>数字范围按位与</div>-->
-<!--      <div>https://xiaohuanxiong3.github.io/2022/09/19/数字范围按位与/</div>-->
+<!--      <div>0-前言</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/05/02/0-前言/</div>-->
 <!--    </div>-->
     <div class="license-meta">
       
@@ -373,7 +350,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年9月19日</div>
+          <div>2023年5月2日</div>
         </div>
       
       
@@ -396,9 +373,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/09/25/%E4%B8%91%E6%95%B0II/" title="丑数II">
+                      <a href="/2023/05/14/1-logging/" title="1-logging">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">丑数II</span>
+                        <span class="hidden-mobile">1-logging</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -406,8 +383,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/09/17/%E4%BC%98%E9%9B%85%E7%9A%84%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF/" title="优雅的解题思路(持续更新)">
-                        <span class="hidden-mobile">优雅的解题思路(持续更新)</span>
+                      <a href="/2022/10/15/%E5%AF%BB%E6%89%BE%E9%87%8D%E5%A4%8D%E6%95%B0/" title="寻找重复数">
+                        <span class="hidden-mobile">寻找重复数</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
