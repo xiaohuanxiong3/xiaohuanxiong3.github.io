@@ -1,0 +1,622 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="ReentrantReadWriteLock    这篇博客我们来阅读 ReentrantReadWriteLock 的源码 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ReentrantReadWriteLock源码解析">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/06/03/ReentrantReadWriteLock%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="ReentrantReadWriteLock    这篇博客我们来阅读 ReentrantReadWriteLock 的源码 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-03T11:32:12.000Z">
+<meta property="article:modified_time" content="2023-06-03T16:08:04.783Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>ReentrantReadWriteLock源码解析 - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/complaint/">
+                <i class="iconfont icon-user-fill"></i>
+                日常吐槽
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="ReentrantReadWriteLock源码解析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-06-03 19:32" pubdate>
+          2023年6月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          15k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          126 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">ReentrantReadWriteLock源码解析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h4 id="ReentrantReadWriteLock"><a href="#ReentrantReadWriteLock" class="headerlink" title="ReentrantReadWriteLock"></a>ReentrantReadWriteLock</h4><p>    这篇博客我们来阅读 ReentrantReadWriteLock 的源码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ReentrantReadWriteLock</span><br>        <span class="hljs-keyword">implements</span> <span class="hljs-title class_">ReadWriteLock</span>, java.io.Serializable &#123; <br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> -<span class="hljs-number">6992448646407690164L</span>;<br>   <br>     <span class="hljs-comment">/** Inner class providing readlock */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ReentrantReadWriteLock.ReadLock readerLock;<br>    <span class="hljs-comment">/** Inner class providing writelock */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ReentrantReadWriteLock.WriteLock writerLock;<br><br>    <span class="hljs-comment">/** Performs all synchronization mechanics */</span><br>    <span class="hljs-keyword">final</span> Sync sync; <br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Creates a new code ReentrantReadWriteLock with</span><br><span class="hljs-comment">     * default (nonfair) ordering properties.</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">ReentrantReadWriteLock</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">// 默认是非公平的</span><br>        <span class="hljs-built_in">this</span>(<span class="hljs-literal">false</span>);<br>    &#125; <br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Creates a new ReentrantReadWriteLock with</span><br><span class="hljs-comment">     * the given fairness policy.</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> fair &#123;<span class="hljs-doctag">@code</span> true&#125; if this lock should use a fair ordering policy</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">ReentrantReadWriteLock</span><span class="hljs-params">(<span class="hljs-type">boolean</span> fair)</span> &#123;<br>        sync = fair ? <span class="hljs-keyword">new</span> <span class="hljs-title class_">FairSync</span>() : <span class="hljs-keyword">new</span> <span class="hljs-title class_">NonfairSync</span>();<br>        readerLock = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReadLock</span>(<span class="hljs-built_in">this</span>);<br>        writerLock = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WriteLock</span>(<span class="hljs-built_in">this</span>);<br>    &#125; <br><br>    <span class="hljs-comment">// 实现 ReadWriteLock 接口的方法 ，提供接口获取读锁的写锁</span><br>    <span class="hljs-keyword">public</span> ReentrantReadWriteLock.WriteLock <span class="hljs-title function_">writeLock</span><span class="hljs-params">()</span> &#123; <span class="hljs-keyword">return</span> writerLock; &#125;<br>    <span class="hljs-keyword">public</span> ReentrantReadWriteLock.ReadLock  <span class="hljs-title function_">readLock</span><span class="hljs-params">()</span>  &#123; <span class="hljs-keyword">return</span> readerLock; &#125;<br><br>    <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Sync</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">AbstractQueuedSynchronizer</span> &#123; <br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> <span class="hljs-number">6317671515068378041L</span>;<br>                <br>        <span class="hljs-comment">// 对读取和写入计数进行抽取的常量和函数</span><br>        <span class="hljs-comment">// 锁定state在逻辑上分为两个无符号short:</span><br>        <span class="hljs-comment">// state低16位表示独占（写）锁持有计数</span><br>        <span class="hljs-comment">// state高16位标识共享（读）锁持有计数</span><br>        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">SHARED_SHIFT</span>   <span class="hljs-operator">=</span> <span class="hljs-number">16</span>;<br>        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">SHARED_UNIT</span>    <span class="hljs-operator">=</span> (<span class="hljs-number">1</span> &lt;&lt; SHARED_SHIFT);<br>        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">MAX_COUNT</span>      <span class="hljs-operator">=</span> (<span class="hljs-number">1</span> &lt;&lt; SHARED_SHIFT) - <span class="hljs-number">1</span>;<br>        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">EXCLUSIVE_MASK</span> <span class="hljs-operator">=</span> (<span class="hljs-number">1</span> &lt;&lt; SHARED_SHIFT) - <span class="hljs-number">1</span>; <br><br>        <span class="hljs-comment">/** Returns the number of shared holds represented in count. */</span><br>        <span class="hljs-comment">// c右移16位，获取高16位</span><br>        <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">sharedCount</span><span class="hljs-params">(<span class="hljs-type">int</span> c)</span>    &#123; <span class="hljs-keyword">return</span> c &gt;&gt;&gt; SHARED_SHIFT; &#125;<br><br>        <span class="hljs-comment">/** Returns the number of exclusive holds represented in count. */</span><br>        <span class="hljs-comment">// 获取c的低16位</span><br>        <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">exclusiveCount</span><span class="hljs-params">(<span class="hljs-type">int</span> c)</span> &#123; <span class="hljs-keyword">return</span> c &amp; EXCLUSIVE_MASK; &#125; <br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * A counter for per-thread read hold counts.</span><br><span class="hljs-comment">         * Maintained as a ThreadLocal; cached in cachedHoldCounter.</span><br><span class="hljs-comment">         * 每个线程共享锁计数</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">HoldCounter</span> &#123;<br>            <span class="hljs-type">int</span> count;          <span class="hljs-comment">// initially 0</span><br>            <span class="hljs-comment">// Use id, not reference, to avoid garbage retention </span><br>            <span class="hljs-comment">// 不持有线程引用，便于垃圾回收</span><br>            <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">tid</span> <span class="hljs-operator">=</span> LockSupport.getThreadId(Thread.currentThread());<br>        &#125; <br><br>        <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ThreadLocalHoldCounter</span><br>            <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ThreadLocal</span>&lt;HoldCounter&gt; &#123;<br>            <span class="hljs-keyword">public</span> HoldCounter <span class="hljs-title function_">initialValue</span><span class="hljs-params">()</span> &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">HoldCounter</span>();<br>            &#125;<br>        &#125; <br><br>        <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * The number of reentrant read locks held by current thread.</span><br><span class="hljs-comment">         * Initialized only in constructor and readObject.</span><br><span class="hljs-comment">         * Removed whenever a thread&#x27;s read hold count drops to 0. </span><br><span class="hljs-comment">         * 当前线程持有的可重入读锁的数量。</span><br><span class="hljs-comment">         * 仅在构造函数和readObject中初始化。每当线程的读保持计数下降到0时移除。</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> ThreadLocalHoldCounter readHolds; <br><br>        <span class="hljs-comment">// 成功获取readLock的最后一个线程的保持计数。</span><br>        <span class="hljs-comment">// 在下一个要释放的线程是最后一个获取的线程的常见情况下，</span><br>        <span class="hljs-comment">// 可以节省ThreadLocal查找</span><br>        <span class="hljs-comment">// 这是非volatile的，因为它只是用作一种启发式步骤，对于要缓存的线程很好</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> HoldCounter cachedHoldCounter;<br><br>        <span class="hljs-comment">// firstReader是第一个获得读锁的线程</span><br>        <span class="hljs-comment">// 更准确地说，firstReader是上一次将共享计数从0更改为1的惟一线程，</span><br>        <span class="hljs-comment">// 并且从那时起就没有释放过读锁；如果没有这样的线程，则为null。</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> Thread firstReader;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> <span class="hljs-type">int</span> firstReaderHoldCount;<br><br>        Sync() &#123;<br>            readHolds = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocalHoldCounter</span>(); <br>            <span class="hljs-comment">// state 是 volatile 变量，保证readHolds的可见性</span><br>            setState(getState()); <span class="hljs-comment">// ensures visibility of readHolds</span><br>        &#125; <br><br>        <span class="hljs-comment">// 获取和释放对公平锁和非公平锁使用相同的代码，</span><br>        <span class="hljs-comment">// 但是在队列非空时，它们 是否/如何 允许入队方面有所不同。</span><br><br><br>        <span class="hljs-comment">// 如果当前线程在尝试获取读锁或者在其他有资格获取读锁的情况下</span><br>        <span class="hljs-comment">// 由于超越其他等待线程而应该被阻塞，则返回true</span><br>        <span class="hljs-keyword">abstract</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">readerShouldBlock</span><span class="hljs-params">()</span>;<br><br>        <span class="hljs-comment">// 和上面方法相似</span><br>        <span class="hljs-keyword">abstract</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">writerShouldBlock</span><span class="hljs-params">()</span>; <br><br>        <span class="hljs-comment">// 注意tryRelease和tryAcquire可以被条件调用。</span><br>        <span class="hljs-comment">// 因此，它们的参数可能包含读取和写入持有量，</span><br>        <span class="hljs-comment">// 这些持有量都是在条件等待期间释放的，并在tryAcquire中重新建立。</span><br>        <span class="hljs-meta">@ReservedStackAccess</span><br>        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryRelease</span><span class="hljs-params">(<span class="hljs-type">int</span> releases)</span> &#123;<br>            <span class="hljs-keyword">if</span> (!isHeldExclusively())<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalMonitorStateException</span>();<br>            <span class="hljs-type">int</span> <span class="hljs-variable">nextc</span> <span class="hljs-operator">=</span> getState() - releases;<br>            <span class="hljs-type">boolean</span> <span class="hljs-variable">free</span> <span class="hljs-operator">=</span> exclusiveCount(nextc) == <span class="hljs-number">0</span>;<br>            <span class="hljs-keyword">if</span> (free)<br>                setExclusiveOwnerThread(<span class="hljs-literal">null</span>);<br>            setState(nextc);<br>            <span class="hljs-keyword">return</span> free;<br>        &#125; <br><br>        <span class="hljs-meta">@ReservedStackAccess</span><br>        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryAcquire</span><span class="hljs-params">(<span class="hljs-type">int</span> acquires)</span> &#123; <br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> Thread.currentThread();<br>            <span class="hljs-type">int</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> getState();<br>            <span class="hljs-type">int</span> <span class="hljs-variable">w</span> <span class="hljs-operator">=</span> exclusiveCount(c);<br>            <span class="hljs-keyword">if</span> (c != <span class="hljs-number">0</span>) &#123;<br>                <span class="hljs-comment">// (Note: if c != 0 and w == 0 then shared count != 0) </span><br>                <span class="hljs-comment">// 读持有非0（正在读的时候其他线程不能获取锁来写？） </span><br>                <span class="hljs-comment">// 或者 锁被其他线程持有</span><br>                <span class="hljs-keyword">if</span> (w == <span class="hljs-number">0</span> || current != getExclusiveOwnerThread())<br>                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>                <span class="hljs-comment">// 当前线程持有锁，但是锁重入超过上限</span><br>                <span class="hljs-keyword">if</span> (w + exclusiveCount(acquires) &gt; MAX_COUNT)<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Maximum lock count exceeded&quot;</span>);<br>                <span class="hljs-comment">// Reentrant acquire</span><br>                setState(c + acquires);<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>            &#125; <br>            <span class="hljs-comment">// 非公平获取写锁应该被阻塞 或者 获取写锁失败</span><br>            <span class="hljs-keyword">if</span> (writerShouldBlock() ||<br>                !compareAndSetState(c, c + acquires))<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>            setExclusiveOwnerThread(current);<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>        &#125; <br><br>        <span class="hljs-meta">@ReservedStackAccess</span><br>        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryReleaseShared</span><span class="hljs-params">(<span class="hljs-type">int</span> unused)</span> &#123;<br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> Thread.currentThread(); <br>            <span class="hljs-comment">// 释放读锁的线程是第一个获取读锁的线程</span><br>            <span class="hljs-keyword">if</span> (firstReader == current) &#123;<br>                <span class="hljs-comment">// assert firstReaderHoldCount &gt; 0;</span><br>                <span class="hljs-keyword">if</span> (firstReaderHoldCount == <span class="hljs-number">1</span>)<br>                    firstReader = <span class="hljs-literal">null</span>;<br>                <span class="hljs-keyword">else</span><br>                    firstReaderHoldCount--;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 其他线程来获取读锁</span><br>                <span class="hljs-type">HoldCounter</span> <span class="hljs-variable">rh</span> <span class="hljs-operator">=</span> cachedHoldCounter;<br>                <span class="hljs-comment">// 判断缓存的 HoldCounter 是否是当前线程的 HoldCounter </span><br>                <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span> ||<br>                    rh.tid != LockSupport.getThreadId(current))<br>                    rh = readHolds.get();<br>                <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> rh.count;<br>                <span class="hljs-keyword">if</span> (count &lt;= <span class="hljs-number">1</span>) &#123;<br>                    <span class="hljs-comment">// 线程取消持有读锁</span><br>                    readHolds.remove();<br>                    <span class="hljs-keyword">if</span> (count &lt;= <span class="hljs-number">0</span>)<br>                        <span class="hljs-keyword">throw</span> unmatchedUnlockException();<br>                &#125;<br>                --rh.count;<br>            &#125;<br>            <span class="hljs-keyword">for</span> (;;) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> getState();<br>                <span class="hljs-comment">// 读锁持有量减1</span><br>                <span class="hljs-type">int</span> <span class="hljs-variable">nextc</span> <span class="hljs-operator">=</span> c - SHARED_UNIT;<br>                <span class="hljs-keyword">if</span> (compareAndSetState(c, nextc))<br>                    <span class="hljs-comment">// 释放读锁对读取者没有影响，</span><br>                    <span class="hljs-comment">// 但是如果读锁和写锁现在都是可获取的，</span><br>                    <span class="hljs-comment">// 它可能使得等待的写入者竞争写锁。</span><br>                    <span class="hljs-keyword">return</span> nextc == <span class="hljs-number">0</span>;<br>            &#125;<br>        &#125; <br><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> IllegalMonitorStateException <span class="hljs-title function_">unmatchedUnlockException</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalMonitorStateException</span>(<br>                <span class="hljs-string">&quot;attempt to unlock read lock, not locked by current thread&quot;</span>);<br>        &#125; <br><br>        <span class="hljs-meta">@ReservedStackAccess</span><br>        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">tryAcquireShared</span><span class="hljs-params">(<span class="hljs-type">int</span> unused)</span> &#123; <br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> Thread.currentThread();<br>            <span class="hljs-type">int</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> getState(); <br>            <span class="hljs-comment">// 写锁被其他线程持有，获取读锁失败</span><br>            <span class="hljs-keyword">if</span> (exclusiveCount(c) != <span class="hljs-number">0</span> &amp;&amp;<br>                getExclusiveOwnerThread() != current)<br>                <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>            <span class="hljs-type">int</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> sharedCount(c);<br>            <span class="hljs-keyword">if</span> (!readerShouldBlock() &amp;&amp;<br>                r &lt; MAX_COUNT &amp;&amp;<br>                compareAndSetState(c, c + SHARED_UNIT)) &#123; <br>                <span class="hljs-comment">// 读持有计数为0即还没有线程持有读锁</span><br>                <span class="hljs-keyword">if</span> (r == <span class="hljs-number">0</span>) &#123;<br>                    firstReader = current;<br>                    firstReaderHoldCount = <span class="hljs-number">1</span>;<br>                &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (firstReader == current) &#123;<br>                    firstReaderHoldCount++;<br>                &#125; <span class="hljs-keyword">else</span> &#123;<br>                    <span class="hljs-type">HoldCounter</span> <span class="hljs-variable">rh</span> <span class="hljs-operator">=</span> cachedHoldCounter;<br>                    <span class="hljs-comment">// 如果缓存的 HoldCounter 不是当前线程持有的 HoldCounter </span><br>                    <span class="hljs-comment">// 从 readHolds 取 并设置 缓存的HoldCounter（cachedHoldCounter）</span><br>                    <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span> ||<br>                        rh.tid != LockSupport.getThreadId(current))<br>                        cachedHoldCounter = rh = readHolds.get();<br>                    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (rh.count == <span class="hljs-number">0</span>) <span class="hljs-comment">// cachedHoldCounter是当前线程持有的HoldCounter</span><br>                        readHolds.set(rh);<br>                    rh.count++;<br>                &#125;<br>                <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>            &#125;<br>            <span class="hljs-keyword">return</span> fullTryAcquireShared(current);<br>        &#125; <br><br>        <span class="hljs-comment">// 获取读锁的完整版本，处理CAS未命中和再次读取的情况，</span><br>        <span class="hljs-comment">// 而tryAcquireShared中没有处理。</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">fullTryAcquireShared</span><span class="hljs-params">(Thread current)</span> &#123;<br>            <span class="hljs-type">HoldCounter</span> <span class="hljs-variable">rh</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>            <span class="hljs-keyword">for</span> (;;) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> getState();<br>                <span class="hljs-comment">// 这里的检查是考虑到并发情况下其他线程持有了写锁</span><br>                <span class="hljs-keyword">if</span> (exclusiveCount(c) != <span class="hljs-number">0</span>) &#123;<br>                    <span class="hljs-keyword">if</span> (getExclusiveOwnerThread() != current)<br>                        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>                    <span class="hljs-comment">// else we hold the exclusive lock; blocking here</span><br>                    <span class="hljs-comment">// would cause deadlock.</span><br>                &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (readerShouldBlock()) &#123;<br>                    <span class="hljs-comment">// Make sure we&#x27;re not acquiring read lock reentrantly </span><br>                    <span class="hljs-comment">// 确保我们不是在再次获取读锁 </span><br>                    <span class="hljs-comment">// 即让其他线程先获取读锁</span><br>                    <span class="hljs-keyword">if</span> (firstReader == current) &#123;<br>                        <span class="hljs-comment">// assert firstReaderHoldCount &gt; 0;</span><br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span>) &#123;<br>                            rh = cachedHoldCounter;<br>                            <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span> ||<br>                                rh.tid != LockSupport.getThreadId(current)) &#123;<br>                                rh = readHolds.get();<br>                                <span class="hljs-keyword">if</span> (rh.count == <span class="hljs-number">0</span>)<br>                                    readHolds.remove();<br>                            &#125;<br>                        &#125; <br>                        <span class="hljs-comment">// 如果线程是第一次获取读锁，直接返回</span><br>                        <span class="hljs-keyword">if</span> (rh.count == <span class="hljs-number">0</span>)<br>                            <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>                    &#125;<br>                &#125;<br>                <span class="hljs-keyword">if</span> (sharedCount(c) == MAX_COUNT)<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Maximum lock count exceeded&quot;</span>);<br>                <span class="hljs-keyword">if</span> (compareAndSetState(c, c + SHARED_UNIT)) &#123;<br>                    <span class="hljs-keyword">if</span> (sharedCount(c) == <span class="hljs-number">0</span>) &#123;<br>                        firstReader = current;<br>                        firstReaderHoldCount = <span class="hljs-number">1</span>;<br>                    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (firstReader == current) &#123;<br>                        firstReaderHoldCount++;<br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span>)<br>                            rh = cachedHoldCounter;<br>                        <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span> ||<br>                            rh.tid != LockSupport.getThreadId(current))<br>                            rh = readHolds.get();<br>                        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (rh.count == <span class="hljs-number">0</span>)<br>                            readHolds.set(rh);<br>                        rh.count++;<br>                        cachedHoldCounter = rh; <span class="hljs-comment">// cache for release</span><br>                    &#125;<br>                    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>                &#125;<br>            &#125;<br>        &#125; <br><br>        <span class="hljs-comment">// 对写操作执行tryLock，在两种模式下都允许。</span><br>        <span class="hljs-comment">// 这实际上与tryAcquire相同，只是缺少对writerShouldBlock的调用。</span><br>        <span class="hljs-meta">@ReservedStackAccess</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryWriteLock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> Thread.currentThread();<br>            <span class="hljs-type">int</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> getState();<br>            <span class="hljs-keyword">if</span> (c != <span class="hljs-number">0</span>) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">w</span> <span class="hljs-operator">=</span> exclusiveCount(c);<br>                <span class="hljs-keyword">if</span> (w == <span class="hljs-number">0</span> || current != getExclusiveOwnerThread())<br>                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>                <span class="hljs-keyword">if</span> (w == MAX_COUNT)<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Maximum lock count exceeded&quot;</span>);<br>            &#125;<br>            <span class="hljs-keyword">if</span> (!compareAndSetState(c, c + <span class="hljs-number">1</span>))<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>            setExclusiveOwnerThread(current);<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>        &#125; <br><br>        <span class="hljs-comment">// 和tryWriteLock类似</span><br>        <span class="hljs-meta">@ReservedStackAccess</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryReadLock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> Thread.currentThread();<br>            <span class="hljs-keyword">for</span> (;;) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> getState();<br>                <span class="hljs-keyword">if</span> (exclusiveCount(c) != <span class="hljs-number">0</span> &amp;&amp;<br>                    getExclusiveOwnerThread() != current)<br>                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> sharedCount(c);<br>                <span class="hljs-keyword">if</span> (r == MAX_COUNT)<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Maximum lock count exceeded&quot;</span>);<br>                <span class="hljs-keyword">if</span> (compareAndSetState(c, c + SHARED_UNIT)) &#123;<br>                    <span class="hljs-keyword">if</span> (r == <span class="hljs-number">0</span>) &#123;<br>                        firstReader = current;<br>                        firstReaderHoldCount = <span class="hljs-number">1</span>;<br>                    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (firstReader == current) &#123;<br>                        firstReaderHoldCount++;<br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-type">HoldCounter</span> <span class="hljs-variable">rh</span> <span class="hljs-operator">=</span> cachedHoldCounter;<br>                        <span class="hljs-keyword">if</span> (rh == <span class="hljs-literal">null</span> ||<br>                            rh.tid != LockSupport.getThreadId(current))<br>                            cachedHoldCounter = rh = readHolds.get();<br>                        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (rh.count == <span class="hljs-number">0</span>)<br>                            readHolds.set(rh);<br>                        rh.count++;<br>                    &#125;<br>                    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>                &#125;<br>            &#125;<br>        &#125; <br><br>        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isHeldExclusively</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-comment">// While we must in general read state before owner,</span><br>            <span class="hljs-comment">// we don&#x27;t need to do so to check if current thread is owner</span><br>            <span class="hljs-keyword">return</span> getExclusiveOwnerThread() == Thread.currentThread();<br>        &#125; <br><br>        <span class="hljs-comment">// 下面是与外部类相关的方法</span><br><br>        <span class="hljs-keyword">final</span> ConditionObject <span class="hljs-title function_">newCondition</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConditionObject</span>();<br>        &#125; <br><br>        <span class="hljs-keyword">final</span> Thread <span class="hljs-title function_">getOwner</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-comment">// Must read state before owner to ensure memory consistency</span><br>            <span class="hljs-keyword">return</span> ((exclusiveCount(getState()) == <span class="hljs-number">0</span>) ?<br>                    <span class="hljs-literal">null</span> :<br>                    getExclusiveOwnerThread());<br>        &#125; <br><br>        <span class="hljs-comment">// 获取读锁数量</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getReadLockCount</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> sharedCount(getState());<br>        &#125; <br><br>        <span class="hljs-comment">// 是否有线程持有写锁</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isWriteLocked</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> exclusiveCount(getState()) != <span class="hljs-number">0</span>;<br>        &#125; <br><br>        <span class="hljs-comment">// 获取当前线程的写锁持有量</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getWriteHoldCount</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> isHeldExclusively() ? exclusiveCount(getState()) : <span class="hljs-number">0</span>;<br>        &#125; <br><br>        <span class="hljs-comment">// 获取当前线程的读锁持有量</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getReadHoldCount</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">if</span> (getReadLockCount() == <span class="hljs-number">0</span>)<br>                <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> Thread.currentThread();<br>            <span class="hljs-keyword">if</span> (firstReader == current)<br>                <span class="hljs-keyword">return</span> firstReaderHoldCount;<br><br>            <span class="hljs-type">HoldCounter</span> <span class="hljs-variable">rh</span> <span class="hljs-operator">=</span> cachedHoldCounter;<br>            <span class="hljs-keyword">if</span> (rh != <span class="hljs-literal">null</span> &amp;&amp; rh.tid == LockSupport.getThreadId(current))<br>                <span class="hljs-keyword">return</span> rh.count;<br><br>            <span class="hljs-type">int</span> <span class="hljs-variable">count</span> <span class="hljs-operator">=</span> readHolds.get().count;<br>            <span class="hljs-keyword">if</span> (count == <span class="hljs-number">0</span>) readHolds.remove();<br>            <span class="hljs-keyword">return</span> count;<br>        &#125; <br><br>        <span class="hljs-comment">// 从流中重新构造实例(即反序列化)。</span><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">readObject</span><span class="hljs-params">(java.io.ObjectInputStream s)</span><br>            <span class="hljs-keyword">throws</span> java.io.IOException, ClassNotFoundException &#123;<br>            s.defaultReadObject();<br>            readHolds = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocalHoldCounter</span>();<br>            setState(<span class="hljs-number">0</span>); <span class="hljs-comment">// reset to unlocked state</span><br>        &#125;<br><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getCount</span><span class="hljs-params">()</span> &#123; <span class="hljs-keyword">return</span> getState(); &#125;<br>    &#125; <br><br>    <span class="hljs-comment">// 同步器的非公平版本</span><br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">NonfairSync</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Sync</span> &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> -<span class="hljs-number">8159625535654395037L</span>;<br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">writerShouldBlock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-comment">// 竞争写锁总是能插队</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; <span class="hljs-comment">// writers can always barge</span><br>        &#125;<br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">readerShouldBlock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-comment">/* As a heuristic to avoid indefinite writer starvation,</span><br><span class="hljs-comment">             * block if the thread that momentarily appears to be head</span><br><span class="hljs-comment">             * of queue, if one exists, is a waiting writer.  This is</span><br><span class="hljs-comment">             * only a probabilistic effect since a new reader will not</span><br><span class="hljs-comment">             * block if there is a waiting writer behind other enabled</span><br><span class="hljs-comment">             * readers that have not yet drained from the queue.</span><br><span class="hljs-comment">             */</span><br>            <span class="hljs-comment">// 如果CLH等待队列中的第一个节点是ExclusiveNode（即一个写入者）</span><br>            <span class="hljs-comment">// 则阻塞，避免写线程匮乏（效果不大）</span><br>            <span class="hljs-keyword">return</span> apparentlyFirstQueuedIsExclusive();<br>        &#125;<br>    &#125; <br><br>    <span class="hljs-comment">// 同步器的公平版本</span><br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FairSync</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Sync</span> &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> -<span class="hljs-number">2274990926593161451L</span>;<br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">writerShouldBlock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> hasQueuedPredecessors();<br>        &#125;<br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">readerShouldBlock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> hasQueuedPredecessors();<br>        &#125;<br>    &#125; <br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ReadLock</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Lock</span>, java.io.Serializable &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> -<span class="hljs-number">5992448646407690164L</span>;<br><br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Sync sync; <br><br>        <span class="hljs-keyword">protected</span> <span class="hljs-title function_">ReadLock</span><span class="hljs-params">(ReentrantReadWriteLock lock)</span> &#123;<br>            sync = lock.sync;<br>        &#125; <br><br>        <span class="hljs-comment">// 获取读锁</span><br>        <span class="hljs-comment">// 如果写锁没有被另一个线程持有，则获取读锁并立即返回。</span><br>        <span class="hljs-comment">// 如果写锁被另一个线程持有，则当前线程出于线程调度的目的被禁用，</span><br>        <span class="hljs-comment">// 并处于休眠状态，直到获得读锁。</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">lock</span><span class="hljs-params">()</span> &#123;<br>            sync.acquireShared(<span class="hljs-number">1</span>);<br>        &#125; <br><br>        <span class="hljs-comment">// 在这个实现中，因为这个方法是一个显式的中断点，</span><br>        <span class="hljs-comment">// 所以优先响应中断，而不是正常的或可重入的锁获取。</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">lockInterruptibly</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>            sync.acquireSharedInterruptibly(<span class="hljs-number">1</span>);<br>        &#125; <br><br>        <span class="hljs-comment">// 仅当调用时另一个线程没有持有写锁时，才获取读锁</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryLock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> sync.tryReadLock();<br>        &#125; <br><br>        <span class="hljs-comment">// 带超时的lock</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryLock</span><span class="hljs-params">(<span class="hljs-type">long</span> timeout, TimeUnit unit)</span><br>                <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>            <span class="hljs-keyword">return</span> sync.tryAcquireSharedNanos(<span class="hljs-number">1</span>, unit.toNanos(timeout));<br>        &#125; <br><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unlock</span><span class="hljs-params">()</span> &#123;<br>            sync.releaseShared(<span class="hljs-number">1</span>);<br>        &#125; <br><br>        <span class="hljs-comment">// 抛出UnsupportedOperationException，因为读锁不支持条件。</span><br>        <span class="hljs-keyword">public</span> Condition <span class="hljs-title function_">newCondition</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UnsupportedOperationException</span>();<br>        &#125; <br><br>        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-type">int</span> <span class="hljs-variable">r</span> <span class="hljs-operator">=</span> sync.getReadLockCount();<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>.toString() +<br>                <span class="hljs-string">&quot;[Read locks = &quot;</span> + r + <span class="hljs-string">&quot;]&quot;</span>;<br>        &#125;<br>    &#125; <br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">WriteLock</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Lock</span>, java.io.Serializable &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> -<span class="hljs-number">4992448646407690164L</span>;<br>       <br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Sync sync;<br><br>        <span class="hljs-keyword">protected</span> <span class="hljs-title function_">WriteLock</span><span class="hljs-params">(ReentrantReadWriteLock lock)</span> &#123;<br>            sync = lock.sync;<br>        &#125; <br><br>        <span class="hljs-comment">// 获取写锁</span><br>        <span class="hljs-comment">// 如果另一个线程既没有持有读锁也没有持有写锁，则获取写锁，并立即返回，</span><br>        <span class="hljs-comment">// 将写锁持有计数设置为1。</span><br>        <span class="hljs-comment">// 如果当前线程已经持有写锁，则持有计数递增1，并且该方法立即返回。</span><br>        <span class="hljs-comment">// 如果该锁被另一个线程持有，则当前线程出于线程调度的目的而被禁用，</span><br>        <span class="hljs-comment">// 并处于休眠状态，直到获得写锁，此时写锁持有计数被设置为1。</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">lock</span><span class="hljs-params">()</span> &#123;<br>            sync.acquire(<span class="hljs-number">1</span>);<br>        &#125; <br><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">lockInterruptibly</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>            sync.acquireInterruptibly(<span class="hljs-number">1</span>);<br>        &#125; <br><br>        <span class="hljs-comment">// 只有读锁和写锁在调用时没有被其他线程持有时，才获取写锁。</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryLock</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> sync.tryWriteLock();<br>        &#125; <br><br>        <span class="hljs-comment">// 带超时的 lock </span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">tryLock</span><span class="hljs-params">(<span class="hljs-type">long</span> timeout, TimeUnit unit)</span><br>                <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>            <span class="hljs-keyword">return</span> sync.tryAcquireNanos(<span class="hljs-number">1</span>, unit.toNanos(timeout));<br>        &#125; <br><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unlock</span><span class="hljs-params">()</span> &#123;<br>            sync.release(<span class="hljs-number">1</span>);<br>        &#125; <br><br>        <span class="hljs-keyword">public</span> Condition <span class="hljs-title function_">newCondition</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> sync.newCondition();<br>        &#125; <br><br>        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-type">Thread</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> sync.getOwner();<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">super</span>.toString() + ((o == <span class="hljs-literal">null</span>) ?<br>                                       <span class="hljs-string">&quot;[Unlocked]&quot;</span> :<br>                                       <span class="hljs-string">&quot;[Locked by thread &quot;</span> + o.getName() + <span class="hljs-string">&quot;]&quot;</span>);<br>        &#125; <br><br>        <span class="hljs-comment">// 判断写锁是否由当前线程持有</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isHeldByCurrentThread</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> sync.isHeldExclusively();<br>        &#125; <br>    <br>        <span class="hljs-comment">// 获取当前线程的写锁持有量</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getHoldCount</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> sync.getWriteHoldCount();<br>        &#125;<br>    &#125; <br><br>    <span class="hljs-comment">// 是否公平</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isFair</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync <span class="hljs-keyword">instanceof</span> FairSync;<br>    &#125; <br><br>    <span class="hljs-comment">// 获取当前持有写锁的线程（没有则返回null）</span><br>    <span class="hljs-keyword">protected</span> Thread <span class="hljs-title function_">getOwner</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync.getOwner();<br>    &#125; <br><br>    <span class="hljs-comment">// 获取读锁数量</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getReadLockCount</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync.getReadLockCount();<br>    &#125; <br><br>    <span class="hljs-comment">// 返回是否有线程持有写锁</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isWriteLocked</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync.isWriteLocked();<br>    &#125; <br><br>    <span class="hljs-comment">// 当前线程是否持有写锁</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isWriteLockedByCurrentThread</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync.isHeldExclusively();<br>    &#125;<br><br>    <span class="hljs-comment">// 获取当前线程的写锁持有量</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getWriteHoldCount</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync.getWriteHoldCount();<br>    &#125; <br><br>    <span class="hljs-comment">// 获取当前线程的读锁持有量</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">getReadHoldCount</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> sync.getReadHoldCount();<br>    &#125;<br><br>    <span class="hljs-comment">// 其他方法是一些提供可观测性的方法，略过</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>    ReentrantReadWriteLock 通过提供读锁和写锁，规定读操作和写操作分别是共享和独占的，降低了锁的粒度，增加了并发度</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/JUC/">#JUC</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>ReentrantReadWriteLock源码解析</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/06/03/ReentrantReadWriteLock源码解析/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年6月3日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/06/09/4-parsing/" title="4-parsing">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">4-parsing</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/03/CountDownLatch%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" title="CountDownLatch源码解析">
+                        <span class="hidden-mobile">CountDownLatch源码解析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
