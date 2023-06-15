@@ -1,0 +1,734 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="之前我一直以为SpringBoot的自动配置由 @EnableAutoConfiguration开启的，在看完源码后，发现是我天真了，下面我们就来根据SpringBoot和Spring的源码来一探究竟（为了行文方便，下面我会按照SpringBoot启动的流程来进行讲解，其实我在研究的时候是逆推的） @SpringBootApplication首先看看SpringBoot应用程序的标志性注解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot自动配置浅析">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/06/11/SpringBoot%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E6%B5%85%E6%9E%90/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="之前我一直以为SpringBoot的自动配置由 @EnableAutoConfiguration开启的，在看完源码后，发现是我天真了，下面我们就来根据SpringBoot和Spring的源码来一探究竟（为了行文方便，下面我会按照SpringBoot启动的流程来进行讲解，其实我在研究的时候是逆推的） @SpringBootApplication首先看看SpringBoot应用程序的标志性注解">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-11T13:44:50.000Z">
+<meta property="article:modified_time" content="2023-06-15T07:44:50.759Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>SpringBoot自动配置浅析 - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/complaint/">
+                <i class="iconfont icon-user-fill"></i>
+                日常吐槽
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="SpringBoot自动配置浅析"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-06-11 21:44" pubdate>
+          2023年6月11日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          43k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          363 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">SpringBoot自动配置浅析</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>    之前我一直以为SpringBoot的自动配置由 <code>@EnableAutoConfiguration</code>开启的，在看完源码后，发现是我天真了，下面我们就来根据SpringBoot和Spring的源码来一探究竟（为了行文方便，下面我会按照SpringBoot启动的流程来进行讲解，其实我在研究的时候是逆推的）</p>
+<h3 id="SpringBootApplication"><a href="#SpringBootApplication" class="headerlink" title="@SpringBootApplication"></a>@SpringBootApplication</h3><p>首先看看SpringBoot应用程序的标志性注解 <code>@SpringBootApplication</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Documented</span><br><span class="hljs-meta">@Inherited</span><br><span class="hljs-meta">@SpringBootConfiguration</span><br><span class="hljs-meta">@EnableAutoConfiguration</span><br><span class="hljs-meta">@ComponentScan(excludeFilters = &#123; @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),</span><br><span class="hljs-meta">        @Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) &#125;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> SpringBootApplication &#123; <br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>除开一些常用的注解外，发现这个注解又由 <code>@SpringBootConfiguration 、@EnableAutoConfiguration、@ComponentScan</code> 三个注解修饰</p>
+<p>点开<code>@SpringBootConfiguration</code>，发现其由 <code>@Configuration</code>注解修饰，这表示SpringBoot应用程序的入口类是一个配置类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Target(&#123;ElementType.TYPE&#125;)</span><br><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Documented</span><br><span class="hljs-meta">@Configuration</span><br><span class="hljs-meta">@Indexed</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> SpringBootConfiguration &#123;<br>    <span class="hljs-meta">@AliasFor(</span><br><span class="hljs-meta">        annotation = Configuration.class</span><br><span class="hljs-meta">    )</span><br>    <span class="hljs-type">boolean</span> <span class="hljs-title function_">proxyBeanMethods</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> <span class="hljs-literal">true</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后就是令人期待的  <code>@EnableAutoConfiguration</code>，看到了<code> @Import</code> 和<br><code>@AutoConfigurationPackage</code>（这个注解里面也是一个 <code>@Import</code>），<code>@Import</code>注解的作用后续再说</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Documented</span><br><span class="hljs-meta">@Inherited</span><br><span class="hljs-meta">@AutoConfigurationPackage</span><br><span class="hljs-meta">@Import(AutoConfigurationImportSelector.class)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> EnableAutoConfiguration &#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Environment property that can be used to override when auto-configuration is</span><br><span class="hljs-comment">     * enabled.</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">ENABLED_OVERRIDE_PROPERTY</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;spring.boot.enableautoconfiguration&quot;</span>;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Exclude specific auto-configuration classes such that they will never be applied.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> the classes to exclude</span><br><span class="hljs-comment">     */</span><br>    Class&lt;?&gt;[] exclude() <span class="hljs-keyword">default</span> &#123;&#125;;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Exclude specific auto-configuration class names such that they will never be</span><br><span class="hljs-comment">     * applied.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> the class names to exclude</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 1.3.0</span><br><span class="hljs-comment">     */</span><br>    String[] excludeName() <span class="hljs-keyword">default</span> &#123;&#125;;<br><br>&#125; <br><br><br><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Documented</span><br><span class="hljs-meta">@Inherited</span><br><span class="hljs-meta">@Import(AutoConfigurationPackages.Registrar.class)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> AutoConfigurationPackage &#123;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Base packages that should be registered with &#123;<span class="hljs-doctag">@link</span> AutoConfigurationPackages&#125;.</span><br><span class="hljs-comment">     * &lt;p&gt;</span><br><span class="hljs-comment">     * Use &#123;<span class="hljs-doctag">@link</span> #basePackageClasses&#125; for a type-safe alternative to String-based package</span><br><span class="hljs-comment">     * names.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> the back package names</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 2.3.0</span><br><span class="hljs-comment">     */</span><br>    String[] basePackages() <span class="hljs-keyword">default</span> &#123;&#125;;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * Type-safe alternative to &#123;<span class="hljs-doctag">@link</span> #basePackages&#125; for specifying the packages to be</span><br><span class="hljs-comment">     * registered with &#123;<span class="hljs-doctag">@link</span> AutoConfigurationPackages&#125;.</span><br><span class="hljs-comment">     * &lt;p&gt;</span><br><span class="hljs-comment">     * Consider creating a special no-op marker class or interface in each package that</span><br><span class="hljs-comment">     * serves no purpose other than being referenced by this attribute.</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@return</span> the base package classes</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@since</span> 2.3.0</span><br><span class="hljs-comment">     */</span><br>    Class&lt;?&gt;[] basePackageClasses() <span class="hljs-keyword">default</span> &#123;&#125;;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后 <code>@ComponentScan</code> 在这里只提供了两个 excludeFilter，这个在之后包扫描的时候会用来排除相应的 Configuration 类</p>
+<h3 id="SpringApplication-run"><a href="#SpringApplication-run" class="headerlink" title="SpringApplication.run"></a>SpringApplication.run</h3><p>    下面我们跟着 <code>SpringApplication.run(Application.class, args);</code>的执行流程大致看一下SpringBoot容器启动的过程中做了哪些与自动配置相关的操作</p>
+<p>一直点，到达 <code>public ConfigurableApplicationContext run(String... args)</code> 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">StopWatch</span> <span class="hljs-variable">stopWatch</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StopWatch</span>();<br>        ...<br><br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-type">ApplicationArguments</span> <span class="hljs-variable">applicationArguments</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DefaultApplicationArguments</span>(args);<br>            <span class="hljs-type">ConfigurableEnvironment</span> <span class="hljs-variable">environment</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.prepareEnvironment(listeners, bootstrapContext, applicationArguments);<br>            <span class="hljs-built_in">this</span>.configureIgnoreBeanInfo(environment);<br>            <span class="hljs-type">Banner</span> <span class="hljs-variable">printedBanner</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.printBanner(environment); <br>            <span class="hljs-comment">// 创建上下文</span><br>            context = <span class="hljs-built_in">this</span>.createApplicationContext();<br>            context.setApplicationStartup(<span class="hljs-built_in">this</span>.applicationStartup);<br>            <span class="hljs-built_in">this</span>.prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);<br>            <span class="hljs-comment">// refreshContext其实就是调用的 AbstractApplicationContext的refresh</span><br>            <span class="hljs-built_in">this</span>.refreshContext(context);<br>            <span class="hljs-built_in">this</span>.afterRefresh(context, applicationArguments);<br>            stopWatch.stop();<br>            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.logStartupInfo) &#123;<br>                (<span class="hljs-keyword">new</span> <span class="hljs-title class_">StartupInfoLogger</span>(<span class="hljs-built_in">this</span>.mainApplicationClass)).logStarted(<span class="hljs-built_in">this</span>.getApplicationLog(), stopWatch);<br>            &#125;<br><br>            listeners.started(context);<br>            <span class="hljs-built_in">this</span>.callRunners(context, applicationArguments);<br>        &#125; <span class="hljs-keyword">catch</span> (Throwable var10) &#123;<br>            <span class="hljs-built_in">this</span>.handleRunFailure(context, var10, listeners);<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(var10);<br>        &#125;<br><br>        ...<br></code></pre></td></tr></table></figure>
+
+<h4 id="this-createApplicationContext"><a href="#this-createApplicationContext" class="headerlink" title="this.createApplicationContext"></a>this.createApplicationContext</h4><p>根据代码可以看到创建上下文是委托给 <code>applicationContextFactory </code>来完成的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> ConfigurableApplicationContext <span class="hljs-title function_">createApplicationContext</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.applicationContextFactory.create(<span class="hljs-built_in">this</span>.webApplicationType);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>而这个 <code>applicationContextFactory</code>在初始化时 赋值为 <code>ApplicationContextFactory.DEFAULT</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-type">ApplicationContextFactory</span> <span class="hljs-variable">DEFAULT</span> <span class="hljs-operator">=</span> (webApplicationType) -&gt; &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">switch</span> (webApplicationType) &#123;<br>            <span class="hljs-keyword">case</span> SERVLET:<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AnnotationConfigServletWebServerApplicationContext</span>();<br>            <span class="hljs-keyword">case</span> REACTIVE:<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AnnotationConfigReactiveWebServerApplicationContext</span>();<br>            <span class="hljs-keyword">default</span>:<br>                <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AnnotationConfigApplicationContext</span>();<br>        &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (Exception var2) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Unable create a default ApplicationContext instance, you may need a custom ApplicationContextFactory&quot;</span>, var2);<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>而根据 <code>ApplicationContextFactory.DEFAULT</code> 的代码可以看到是根据 <code>webApplicationType </code>来创建应用上下文</p>
+<p>具体的细节不谈，这里我们只需要直到这三个应用上下文的初始化方法中都有这一行</p>
+<p><code>this.reader = new AnnotatedBeanDefinitionReader(this);</code></p>
+<p>点进去看看，发现在 <code>AnnotatedBeanDefinitionReader</code>初始化的时候调用了 <code>AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);</code></p>
+<p>看方法名猜测这个方法应该是注册了一些配置处理器</p>
+<p>再点进去看看，一直到 <code> public static Set&lt;BeanDefinitionHolder&gt; registerAnnotationConfigProcessors(BeanDefinitionRegistry registry, @Nullable Object source)</code> 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Set&lt;BeanDefinitionHolder&gt; <span class="hljs-title function_">registerAnnotationConfigProcessors</span><span class="hljs-params">(BeanDefinitionRegistry registry, <span class="hljs-meta">@Nullable</span> Object source)</span> &#123;<br>        ...<br><br>        Set&lt;BeanDefinitionHolder&gt; beanDefs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashSet</span>(<span class="hljs-number">8</span>);<br>        RootBeanDefinition def;<br>        <span class="hljs-keyword">if</span> (!registry.containsBeanDefinition(<span class="hljs-string">&quot;org.springframework.context.annotation.internalConfigurationAnnotationProcessor&quot;</span>)) &#123; <br>            <span class="hljs-comment">// 这里的 ConfigurationClassPostProcessor 是咱们今天的主角</span><br>            def = <span class="hljs-keyword">new</span> <span class="hljs-title class_">RootBeanDefinition</span>(ConfigurationClassPostProcessor.class);<br>            def.setSource(source);<br>            <span class="hljs-comment">// 可以看到这里是把 ConfigurationClassPostProcessor 注册到了IOC容器中</span><br>            <span class="hljs-comment">// 也就是容器刚创建时就往IOC容器中塞了好几个 BeanFactoryPostProcessor</span><br>            beanDefs.add(registerPostProcessor(registry, def, <span class="hljs-string">&quot;org.springframework.context.annotation.internalConfigurationAnnotationProcessor&quot;</span>));<br>        &#125;<br><br>        ...<br><br>        <span class="hljs-keyword">return</span> beanDefs;<br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="this-prepareContext"><a href="#this-prepareContext" class="headerlink" title="this.prepareContext"></a>this.prepareContext</h4><p>下面我们来看一下  <code>this.prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);</code></p>
+<p>本文我们主要关注 <code>this.load(context, sources.toArray(new Object[0]));</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">load</span><span class="hljs-params">(ApplicationContext context, Object[] sources)</span> &#123;<br>    <span class="hljs-keyword">if</span> (logger.isDebugEnabled()) &#123;<br>        logger.debug(<span class="hljs-string">&quot;Loading source &quot;</span> + StringUtils.arrayToCommaDelimitedString(sources));<br>    &#125;<br><br>    <span class="hljs-type">BeanDefinitionLoader</span> <span class="hljs-variable">loader</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.createBeanDefinitionLoader(<span class="hljs-built_in">this</span>.getBeanDefinitionRegistry(context), sources);<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.beanNameGenerator != <span class="hljs-literal">null</span>) &#123;<br>        loader.setBeanNameGenerator(<span class="hljs-built_in">this</span>.beanNameGenerator);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.resourceLoader != <span class="hljs-literal">null</span>) &#123;<br>        loader.setResourceLoader(<span class="hljs-built_in">this</span>.resourceLoader);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.environment != <span class="hljs-literal">null</span>) &#123;<br>        loader.setEnvironment(<span class="hljs-built_in">this</span>.environment);<br>    &#125;<br><br>    loader.load();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>发现这个方法里先是定义了一个 <code>BeanDefinitionLoader</code> ，然后通过 <code>BeanDefinitionLoader.load()</code>进行load</p>
+<p>然后再点点点</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">load</span><span class="hljs-params">(Object source)</span> &#123;<br>    Assert.notNull(source, <span class="hljs-string">&quot;Source must not be null&quot;</span>);<br>    <span class="hljs-keyword">if</span> (source <span class="hljs-keyword">instanceof</span> Class) &#123;<br>        <span class="hljs-built_in">this</span>.load((Class)source);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (source <span class="hljs-keyword">instanceof</span> Resource) &#123;<br>        <span class="hljs-built_in">this</span>.load((Resource)source);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (source <span class="hljs-keyword">instanceof</span> Package) &#123;<br>        <span class="hljs-built_in">this</span>.load((Package)source);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (source <span class="hljs-keyword">instanceof</span> CharSequence) &#123;<br>        <span class="hljs-built_in">this</span>.load((CharSequence)source);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Invalid source type &quot;</span> + source.getClass());<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到这里根据 source的类型选择了不同的方法</p>
+<p>让我们回到 <code>SpringApplication.run(Application.class, args);</code>在构造方法的调用过程中看到了这样一个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> ConfigurableApplicationContext <span class="hljs-title function_">run</span><span class="hljs-params">(Class&lt;?&gt;[] primarySources, String[] args)</span> &#123;<br>    <span class="hljs-keyword">return</span> (<span class="hljs-keyword">new</span> <span class="hljs-title class_">SpringApplication</span>(primarySources)).run(args);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到这是将 <code>Application.class</code>作为参数传给了 <code>SpringApplication</code></p>
+<p>而在 <code>SpringApplication</code>的构造方法中有这么一行代码 <code>this.primarySources = new LinkedHashSet(Arrays.asList(primarySources));</code></p>
+<p>我们再回来，看看传给 <code>this.load(context, sources.toArray(new Object[0]));</code>的sources有哪些元素</p>
+<p>根据上下文知道  <code>Set&lt;Object&gt; sources = this.getAllSources();</code></p>
+<p>点进去看看</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> Set&lt;Object&gt; <span class="hljs-title function_">getAllSources</span><span class="hljs-params">()</span> &#123;<br>    Set&lt;Object&gt; allSources = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashSet</span>();<br>    <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(<span class="hljs-built_in">this</span>.primarySources)) &#123;<br>        allSources.addAll(<span class="hljs-built_in">this</span>.primarySources);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!CollectionUtils.isEmpty(<span class="hljs-built_in">this</span>.sources)) &#123;<br>        allSources.addAll(<span class="hljs-built_in">this</span>.sources);<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> Collections.unmodifiableSet(allSources);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>发现 <code>primarySources </code>在sources中，所以知道 Application.class 也被load了</p>
+<p>点进 <code>load(Class&lt;?&gt; source)</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">load</span><span class="hljs-params">(Class&lt;?&gt; source)</span> &#123; <br>    <span class="hljs-comment">// 这个条件一看就不满足</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.isGroovyPresent() &amp;&amp; GroovyBeanDefinitionSource.class.isAssignableFrom(source)) &#123;<br>        <span class="hljs-type">GroovyBeanDefinitionSource</span> <span class="hljs-variable">loader</span> <span class="hljs-operator">=</span> (GroovyBeanDefinitionSource)BeanUtils.instantiateClass(source, GroovyBeanDefinitionSource.class);<br>        ((GroovyBeanDefinitionReader)<span class="hljs-built_in">this</span>.groovyReader).beans(loader.getBeans());<br>    &#125;<br><br>    <span class="hljs-comment">// 这个条件成立</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.isEligible(source)) &#123;<br>        <span class="hljs-comment">// 在这里将 SpringBoot应用程序的入口类注册到了 IOC 容器中</span><br>        <span class="hljs-comment">// 有兴趣的同学可以自己深入了解或者debug一下看看是不是这样</span><br>        <span class="hljs-built_in">this</span>.annotatedReader.register(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;source&#125;);<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>至此，我们知道了应用程序上下文在创建的时候就向IOC容器中注册了几个 <code>BeanFactoryPostProcessor</code>，其中包括我们今天的主角 <code>ConfigurationClassPostProcessor</code>，并且在<code>this.prepareContext</code>将SpringBoot应用程序的入口类也注册进了IOC容器中</p>
+<h4 id="this-refreshContext"><a href="#this-refreshContext" class="headerlink" title="this.refreshContext"></a>this.refreshContext</h4><p>    下面就进入到了 AbstractApplicationContext 中的refresh 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">refresh</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> BeansException, IllegalStateException &#123;<br>	<span class="hljs-keyword">synchronized</span> (<span class="hljs-built_in">this</span>.startupShutdownMonitor) &#123;<br>		<span class="hljs-type">StartupStep</span> <span class="hljs-variable">contextRefresh</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.applicationStartup.start(<span class="hljs-string">&quot;spring.context.refresh&quot;</span>);<br><br>		<span class="hljs-comment">// Prepare this context for refreshing.</span><br>		<span class="hljs-comment">// 准备刷新的上下文环境</span><br>		prepareRefresh();<br><br>		<span class="hljs-comment">// Tell the subclass to refresh the internal bean factory.</span><br>		<span class="hljs-comment">// 初始化BeanFactory，并进行XML文件读取</span><br>		<span class="hljs-type">ConfigurableListableBeanFactory</span> <span class="hljs-variable">beanFactory</span> <span class="hljs-operator">=</span> obtainFreshBeanFactory();<br><br>		<span class="hljs-comment">// Prepare the bean factory for use in this context.</span><br>		<span class="hljs-comment">// 对BeanFactory进行各种功能优化</span><br>		prepareBeanFactory(beanFactory);<br><br>		<span class="hljs-keyword">try</span> &#123;<br>			<span class="hljs-comment">// Allows post-processing of the bean factory in context subclasses.</span><br>			<span class="hljs-comment">// 子类覆盖方法做额外的处理</span><br>			postProcessBeanFactory(beanFactory);<br><br>			<span class="hljs-type">StartupStep</span> <span class="hljs-variable">beanPostProcess</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.applicationStartup.start(<span class="hljs-string">&quot;spring.context.beans.post-process&quot;</span>);<br>			<span class="hljs-comment">// Invoke factory processors registered as beans in the context.	</span><br>			<span class="hljs-comment">// 激活各种BeanFactory处理器</span><br>            invokeBeanFactoryPostProcessors(beanFactory);<br><br>			<span class="hljs-comment">// Register bean processors that intercept bean creation.</span><br>			<span class="hljs-comment">// 注册拦截Bean创建的Bean处理器，这里只是注册，真正的调用是在getBean的时候</span><br>			registerBeanPostProcessors(beanFactory);<br>			beanPostProcess.end();<br><br>			<span class="hljs-comment">// Initialize message source for this context.</span><br>			<span class="hljs-comment">// 为上下文初始化Message源，即不同语言的消息体，国际化处理</span><br>			initMessageSource();<br><br>			<span class="hljs-comment">// Initialize event multicaster for this context.</span><br>			<span class="hljs-comment">// 初始化应用消息广播器，并放入&quot;applicationEventMulticaster&quot; bean 中</span><br>			initApplicationEventMulticaster();<br><br>			<span class="hljs-comment">// Initialize other special beans in specific context subclasses.</span><br>			<span class="hljs-comment">// 留给子类来初始化其他的bean</span><br>			onRefresh();<br><br>			<span class="hljs-comment">// Check for listener beans and register them.</span><br>			<span class="hljs-comment">// 在所有注册的bean中查找Listener bean，注册到消息广播器中</span><br>			registerListeners();<br><br>			<span class="hljs-comment">// Instantiate all remaining (non-lazy-init) singletons.</span><br>			<span class="hljs-comment">// 初始化剩下的单实例（非惰性的）</span><br>			finishBeanFactoryInitialization(beanFactory);<br><br>			<span class="hljs-comment">// Last step: publish corresponding event.</span><br>			<span class="hljs-comment">// 完成刷新过程，通知生命周期处理器lifecycleProcessor刷新过程，同时发出</span><br>			<span class="hljs-comment">// ContextRefreshEvent通知别人</span><br>			finishRefresh();<br>		&#125;<br><br>		<span class="hljs-keyword">catch</span> (BeansException ex) &#123;<br>			<span class="hljs-keyword">if</span> (logger.isWarnEnabled()) &#123;<br>				logger.warn(<span class="hljs-string">&quot;Exception encountered during context initialization - &quot;</span> +<br>						<span class="hljs-string">&quot;cancelling refresh attempt: &quot;</span> + ex);<br>			&#125;<br><br>			<span class="hljs-comment">// Destroy already created singletons to avoid dangling resources.</span><br>			destroyBeans();<br><br>			<span class="hljs-comment">// Reset &#x27;active&#x27; flag.</span><br>			cancelRefresh(ex);<br><br>			<span class="hljs-comment">// Propagate exception to caller.</span><br>			<span class="hljs-keyword">throw</span> ex;<br>		&#125;<br><br>		<span class="hljs-keyword">finally</span> &#123;<br>			<span class="hljs-comment">// Reset common introspection caches in Spring&#x27;s core, since we</span><br>			<span class="hljs-comment">// might not ever need metadata for singleton beans anymore...</span><br>			resetCommonCaches();<br>			contextRefresh.end();<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>因为今天的主角是 一个 BeanFactoryPostProcessor，所以我们只关注 <code>invokeBeanFactoryPostProcessors(beanFactory);</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">invokeBeanFactoryPostProcessors</span><span class="hljs-params">(ConfigurableListableBeanFactory beanFactory)</span> &#123;<br>	PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors());<br><br>	<span class="hljs-comment">// Detect a LoadTimeWeaver and prepare for weaving, if found in the meantime</span><br>	<span class="hljs-comment">// (e.g. through an @Bean method registered by ConfigurationClassPostProcessor)</span><br>	<span class="hljs-keyword">if</span> (!NativeDetector.inNativeImage() &amp;&amp; beanFactory.getTempClassLoader() == <span class="hljs-literal">null</span> &amp;&amp; beanFactory.containsBean(LOAD_TIME_WEAVER_BEAN_NAME)) &#123;<br>		beanFactory.addBeanPostProcessor(<span class="hljs-keyword">new</span> <span class="hljs-title class_">LoadTimeWeaverAwareProcessor</span>(beanFactory));<br>		beanFactory.setTempClassLoader(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ContextTypeMatchClassLoader</span>(beanFactory.getBeanClassLoader()));<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>点进去发现对 <code>BeanFactoryPostProcessor </code>相关方法的调用委托给了 <code>PostProcessorRegistrationDelegate</code></p>
+<blockquote>
+<p>注意，执行到这里的时候 <code>getBeanFactoryPostProcessors()</code>默认情况下返回的集合元素个数为0，除非在这之前手动调用了 <code>addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor)</code>方法</p>
+</blockquote>
+<p>在 <code>PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(beanFactory, getBeanFactoryPostProcessors())</code>中主要看下面一行代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">String[] postProcessorNames =<br>	beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, <span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>);<br></code></pre></td></tr></table></figure>
+
+<p>顾名思义，这行代码从IOC容器中获取所有实现了 <code>BeanDefinitionRegistryPostProcessor </code>接口的bean的名称，不巧的是 <code>ConfigurationClassPostProcessor</code>实现了这个接口（方法中还对实现了<code>BeanDefinitionRegistryPostProcessor </code>接口的类进行了排序）</p>
+<blockquote>
+<p>注意：</p>
+<p><code>BeanDefinitionRegistryPostProcessor </code>实现了 <code>BeanFactoryPostProcessor</code>接口</p>
+</blockquote>
+<p>然后是 <code>invokeBeanDefinitionRegistryPostProcessors(currentRegistryProcessors, registry, beanFactory.getApplicationStartup());</code>  和 <code>invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">invokeBeanDefinitionRegistryPostProcessors</span><span class="hljs-params">(</span><br><span class="hljs-params">		Collection&lt;? extends BeanDefinitionRegistryPostProcessor&gt; postProcessors, BeanDefinitionRegistry registry, ApplicationStartup applicationStartup)</span> &#123;<br><br>	<span class="hljs-keyword">for</span> (BeanDefinitionRegistryPostProcessor postProcessor : postProcessors) &#123;<br>		<span class="hljs-type">StartupStep</span> <span class="hljs-variable">postProcessBeanDefRegistry</span> <span class="hljs-operator">=</span> applicationStartup.start(<span class="hljs-string">&quot;spring.context.beandef-registry.post-process&quot;</span>)<br>				.tag(<span class="hljs-string">&quot;postProcessor&quot;</span>, postProcessor::toString);<br>		postProcessor.postProcessBeanDefinitionRegistry(registry);<br>		postProcessBeanDefRegistry.end();<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>对每个 <code>BeanDefinitionRegistryPostProcessor</code>，调用其 <code>postProcessBeanDefinitionRegistry </code>方法和 <code>postProcessBeanFactory </code> 方法</p>
+<p>由于咱们的 <code>ConfigurationClassPostProcessor </code>也在其中，下面就去看它具体做了什么</p>
+<h4 id="ConfigurationClassPostProcessor-postProcessBeanDefinitionRegistry"><a href="#ConfigurationClassPostProcessor-postProcessBeanDefinitionRegistry" class="headerlink" title="ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry"></a>ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Derive further bean definitions from the configuration classes in the registry. </span><br><span class="hljs-comment"> * 从registry中的配置类派生更多的bean定义。</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">postProcessBeanDefinitionRegistry</span><span class="hljs-params">(BeanDefinitionRegistry registry)</span> &#123;<br>	<span class="hljs-type">int</span> <span class="hljs-variable">registryId</span> <span class="hljs-operator">=</span> System.identityHashCode(registry);<br>	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.registriesPostProcessed.contains(registryId)) &#123;<br>		<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<br>				<span class="hljs-string">&quot;postProcessBeanDefinitionRegistry already called on this post-processor against &quot;</span> + registry);<br>	&#125;<br>	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.factoriesPostProcessed.contains(registryId)) &#123;<br>		<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<br>				<span class="hljs-string">&quot;postProcessBeanFactory already called on this post-processor against &quot;</span> + registry);<br>	&#125;<br>	<span class="hljs-built_in">this</span>.registriesPostProcessed.add(registryId);<br><br>	processConfigBeanDefinitions(registry);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>点进 <code>processConfigBeanDefinitions(registry)</code> 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processConfigBeanDefinitions</span><span class="hljs-params">(BeanDefinitionRegistry registry)</span> &#123;<br>	List&lt;BeanDefinitionHolder&gt; configCandidates = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;(); <br>    <span class="hljs-comment">// 获取容器中所有的bean名称，注意到这里可以获取到SpringBoot应用程序</span><br>    <span class="hljs-comment">// 的入口类对应的bean的名称</span><br>	String[] candidateNames = registry.getBeanDefinitionNames();<br><br>	<span class="hljs-keyword">for</span> (String beanName : candidateNames) &#123;<br>		<span class="hljs-type">BeanDefinition</span> <span class="hljs-variable">beanDef</span> <span class="hljs-operator">=</span> registry.getBeanDefinition(beanName); <br>        <span class="hljs-comment">// 判断bean是否被处理过</span><br>		<span class="hljs-keyword">if</span> (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != <span class="hljs-literal">null</span>) &#123;<br>			<span class="hljs-keyword">if</span> (logger.isDebugEnabled()) &#123;<br>				logger.debug(<span class="hljs-string">&quot;Bean definition has already been processed as a configuration class: &quot;</span> + beanDef);<br>			&#125;<br>		&#125; <br>        <span class="hljs-comment">// 这里判断bean是否满足条件</span><br>        <span class="hljs-comment">// 具体的条件是类被 @Configuration 修饰</span><br>        <span class="hljs-comment">// 然后下面两项条件满足一项即可</span><br>        <span class="hljs-comment">// 1. @Configuration 注解的 proxyBeanMethods 属性为true</span><br>        <span class="hljs-comment">// 2. 类同时被 @Component 或者 @ComponentScan 或者 @Import 或者</span><br>        <span class="hljs-comment">// @ImportResource 注解修饰 或者类有方法被@Bean注解修饰</span><br>		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ConfigurationClassUtils.checkConfigurationClassCandidate(beanDef, <span class="hljs-built_in">this</span>.metadataReaderFactory)) &#123;<br>			configCandidates.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BeanDefinitionHolder</span>(beanDef, beanName));<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// Return immediately if no @Configuration classes were found</span><br>	<span class="hljs-keyword">if</span> (configCandidates.isEmpty()) &#123;<br>		<span class="hljs-keyword">return</span>;<br>	&#125;<br><br>	<span class="hljs-comment">// Sort by previously determined @Order value, if applicable</span><br>	configCandidates.sort((bd1, bd2) -&gt; &#123;<br>		<span class="hljs-type">int</span> <span class="hljs-variable">i1</span> <span class="hljs-operator">=</span> ConfigurationClassUtils.getOrder(bd1.getBeanDefinition());<br>		<span class="hljs-type">int</span> <span class="hljs-variable">i2</span> <span class="hljs-operator">=</span> ConfigurationClassUtils.getOrder(bd2.getBeanDefinition());<br>		<span class="hljs-keyword">return</span> Integer.compare(i1, i2);<br>	&#125;);<br><br>	<span class="hljs-comment">// Detect any custom bean name generation strategy supplied through the enclosing application context</span><br>	<span class="hljs-type">SingletonBeanRegistry</span> <span class="hljs-variable">sbr</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>	<span class="hljs-keyword">if</span> (registry <span class="hljs-keyword">instanceof</span> SingletonBeanRegistry) &#123;<br>		sbr = (SingletonBeanRegistry) registry;<br>		<span class="hljs-keyword">if</span> (!<span class="hljs-built_in">this</span>.localBeanNameGeneratorSet) &#123;<br>			<span class="hljs-type">BeanNameGenerator</span> <span class="hljs-variable">generator</span> <span class="hljs-operator">=</span> (BeanNameGenerator) sbr.getSingleton(<br>					AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);<br>			<span class="hljs-keyword">if</span> (generator != <span class="hljs-literal">null</span>) &#123;<br>				<span class="hljs-built_in">this</span>.componentScanBeanNameGenerator = generator;<br>				<span class="hljs-built_in">this</span>.importBeanNameGenerator = generator;<br>			&#125;<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.environment == <span class="hljs-literal">null</span>) &#123;<br>		<span class="hljs-built_in">this</span>.environment = <span class="hljs-keyword">new</span> <span class="hljs-title class_">StandardEnvironment</span>();<br>	&#125;<br><br>	<span class="hljs-comment">// Parse each @Configuration class</span><br>	<span class="hljs-type">ConfigurationClassParser</span> <span class="hljs-variable">parser</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassParser</span>(<br>			<span class="hljs-built_in">this</span>.metadataReaderFactory, <span class="hljs-built_in">this</span>.problemReporter, <span class="hljs-built_in">this</span>.environment,<br>			<span class="hljs-built_in">this</span>.resourceLoader, <span class="hljs-built_in">this</span>.componentScanBeanNameGenerator, registry);<br><br>	Set&lt;BeanDefinitionHolder&gt; candidates = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashSet</span>&lt;&gt;(configCandidates);<br>	Set&lt;ConfigurationClass&gt; alreadyParsed = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;(configCandidates.size());<br>	<span class="hljs-keyword">do</span> &#123;<br>		<span class="hljs-type">StartupStep</span> <span class="hljs-variable">processConfig</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.applicationStartup.start(<span class="hljs-string">&quot;spring.context.config-classes.parse&quot;</span>);<br>		<span class="hljs-comment">// 委托 ConfigurationClassParser 处理候选的 配置类</span><br>        parser.parse(candidates);<br>		parser.validate();<br><br>		Set&lt;ConfigurationClass&gt; configClasses = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashSet</span>&lt;&gt;(parser.getConfigurationClasses());<br>		configClasses.removeAll(alreadyParsed);<br><br>		<span class="hljs-comment">// Read the model and create bean definitions based on its content</span><br>		<span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.reader == <span class="hljs-literal">null</span>) &#123;<br>			<span class="hljs-built_in">this</span>.reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassBeanDefinitionReader</span>(<br>					registry, <span class="hljs-built_in">this</span>.sourceExtractor, <span class="hljs-built_in">this</span>.resourceLoader, <span class="hljs-built_in">this</span>.environment,<br>					<span class="hljs-built_in">this</span>.importBeanNameGenerator, parser.getImportRegistry());<br>		&#125;<br>		<span class="hljs-built_in">this</span>.reader.loadBeanDefinitions(configClasses);<br>		alreadyParsed.addAll(configClasses);<br>		processConfig.tag(<span class="hljs-string">&quot;classCount&quot;</span>, () -&gt; String.valueOf(configClasses.size())).end();<br><br>		candidates.clear();<br>		<span class="hljs-keyword">if</span> (registry.getBeanDefinitionCount() &gt; candidateNames.length) &#123;<br>			String[] newCandidateNames = registry.getBeanDefinitionNames();<br>			Set&lt;String&gt; oldCandidateNames = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;(Arrays.asList(candidateNames));<br>			Set&lt;String&gt; alreadyParsedClasses = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;();<br>			<span class="hljs-keyword">for</span> (ConfigurationClass configurationClass : alreadyParsed) &#123;<br>				alreadyParsedClasses.add(configurationClass.getMetadata().getClassName());<br>			&#125;<br>			<span class="hljs-keyword">for</span> (String candidateName : newCandidateNames) &#123;<br>				<span class="hljs-keyword">if</span> (!oldCandidateNames.contains(candidateName)) &#123;<br>					<span class="hljs-type">BeanDefinition</span> <span class="hljs-variable">bd</span> <span class="hljs-operator">=</span> registry.getBeanDefinition(candidateName);<br>					<span class="hljs-keyword">if</span> (ConfigurationClassUtils.checkConfigurationClassCandidate(bd, <span class="hljs-built_in">this</span>.metadataReaderFactory) &amp;&amp;<br>							!alreadyParsedClasses.contains(bd.getBeanClassName())) &#123;<br>						candidates.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BeanDefinitionHolder</span>(bd, candidateName));<br>					&#125;<br>				&#125;<br>			&#125;<br>			candidateNames = newCandidateNames;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">while</span> (!candidates.isEmpty());<br><br>	<span class="hljs-comment">// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes</span><br>	<span class="hljs-keyword">if</span> (sbr != <span class="hljs-literal">null</span> &amp;&amp; !sbr.containsSingleton(IMPORT_REGISTRY_BEAN_NAME)) &#123;<br>		sbr.registerSingleton(IMPORT_REGISTRY_BEAN_NAME, parser.getImportRegistry());<br>	&#125;<br><br>	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.metadataReaderFactory <span class="hljs-keyword">instanceof</span> CachingMetadataReaderFactory cachingMetadataReaderFactory) &#123;<br>		<span class="hljs-comment">// Clear cache in externally provided MetadataReaderFactory; this is a no-op</span><br>		<span class="hljs-comment">// for a shared cache since it&#x27;ll be cleared by the ApplicationContext.</span><br>		cachingMetadataReaderFactory.clearCache();<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="ConfigurationClassParser-parse"><a href="#ConfigurationClassParser-parse" class="headerlink" title="ConfigurationClassParser.parse"></a>ConfigurationClassParser.parse</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">parse</span><span class="hljs-params">(Set&lt;BeanDefinitionHolder&gt; configCandidates)</span> &#123;<br>	<span class="hljs-keyword">for</span> (BeanDefinitionHolder holder : configCandidates) &#123;<br>		<span class="hljs-type">BeanDefinition</span> <span class="hljs-variable">bd</span> <span class="hljs-operator">=</span> holder.getBeanDefinition();<br>		<span class="hljs-keyword">try</span> &#123;<br>			<span class="hljs-keyword">if</span> (bd <span class="hljs-keyword">instanceof</span> AnnotatedBeanDefinition) &#123;<br>				parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());<br>			&#125;<br>			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (bd <span class="hljs-keyword">instanceof</span> AbstractBeanDefinition &amp;&amp; ((AbstractBeanDefinition) bd).hasBeanClass()) &#123;<br>				parse(((AbstractBeanDefinition) bd).getBeanClass(), holder.getBeanName());<br>			&#125;<br>			<span class="hljs-keyword">else</span> &#123;<br>				parse(bd.getBeanClassName(), holder.getBeanName());<br>			&#125;<br>		&#125;<br>		...<br>	&#125;<br><br>	<span class="hljs-built_in">this</span>.deferredImportSelectorHandler.process();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到根据 BeanDefinition的类型进行了不同的处理（parse）</p>
+<p>其中<code>this.deferredImportSelectorHandler.process();</code>这行代码对应<code>DeferredImportSelector</code>的处理</p>
+<p>上面的三个parse方法最终都会调用<code>protected void processConfigurationClass(ConfigurationClass configClass, Predicate&lt;String&gt; filter) throws IOException</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processConfigurationClass</span><span class="hljs-params">(ConfigurationClass configClass, Predicate&lt;String&gt; filter)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>   	<span class="hljs-comment">// 是否应该跳过处理配置类（根据类上的 @Conditional注解）</span><br>	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.conditionEvaluator.shouldSkip(configClass.getMetadata(), ConfigurationPhase.PARSE_CONFIGURATION)) &#123;<br>		<span class="hljs-keyword">return</span>;<br>	&#125;<br>       <span class="hljs-comment">// 看这个类是否已经被放入待处理集合</span><br>	<span class="hljs-type">ConfigurationClass</span> <span class="hljs-variable">existingClass</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.configurationClasses.get(configClass);<br>	<span class="hljs-keyword">if</span> (existingClass != <span class="hljs-literal">null</span>) &#123; <br>        <span class="hljs-comment">// configClass是通过 @Import 注册的或者是 由于嵌套在另一个配置类中而自动注册</span><br>		<span class="hljs-keyword">if</span> (configClass.isImported()) &#123;<br>			<span class="hljs-keyword">if</span> (existingClass.isImported()) &#123; <br>                <span class="hljs-comment">// 合并同一个类的导入对象集合</span><br>				existingClass.mergeImportedBy(configClass);<br>			&#125;<br>			<span class="hljs-comment">// Otherwise ignore new imported config class; existing non-imported class overrides it.</span><br>			<span class="hljs-keyword">return</span>;<br>		&#125;<br>		<span class="hljs-keyword">else</span> &#123;<br>			<span class="hljs-comment">// Explicit bean definition found, probably replacing an import.</span><br>			<span class="hljs-comment">// Let&#x27;s remove the old one and go with the new one. </span><br>            <span class="hljs-comment">// 找到了显式bean定义，将之前可能存在的导入的bean定义删除</span><br>			<span class="hljs-built_in">this</span>.configurationClasses.remove(configClass);<br>			<span class="hljs-built_in">this</span>.knownSuperclasses.values().removeIf(configClass::equals);<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// Recursively process the configuration class and its superclass hierarchy.</span><br>    <span class="hljs-comment">// 递归处理配置类及其父类</span><br>	<span class="hljs-type">SourceClass</span> <span class="hljs-variable">sourceClass</span> <span class="hljs-operator">=</span> asSourceClass(configClass, filter);<br>	<span class="hljs-keyword">do</span> &#123;<br>		sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);<br>	&#125;<br>	<span class="hljs-keyword">while</span> (sourceClass != <span class="hljs-literal">null</span>);<br><br>    <span class="hljs-comment">// 最后将类放入待处理集合中，这个集合是 LinkedHashMap，根据插入元素的顺序</span><br>    <span class="hljs-comment">// 是有序的</span><br>	<span class="hljs-built_in">this</span>.configurationClasses.put(configClass, configClass);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>看一下 <code>doProcessConfigurationClass </code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> ConfigurationClassParser.SourceClass <span class="hljs-title function_">doProcessConfigurationClass</span><span class="hljs-params">(</span><br><span class="hljs-params">        ConfigurationClass configClass, ConfigurationClassParser.SourceClass sourceClass, Predicate&lt;String&gt; filter)</span><br>        <span class="hljs-keyword">throws</span> IOException &#123;<br><br>    <span class="hljs-comment">// 处理嵌入的类，也是通过</span><br>    <span class="hljs-comment">// ConfigurationClassUtils.isConfigurationCandidate 判断嵌入类</span><br>    <span class="hljs-comment">// 是否是配置类候选，然后递归进行处理</span><br>    <span class="hljs-keyword">if</span> (configClass.getMetadata().isAnnotated(Component.class.getName())) &#123;<br>        <span class="hljs-comment">// Recursively process any member (nested) classes first</span><br>        processMemberClasses(configClass, sourceClass, filter);<br>    &#125;<br><br>    <span class="hljs-comment">// Process any @PropertySource annotations</span><br>    <span class="hljs-keyword">for</span> (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(<br>            sourceClass.getMtadata(), PropertySources.class,<br>            org.springframework.context.annotation.PropertySource.class)) &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.environment <span class="hljs-keyword">instanceof</span> ConfigurableEnvironment) &#123;<br>            processPropertySource(propertySource);<br>        &#125;<br>        <span class="hljs-keyword">else</span> &#123;<br>            logger.info(<span class="hljs-string">&quot;Ignoring @PropertySource annotation on [&quot;</span> + sourceClass.getMetadata().getClassName() +<br>                    <span class="hljs-string">&quot;]. Reason: Environment must implement ConfigurableEnvironment&quot;</span>);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// Process any @ComponentScan annotations</span><br>    <span class="hljs-comment">// 配置类上有 @ComponentScan 注解（支持同时使用多个@ComponentScan注解）</span><br>    Set&lt;AnnotationAttributes&gt; componentScans = AnnotationConfigUtils.attributesForRepeatable(<br>            sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);<br>    <span class="hljs-keyword">if</span> (!componentScans.isEmpty() &amp;&amp;<br>            !<span class="hljs-built_in">this</span>.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationCondition.ConfigurationPhase.REGISTER_BEAN)) &#123;<br>        <span class="hljs-keyword">for</span> (AnnotationAttributes componentScan : componentScans) &#123;<br>            <span class="hljs-comment">// The config class is annotated with @ComponentScan -&gt; perform the scan immediately </span><br>            <span class="hljs-comment">// 通过 @ComponentScan 注解的属性进行包扫描，并把扫描到的bean注册到IOC容器中</span><br>            <span class="hljs-comment">// 如果 basePackages 和 basePackageClasses都为空，则扫描 sourceClass 所在的包</span><br>            <span class="hljs-comment">// 扫描时会根据 excludeFilters 和 includeFilters 过滤掉不符合条件的类</span><br>            <span class="hljs-comment">// 其中 includeFilters 有默认的过滤器 AnnotationTypeFilter(Component.class)等等</span><br>            Set&lt;BeanDefinitionHolder&gt; scannedBeanDefinitions =<br>                    <span class="hljs-built_in">this</span>.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());<br>            <span class="hljs-comment">// Check the set of scanned definitions for any further config classes and parse recursively if needed</span><br>            <span class="hljs-keyword">for</span> (BeanDefinitionHolder holder : scannedBeanDefinitions) &#123;<br>                <span class="hljs-type">BeanDefinition</span> <span class="hljs-variable">bdCand</span> <span class="hljs-operator">=</span> holder.getBeanDefinition().getOriginatingBeanDefinition();<br>                <span class="hljs-keyword">if</span> (bdCand == <span class="hljs-literal">null</span>) &#123;<br>                    bdCand = holder.getBeanDefinition();<br>                &#125;<br>                <span class="hljs-comment">// 处理候选配置类</span><br>                <span class="hljs-keyword">if</span> (ConfigurationClassUtils.checkConfigurationClassCandidate(bdCand, <span class="hljs-built_in">this</span>.metadataReaderFactory)) &#123;<br>                    parse(bdCand.getBeanClassName(), holder.getBeanName());<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// Process any @Import annotations</span><br>    processImports(configClass, sourceClass, getImports(sourceClass), filter, <span class="hljs-literal">true</span>);<br><br>    <span class="hljs-comment">// Process any @ImportResource annotations</span><br>    <span class="hljs-type">AnnotationAttributes</span> <span class="hljs-variable">importResource</span> <span class="hljs-operator">=</span><br>            AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);<br>    <span class="hljs-keyword">if</span> (importResource != <span class="hljs-literal">null</span>) &#123;<br>        String[] resources = importResource.getStringArray(<span class="hljs-string">&quot;locations&quot;</span>);<br>        Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BeanDefinitionReader</span>&gt; readerClass = importResource.getClass(<span class="hljs-string">&quot;reader&quot;</span>);<br>        <span class="hljs-keyword">for</span> (String resource : resources) &#123;<br>            <span class="hljs-type">String</span> <span class="hljs-variable">resolvedResource</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.environment.resolveRequiredPlaceholders(resource);<br>            configClass.addImportedResource(resolvedResource, readerClass);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// Process individual @Bean methods</span><br>    Set&lt;MethodMetadata&gt; beanMethods = retrieveBeanMethodMetadata(sourceClass);<br>    <span class="hljs-keyword">for</span> (MethodMetadata methodMetadata : beanMethods) &#123;<br>        configClass.addBeanMethod(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BeanMethod</span>(methodMetadata, configClass));<br>    &#125;<br><br>    <span class="hljs-comment">// Process default methods on interfaces</span><br>    <span class="hljs-comment">// 处理类继承的接口中的被 @Bean注解修饰的方法 ？</span><br>    processInterfaces(configClass, sourceClass);<br><br>    <span class="hljs-comment">// Process superclass, if any</span><br>    <span class="hljs-keyword">if</span> (sourceClass.getMetadata().hasSuperClass()) &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">superclass</span> <span class="hljs-operator">=</span> sourceClass.getMetadata().getSuperClassName();<br>        <span class="hljs-keyword">if</span> (superclass != <span class="hljs-literal">null</span> &amp;&amp; !superclass.startsWith(<span class="hljs-string">&quot;java&quot;</span>) &amp;&amp;<br>                !<span class="hljs-built_in">this</span>.knownSuperclasses.containsKey(superclass)) &#123;<br>            <span class="hljs-built_in">this</span>.knownSuperclasses.put(superclass, configClass);<br>            <span class="hljs-comment">// Superclass found, return its annotation metadata and recurse</span><br>            <span class="hljs-keyword">return</span> sourceClass.getSuperClass();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// No superclass -&gt; processing is complete</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>在看处理<code>@import</code> 注解的方法前先看一下 <code>getImports(SourceClass sourceClass)</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> Set&lt;ConfigurationClassParser.SourceClass&gt; getImports(ConfigurationClassParser.SourceClass sourceClass) <span class="hljs-keyword">throws</span> IOException &#123;<br>    Set&lt;ConfigurationClassParser.SourceClass&gt; imports = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashSet</span>&lt;&gt;();<br>    Set&lt;ConfigurationClassParser.SourceClass&gt; visited = <span class="hljs-keyword">new</span> <span class="hljs-title class_">LinkedHashSet</span>&lt;&gt;();<br>    collectImports(sourceClass, imports, visited);<br>    <span class="hljs-keyword">return</span> imports;<br>&#125; <br><br><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">collectImports</span><span class="hljs-params">(ConfigurationClassParser.SourceClass sourceClass, Set&lt;ConfigurationClassParser.SourceClass&gt; imports, Set&lt;ConfigurationClassParser.SourceClass&gt; visited)</span><br>        <span class="hljs-keyword">throws</span> IOException &#123;<br><br>    <span class="hljs-keyword">if</span> (visited.add(sourceClass)) &#123;<br>        <span class="hljs-keyword">for</span> (ConfigurationClassParser.SourceClass annotation : sourceClass.getAnnotations()) &#123;<br>            <span class="hljs-type">String</span> <span class="hljs-variable">annName</span> <span class="hljs-operator">=</span> annotation.getMetadata().getClassName();<br>            <span class="hljs-keyword">if</span> (!annName.equals(Import.class.getName())) &#123;<br>                collectImports(annotation, imports, visited);<br>            &#125;<br>        &#125;<br>        imports.addAll(sourceClass.getAnnotationAttributes(Import.class.getName(), <span class="hljs-string">&quot;value&quot;</span>));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看到Spring是递归地获取配置类上所有 <code>@Import</code> 注解上的 value值作为 importCandidates 传给 <code>processImports</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processImports</span><span class="hljs-params">(ConfigurationClass configClass, ConfigurationClassParser.SourceClass currentSourceClass,</span><br><span class="hljs-params">                            Collection&lt;ConfigurationClassParser.SourceClass&gt; importCandidates, Predicate&lt;String&gt; exclusionFilter,</span><br><span class="hljs-params">                            <span class="hljs-type">boolean</span> checkForCircularImports)</span>     &#123;<br>    <span class="hljs-comment">// 配置类上没有 @Import 注解或者 @Import 注解上的value为空</span><br>    <span class="hljs-keyword">if</span> (importCandidates.isEmpty()) &#123;<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 检查循环 Import</span><br>    <span class="hljs-keyword">if</span> (checkForCircularImports &amp;&amp; isChainedImportOnStack(configClass)) &#123;<br>        <span class="hljs-built_in">this</span>.problemReporter.error(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassParser</span>.CircularImportProblem(configClass, <span class="hljs-built_in">this</span>.importStack));<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-built_in">this</span>.importStack.push(configClass);<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">for</span> (ConfigurationClassParser.SourceClass candidate : importCandidates) &#123;<br>                <span class="hljs-comment">// import 的是 ImportSelector 的实现类</span><br>                <span class="hljs-keyword">if</span> (candidate.isAssignable(ImportSelector.class)) &#123;<br>                    <span class="hljs-comment">// Candidate class is an ImportSelector -&gt; delegate to it to determine imports</span><br>                    Class&lt;?&gt; candidateClass = candidate.loadClass();<br>                    <span class="hljs-type">ImportSelector</span> <span class="hljs-variable">selector</span> <span class="hljs-operator">=</span> ParserStrategyUtils.instantiateClass(candidateClass, ImportSelector.class,<br>                            <span class="hljs-built_in">this</span>.environment, <span class="hljs-built_in">this</span>.resourceLoader, <span class="hljs-built_in">this</span>.registry);<br>                    Predicate&lt;String&gt; selectorFilter = selector.getExclusionFilter();<br>                    <span class="hljs-comment">// 处理过滤器</span><br>                    <span class="hljs-keyword">if</span> (selectorFilter != <span class="hljs-literal">null</span>) &#123;<br>                        exclusionFilter = exclusionFilter.or(selectorFilter);<br>                    &#125;<br>                    <span class="hljs-comment">// 如果是DeferredImportSelector，则先存起来</span><br>                    <span class="hljs-comment">// 最后在 parse(Set&lt;BeanDefinitionHolder&gt; configCandidates) 方法中</span><br>                    <span class="hljs-comment">// 调用 this.deferredImportSelectorHandler.process</span><br>                    <span class="hljs-comment">// 统一处理，实现了了延迟加载的效果</span><br>                    <span class="hljs-keyword">if</span> (selector <span class="hljs-keyword">instanceof</span> DeferredImportSelector) &#123;<br>                        <span class="hljs-built_in">this</span>.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);<br>                    &#125;<br>                    <span class="hljs-keyword">else</span> &#123;<br>                        String[] importClassNames = selector.selectImports(currentSourceClass.getMetadata());<br>                        Collection&lt;ConfigurationClassParser.SourceClass&gt; importSourceClasses = asSourceClasses(importClassNames, exclusionFilter);<br>                        <span class="hljs-comment">// 递归处理配置类</span><br>                        processImports(configClass, currentSourceClass, importSourceClasses, exclusionFilter, <span class="hljs-literal">false</span>);<br>                    &#125;<br>                &#125;<br>                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (candidate.isAssignable(ImportBeanDefinitionRegistrar.class)) &#123;<br>                    <span class="hljs-comment">// Candidate class is an ImportBeanDefinitionRegistrar -&gt;</span><br>                    <span class="hljs-comment">// delegate to it to register additional bean definitions</span><br>                    Class&lt;?&gt; candidateClass = candidate.loadClass();<br>                    <span class="hljs-type">ImportBeanDefinitionRegistrar</span> <span class="hljs-variable">registrar</span> <span class="hljs-operator">=</span><br>                            ParserStrategyUtils.instantiateClass(candidateClass, ImportBeanDefinitionRegistrar.class,<br>                                    <span class="hljs-built_in">this</span>.environment, <span class="hljs-built_in">this</span>.resourceLoader, <span class="hljs-built_in">this</span>.registry);<br>                    <span class="hljs-comment">// 如果是导入 ImportBeanDefinitionRegistrar 类型的类</span><br>                    <span class="hljs-comment">// 先添加到 this.importBeanDefinitionRegistrars 集合中</span><br>                    <span class="hljs-comment">// 最后在 ConfigurationClassBeanDefinitionReader中处理</span><br>                    configClass.addImportBeanDefinitionRegistrar(registrar, currentSourceClass.getMetadata());<br>                &#125;<br>                <span class="hljs-keyword">else</span> &#123;<br>                    <span class="hljs-comment">// Candidate class not an ImportSelector or ImportBeanDefinitionRegistrar -&gt;</span><br>                    <span class="hljs-comment">// process it as an @Configuration class</span><br>                    <span class="hljs-comment">// 作为配置类处理，递归调用</span><br>                    <span class="hljs-built_in">this</span>.importStack.registerImport(<br>                            currentSourceClass.getMetadata(), candidate.getMetadata().getClassName());<br>                    processConfigurationClass(candidate.asConfigClass(configClass), exclusionFilter);<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">catch</span> (BeanDefinitionStoreException ex) &#123;<br>            <span class="hljs-keyword">throw</span> ex;<br>        &#125;<br>        <span class="hljs-keyword">catch</span> (Throwable ex) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BeanDefinitionStoreException</span>(<br>                    <span class="hljs-string">&quot;Failed to process import candidates for configuration class [&quot;</span> +<br>                            configClass.getMetadata().getClassName() + <span class="hljs-string">&quot;]&quot;</span>, ex);<br>        &#125;<br>        <span class="hljs-keyword">finally</span> &#123;<br>            <span class="hljs-built_in">this</span>.importStack.pop();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="ConfigurationClassBeanDefinitionReader-loadBeanDefinitions"><a href="#ConfigurationClassBeanDefinitionReader-loadBeanDefinitions" class="headerlink" title="ConfigurationClassBeanDefinitionReader.loadBeanDefinitions"></a>ConfigurationClassBeanDefinitionReader.loadBeanDefinitions</h4><p>    委托给ConfigurationClassParser解析完配置类后，调用<code>this.reader.loadBeanDefinitions(configClasses);</code>将配置类注册到IOC容器中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">loadBeanDefinitions</span><span class="hljs-params">(Set&lt;ConfigurationClass&gt; configurationModel)</span> &#123;<br>    ConfigurationClassBeanDefinitionReader.<span class="hljs-type">TrackedConditionEvaluator</span> <span class="hljs-variable">trackedConditionEvaluator</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassBeanDefinitionReader</span>.TrackedConditionEvaluator();<br>    <span class="hljs-keyword">for</span> (ConfigurationClass configClass : configurationModel) &#123;<br>        loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">loadBeanDefinitionsForConfigurationClass</span><span class="hljs-params">(</span><br><span class="hljs-params">        ConfigurationClass configClass, ConfigurationClassBeanDefinitionReader.TrackedConditionEvaluator trackedConditionEvaluator)</span> &#123;<br><br>    <span class="hljs-keyword">if</span> (trackedConditionEvaluator.shouldSkip(configClass)) &#123;<br>        <span class="hljs-type">String</span> <span class="hljs-variable">beanName</span> <span class="hljs-operator">=</span> configClass.getBeanName();<br>        <span class="hljs-keyword">if</span> (StringUtils.hasLength(beanName) &amp;&amp; <span class="hljs-built_in">this</span>.registry.containsBeanDefinition(beanName)) &#123;<br>            <span class="hljs-built_in">this</span>.registry.removeBeanDefinition(beanName);<br>        &#125;<br>        <span class="hljs-built_in">this</span>.importRegistry.removeImportingClass(configClass.getMetadata().getClassName());<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (configClass.isImported()) &#123;<br>        registerBeanDefinitionForImportedConfigurationClass(configClass);<br>    &#125;<br>    <span class="hljs-keyword">for</span> (BeanMethod beanMethod : configClass.getBeanMethods()) &#123;<br>        loadBeanDefinitionsForBeanMethod(beanMethod);<br>    &#125;<br><br>    loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());<br>    loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们可以看到是根据 配置类插入的顺序依次进行bean定义的加载</p>
+<p>而对单个配置类，如果该配置类是由其他配置类导入的，会额外将其注册IOC容器中、然后是注册其被<code>@Bean</code>注解修饰的方法返回的bean、然后注册配置类上<code>@ImportResource</code>导入的bean、最后注册配置类导入的 实现了<code>ImportBeanDefinitionRegistrar</code>接口的类中要注册的bean</p>
+<p>至此Spring加载配置类的流程基本上就走完了</p>
+<h3 id="DeferredImportSelector-的加载流程"><a href="#DeferredImportSelector-的加载流程" class="headerlink" title="DeferredImportSelector 的加载流程"></a>DeferredImportSelector 的加载流程</h3><p>    <code>ConfigurationClassParser</code>在解析配置类时对 <code>@Import</code>注解的处理涉及到 <code>DeferredImportSelector</code></p>
+<p>在处理 <code>ImportSelector </code>的实现类时，如果其还是 <code>DeferredImportSelector</code>的实现类，会调用 <code>this.deferredImportSelectorHandler.handle(configClass, (DeferredImportSelector) selector);</code>进行处理</p>
+<p>下面我们点进去看看</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">handle</span><span class="hljs-params">(ConfigurationClass configClass, DeferredImportSelector importSelector)</span> &#123;<br>    ConfigurationClassParser.<span class="hljs-type">DeferredImportSelectorHolder</span> <span class="hljs-variable">holder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassParser</span>.DeferredImportSelectorHolder(configClass, importSelector);<br>    <span class="hljs-comment">// 正在执行 this.deferredImportSelectorHandler.process</span><br>    <span class="hljs-comment">// 对新加入的 DeferredImportSelector 单独进行处理</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.deferredImportSelectors == <span class="hljs-literal">null</span>) &#123;<br>        ConfigurationClassParser.<span class="hljs-type">DeferredImportSelectorGroupingHandler</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassParser</span>.DeferredImportSelectorGroupingHandler();<br>        handler.register(holder);<br>        handler.processGroupImports();<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 简单地将封装好的 DeferredImportSelectorHolder 加入到</span><br>        <span class="hljs-comment">// this.deferredImportSelector List中</span><br>        <span class="hljs-built_in">this</span>.deferredImportSelectors.add(holder);<br>    &#125;<br>&#125; <br></code></pre></td></tr></table></figure>
+
+<p>最后在 <code>public void parse(Set&lt;BeanDefinitionHolder&gt; configCandidates)</code>的最后执行  <code>this.deferredImportSelectorHandler.process();</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">process</span><span class="hljs-params">()</span> &#123;<br>    List&lt;ConfigurationClassParser.DeferredImportSelectorHolder&gt; deferredImports = <span class="hljs-built_in">this</span>.deferredImportSelectors;<br>    <span class="hljs-comment">// 这里对应上面的 this.deferredImportSelectors == null 的情况</span><br>    <span class="hljs-built_in">this</span>.deferredImportSelectors = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">if</span> (deferredImports != <span class="hljs-literal">null</span>) &#123;<br>            ConfigurationClassParser.<span class="hljs-type">DeferredImportSelectorGroupingHandler</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassParser</span>.DeferredImportSelectorGroupingHandler();<br>            deferredImports.sort(DEFERRED_IMPORT_COMPARATOR);<br>            <span class="hljs-comment">// 逐个将 DeferredImportSelectorHolder 注册到 </span><br>            <span class="hljs-comment">// DeferredImportSelectorGroupingHandler 中</span><br>            deferredImports.forEach(handler::register);<br>            <span class="hljs-comment">// 处理</span><br>            handler.processGroupImports();<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">finally</span> &#123;<br>        <span class="hljs-built_in">this</span>.deferredImportSelectors = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br>    &#125;<br>&#125; <br><br><br><span class="hljs-comment">// private final Map&lt;Object, DeferredImportSelectorGrouping&gt; groupings = new LinkedHashMap&lt;&gt;();</span><br><span class="hljs-comment">// private final Map&lt;AnnotationMetadata, ConfigurationClass&gt; configurationClasses = new HashMap&lt;&gt;();</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(ConfigurationClassParser.DeferredImportSelectorHolder deferredImport)</span> &#123;<br>    Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">DeferredImportSelector</span>.Group&gt; group = deferredImport.getImportSelector().getImportGroup();<br>    <span class="hljs-comment">// 看 DeferredImportSelectorHolder 中存储的 DeferredImportSelector </span><br>    <span class="hljs-comment">// 是否有 DeferredImportSelector.Group 子类，没有的话以 </span><br>    <span class="hljs-comment">// DeferredImportSelectorHolder 为key</span><br>    <span class="hljs-comment">// 其中 createGroup 方法也判断 group是否为空</span><br>    <span class="hljs-comment">// 如果为空，则以默认的 DefaultDeferredImportSelectorGroup作为group</span><br>    ConfigurationClassParser.<span class="hljs-type">DeferredImportSelectorGrouping</span> <span class="hljs-variable">grouping</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.groupings.computeIfAbsent(<br>            (group != <span class="hljs-literal">null</span> ? group : deferredImport),<br>            key -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">ConfigurationClassParser</span>.DeferredImportSelectorGrouping(createGroup(group)));<br>    grouping.add(deferredImport);<br>    <span class="hljs-comment">// 将 DeferredImportSelector 接口的实现类放入 LinkedHashMap中后续处理</span><br>    <span class="hljs-comment">// import 导入的配置类会在</span><br>    <span class="hljs-comment">// ConfigurationClassBeanDefinitionReader.registerBeanDefinitionForImportedConfigurationClass</span><br>    <span class="hljs-comment">// 方法中注册进IOC容器</span><br>    <span class="hljs-built_in">this</span>.configurationClasses.put(deferredImport.getConfigurationClass().getMetadata(),<br>            deferredImport.getConfigurationClass());<br>&#125; <br><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processGroupImports</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">for</span> (ConfigurationClassParser.DeferredImportSelectorGrouping grouping : <span class="hljs-built_in">this</span>.groupings.values()) &#123;<br>        Predicate&lt;String&gt; exclusionFilter = grouping.getCandidateFilter();<br>        grouping.getImports().forEach(entry -&gt; &#123;<br>            <span class="hljs-comment">// 根据entry 的 AnnotationMetadata 获取将entry导入的配置类</span><br>            <span class="hljs-type">ConfigurationClass</span> <span class="hljs-variable">configurationClass</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.configurationClasses.get(entry.getMetadata());<br>            <span class="hljs-keyword">try</span> &#123;<br>                <span class="hljs-comment">// 以处理@Import注解的方式处理 </span><br>                <span class="hljs-comment">// DeferredImportSelector 导入的类</span><br>                processImports(configurationClass, asSourceClass(configurationClass, exclusionFilter),<br>                        Collections.singleton(asSourceClass(entry.getImportClassName(), exclusionFilter)),<br>                        exclusionFilter, <span class="hljs-literal">false</span>);<br>            &#125;<br>            <span class="hljs-keyword">catch</span> (BeanDefinitionStoreException ex) &#123;<br>                <span class="hljs-keyword">throw</span> ex;<br>            &#125;<br>            <span class="hljs-keyword">catch</span> (Throwable ex) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BeanDefinitionStoreException</span>(<br>                        <span class="hljs-string">&quot;Failed to process import candidates for configuration class [&quot;</span> +<br>                                configurationClass.getMetadata().getClassName() + <span class="hljs-string">&quot;]&quot;</span>, ex);<br>            &#125;<br>        &#125;);<br>    &#125;<br>&#125; <br><br><span class="hljs-comment">// 可以看到 DeferredImportSelectorGrouping的 getImports 方法</span><br><span class="hljs-comment">// 调用了 DeferredImportSelector.Group 的 process 和 selectImports 方法</span><br><span class="hljs-keyword">public</span> Iterable&lt;DeferredImportSelector.Group.Entry&gt; getImports() &#123;<br>    <span class="hljs-keyword">for</span> (ConfigurationClassParser.DeferredImportSelectorHolder deferredImport : <span class="hljs-built_in">this</span>.deferredImports) &#123;<br>        <span class="hljs-built_in">this</span>.group.process(deferredImport.getConfigurationClass().getMetadata(),<br>                deferredImport.getImportSelector());<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.group.selectImports();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>我们再回过头看看 <code>@EnableAutoConfiguration</code>中 import 的 <code>AutoConfigurationImportSelector</code>，其实现了 <code>DeferredImportSelector</code>接口，并且 <code>getImportGroup()</code>方法返回其子类  <code>AutoConfigurationGroup</code></p>
+<p>所以我们主要看 <code>AutoConfigurationGroup </code>的 <code>process </code>和 <code>selectImports </code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">process</span><span class="hljs-params">(AnnotationMetadata annotationMetadata, DeferredImportSelector deferredImportSelector)</span> &#123;<br>    Assert.state(deferredImportSelector <span class="hljs-keyword">instanceof</span> AutoConfigurationImportSelector,<br>            () -&gt; String.format(<span class="hljs-string">&quot;Only %s implementations are supported, got %s&quot;</span>,<br>                    AutoConfigurationImportSelector.class.getSimpleName(),<br>                    deferredImportSelector.getClass().getName()));<br>    <span class="hljs-comment">// 根据 annotationMetadata 构建 AutoConfigurationEntry</span><br>    AutoConfigurationImportSelector.<span class="hljs-type">AutoConfigurationEntry</span> <span class="hljs-variable">autoConfigurationEntry</span> <span class="hljs-operator">=</span> ((AutoConfigurationImportSelector) deferredImportSelector)<br>            .getAutoConfigurationEntry(annotationMetadata);<br>    <span class="hljs-built_in">this</span>.autoConfigurationEntries.add(autoConfigurationEntry);<br>    <span class="hljs-keyword">for</span> (String importClassName : autoConfigurationEntry.getConfigurations()) &#123;<br>        <span class="hljs-comment">// 建立 annotationMetadata 和根据其导入的类的名称 importClassName 的映射</span><br>        <span class="hljs-built_in">this</span>.entries.putIfAbsent(importClassName, annotationMetadata);<br>    &#125;<br>&#125; <br><br><br><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> Iterable&lt;DeferredImportSelector.Group.Entry&gt; selectImports() &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.autoConfigurationEntries.isEmpty()) &#123;<br>        <span class="hljs-keyword">return</span> Collections.emptyList();<br>    &#125;<br>    Set&lt;String&gt; allExclusions = <span class="hljs-built_in">this</span>.autoConfigurationEntries.stream()<br>            .map(AutoConfigurationImportSelector.AutoConfigurationEntry::getExclusions).flatMap(Collection::stream).collect(Collectors.toSet());<br>    Set&lt;String&gt; processedConfigurations = <span class="hljs-built_in">this</span>.autoConfigurationEntries.stream()<br>            .map(AutoConfigurationImportSelector.AutoConfigurationEntry::getConfigurations).flatMap(Collection::stream)<br>            .collect(Collectors.toCollection(LinkedHashSet::<span class="hljs-keyword">new</span>));<br>    processedConfigurations.removeAll(allExclusions);<br><br>    <span class="hljs-comment">// 最后返回排好序的 DeferredImportSelector.Group.Entry</span><br>    <span class="hljs-keyword">return</span> sortAutoConfigurations(processedConfigurations, getAutoConfigurationMetadata()).stream()<br>            .map((importClassName) -&gt; <span class="hljs-keyword">new</span> <span class="hljs-title class_">DeferredImportSelector</span>.Group.Entry(<span class="hljs-built_in">this</span>.entries.get(importClassName), importClassName))<br>            .collect(Collectors.toList());<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后看一下 <code>AutoConfigurationImportSelector</code>的 <code>getAutoConfigurationEntry</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> AutoConfigurationImportSelector.AutoConfigurationEntry <span class="hljs-title function_">getAutoConfigurationEntry</span><span class="hljs-params">(AnnotationMetadata annotationMetadata)</span> &#123;<br>    <span class="hljs-keyword">if</span> (!isEnabled(annotationMetadata)) &#123;<br>        <span class="hljs-keyword">return</span> EMPTY_ENTRY;<br>    &#125; <br>    <span class="hljs-comment">// 获取注解上的属性</span><br>    <span class="hljs-type">AnnotationAttributes</span> <span class="hljs-variable">attributes</span> <span class="hljs-operator">=</span> getAttributes(annotationMetadata);<br>    <span class="hljs-comment">// 根据注解的属性获取要导入的候选类</span><br>    List&lt;String&gt; configurations = getCandidateConfigurations(annotationMetadata, attributes);<br>    configurations = removeDuplicates(configurations);<br>    Set&lt;String&gt; exclusions = getExclusions(annotationMetadata, attributes);<br>    checkExcludedClasses(configurations, exclusions);<br>    configurations.removeAll(exclusions);<br>    configurations = getConfigurationClassFilter().filter(configurations);<br>    fireAutoConfigurationImportEvents(configurations, exclusions);<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AutoConfigurationImportSelector</span>.AutoConfigurationEntry(configurations, exclusions);<br>&#125; <br><br><br><span class="hljs-keyword">protected</span> List&lt;String&gt; <span class="hljs-title function_">getCandidateConfigurations</span><span class="hljs-params">(AnnotationMetadata metadata, AnnotationAttributes attributes)</span> &#123;<br>    <span class="hljs-comment">// 获取候选类名的方法委托给 SpringFactoriesLoader.loadFactoryNames 实现</span><br>    List&lt;String&gt; configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),<br>            getBeanClassLoader());<br>    Assert.notEmpty(configurations, <span class="hljs-string">&quot;No auto configuration classes found in META-INF/spring.factories. If you &quot;</span><br>            + <span class="hljs-string">&quot;are using a custom packaging, make sure that file is correct.&quot;</span>);<br>    <span class="hljs-keyword">return</span> configurations;<br>&#125; <br><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> List&lt;String&gt; <span class="hljs-title function_">loadFactoryNames</span><span class="hljs-params">(Class&lt;?&gt; factoryType, <span class="hljs-meta">@Nullable</span> ClassLoader classLoader)</span> &#123;<br>    <span class="hljs-type">ClassLoader</span> <span class="hljs-variable">classLoaderToUse</span> <span class="hljs-operator">=</span> classLoader;<br>    <span class="hljs-keyword">if</span> (classLoader == <span class="hljs-literal">null</span>) &#123;<br>        classLoaderToUse = SpringFactoriesLoader.class.getClassLoader();<br>    &#125; <br><br>    <span class="hljs-comment">// 这里的 factoryTypeName 就是 @EnableAutoConfiguration 注解的类名</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">factoryTypeName</span> <span class="hljs-operator">=</span> factoryType.getName(); <br>    <span class="hljs-comment">// 找不到就返回空集合</span><br>    <span class="hljs-keyword">return</span> (List)loadSpringFactories(classLoaderToUse).getOrDefault(factoryTypeName, Collections.emptyList());<br>&#125; <br><br><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Map&lt;String, List&lt;String&gt;&gt; <span class="hljs-title function_">loadSpringFactories</span><span class="hljs-params">(ClassLoader classLoader)</span> &#123;<br>    Map&lt;String, List&lt;String&gt;&gt; result = (Map)cache.get(classLoader);<br>    <span class="hljs-keyword">if</span> (result != <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">return</span> result;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        Map&lt;String, List&lt;String&gt;&gt; result = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>();<br><br>        <span class="hljs-keyword">try</span> &#123; <br>            <span class="hljs-comment">// 解析 META-INF/spring.factories 文件</span><br>            Enumeration&lt;URL&gt; urls = classLoader.getResources(<span class="hljs-string">&quot;META-INF/spring.factories&quot;</span>);<br><br>            <span class="hljs-keyword">while</span>(urls.hasMoreElements()) &#123;<br>                <span class="hljs-type">URL</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> (URL)urls.nextElement();<br>                <span class="hljs-type">UrlResource</span> <span class="hljs-variable">resource</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">UrlResource</span>(url);<br>                <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> PropertiesLoaderUtils.loadProperties(resource);<br>                <span class="hljs-type">Iterator</span> <span class="hljs-variable">var6</span> <span class="hljs-operator">=</span> properties.entrySet().iterator();<br><br>                <span class="hljs-keyword">while</span>(var6.hasNext()) &#123;<br>                    Map.Entry&lt;?, ?&gt; entry = (Map.Entry)var6.next(); <br>                    <span class="hljs-comment">// 获取文件中一行格式为 factoryTypeName = className,className...</span><br>                    <span class="hljs-comment">// 的行的 factoryTypeName </span><br>                    <span class="hljs-type">String</span> <span class="hljs-variable">factoryTypeName</span> <span class="hljs-operator">=</span> ((String)entry.getKey()).trim();<br>                    String[] factoryImplementationNames = StringUtils.commaDelimitedListToStringArray((String)entry.getValue());<br>                    String[] var10 = factoryImplementationNames;<br>                    <span class="hljs-type">int</span> <span class="hljs-variable">var11</span> <span class="hljs-operator">=</span> factoryImplementationNames.length;<br>                    <span class="hljs-comment">// 获取factoryTypeName 对应的所有className</span><br>                    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> <span class="hljs-variable">var12</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; var12 &lt; var11; ++var12) &#123;<br>                        <span class="hljs-type">String</span> <span class="hljs-variable">factoryImplementationName</span> <span class="hljs-operator">=</span> var10[var12];<br>                        ((List)result.computeIfAbsent(factoryTypeName, (key) -&gt; &#123;<br>                            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>();<br>                        &#125;)).add(factoryImplementationName.trim());<br>                    &#125;<br>                &#125;<br>            &#125;<br>            <span class="hljs-comment">// 每个 factoryTypeName 对应的 classNames去重</span><br>            result.replaceAll((factoryType, implementations) -&gt; &#123;<br>                <span class="hljs-keyword">return</span> (List)implementations.stream().distinct().collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));<br>            &#125;);<br>            cache.put(classLoader, result);<br>            <span class="hljs-keyword">return</span> result;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException var14) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Unable to load factories from location [META-INF/spring.factories]&quot;</span>, var14);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="AutoConfigurationPackage"><a href="#AutoConfigurationPackage" class="headerlink" title="@AutoConfigurationPackage"></a>@AutoConfigurationPackage</h4><p>    <code>@EnableAutoConfiguration</code> 注解还被 <code>@AutoConfigurationPackage</code> 修饰</p>
+<p>而点进去发现了 <code>@Import(AutoConfigurationPackages.Registrar.class)</code></p>
+<p>其中 <code>AutoConfigurationPackages.Registrar</code> 实现了 <code>ImportBeanDefinitionRegistrar</code>接口</p>
+<p>而这个类的 <code>registerBeanDefinitions</code>方法是在加载配置类的bean定义时在 <code>loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());</code>中被调用的</p>
+<p>其实 <code>AutoConfigurationPackages.Registrar</code>只是往容器中注册了一个名为 <code>AutoConfigurationPackages.class.getName()</code>的bean，这个bean中有一个Set 型的basePackages属性，感兴趣的同学可以自行去看一下源码</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>    在<code>@SpringBootApplication</code>注解中的<code>@ComponentScan</code>有excludeFilters属性，它定义了两个excludeFilter，一个是<code>TypeExcludeFilter</code>，看了一下这个过滤器的实现类全在test包里面，猜测应该和SpringBootTest相关；还有一个就是<code>AutoConfigurationExcludeFilter</code>，这个过滤器是匹配被<code>@Configuration</code>注解修饰并且是在 <code>META-INF/spring.factories</code> 文件中以 <code>EnableAutoConfiguration</code>的类名为开头的类，也就是在扫描包的时候，由<code>@EnableAutoConfiguration</code>中 <code>AutoConfigurationImportSelector</code>导入的类先不要处理，等到最后由<code>deferredImportSelectorHandler</code>处理</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>    综上所述，我认为以<code>ConfigurationClassPostProcessor</code>和<code>ConfigurationClassParser</code>为核心的配置类处理类</p>
+<p>以及</p>
+<ol>
+<li><p>在创建上下文时注册配置类处理器</p>
+</li>
+<li><p>准备上下文时将SpringBoot入口类注册进IOC容器中</p>
+</li>
+<li><p>以及在refresh上下文时调用配置类处理器进行包扫描并根据不同的情况处理配置类</p>
+</li>
+</ol>
+<p>流程称作SpringBoot的自动配置更为恰当一些。</p>
+<p> <code>@EnableAutoConfiguration</code>注解的作用不是开启自动配置，而是提供了一种在配置文件<code>META-INF/spring.factories</code>中延迟注册bean的方案以及往IOC容器中塞了一个名为 <code>AutoConfigurationPackages.class.getName()</code>的bean，而这个bean在配置类处理类中也没有被使用过（我没有看到，如有错误，恳请指正）</p>
+<h4 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h4><ul>
+<li><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/147025312">Spring全解系列 - @Import注解 - 知乎 (zhihu.com)</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ZhuChangwu/p/11681101.html">深入理解 Spring BeanFactoryPostProcessor的回调 - 赐我白日梦 - 博客园 (cnblogs.com)</a></p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Spring/">#Spring</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>SpringBoot自动配置浅析</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/06/11/SpringBoot自动配置浅析/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年6月11日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/09/4-parsing/" title="4-parsing">
+                        <span class="hidden-mobile">4-parsing</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
