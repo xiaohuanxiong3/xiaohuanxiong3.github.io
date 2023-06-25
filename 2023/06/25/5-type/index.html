@@ -1,0 +1,640 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Alias    此注解用于注册类型别名 12345678910111213141516&#x2F;** * 2种方式可以注册别名 *     1)xml方式 * &lt;typeAlias alias&#x3D;&quot;Author&quot; type&#x3D;&quot;domain.blog.Author&quot;&#x2F;&gt; *     2)annotation方式 * @Alias(&quot;author&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5-type">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/06/25/5-type/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="Alias    此注解用于注册类型别名 12345678910111213141516&#x2F;** * 2种方式可以注册别名 *     1)xml方式 * &lt;typeAlias alias&#x3D;&quot;Author&quot; type&#x3D;&quot;domain.blog.Author&quot;&#x2F;&gt; *     2)annotation方式 * @Alias(&quot;author&amp;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-25T12:56:14.000Z">
+<meta property="article:modified_time" content="2023-06-25T15:14:24.670Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>5-type - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/complaint/">
+                <i class="iconfont icon-user-fill"></i>
+                日常吐槽
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="5-type"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-06-25 20:56" pubdate>
+          2023年6月25日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          24k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          197 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">5-type</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h4 id="Alias"><a href="#Alias" class="headerlink" title="Alias"></a>Alias</h4><p>    此注解用于注册类型别名</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 2种方式可以注册别名</span><br><span class="hljs-comment"> *     1)xml方式</span><br><span class="hljs-comment"> * &lt;typeAlias alias=&quot;Author&quot; type=&quot;domain.blog.Author&quot;/&gt;</span><br><span class="hljs-comment"> *     2)annotation方式</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@Alias</span>(&quot;author&quot;)</span><br><span class="hljs-comment"> * public class Author &#123;</span><br><span class="hljs-comment"> *   ...</span><br><span class="hljs-comment"> * &#125;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> Alias &#123;<br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">value</span><span class="hljs-params">()</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="JdbcType"><a href="#JdbcType" class="headerlink" title="JdbcType"></a>JdbcType</h4><p>    JDBC类型枚举</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">enum</span> <span class="hljs-title class_">JdbcType</span> &#123;<br>  <span class="hljs-comment">// 就是包装了一下java.sql.Types</span><br><br>  <span class="hljs-comment">/*</span><br><span class="hljs-comment">   * This is added to enable basic support for the</span><br><span class="hljs-comment">   * ARRAY data type - but a custom type handler is still required</span><br><span class="hljs-comment">   */</span><br>  ARRAY(Types.ARRAY),<br>  BIT(Types.BIT),<br>  TINYINT(Types.TINYINT),<br>  SMALLINT(Types.SMALLINT),<br>  INTEGER(Types.INTEGER),<br>  BIGINT(Types.BIGINT),<br>  FLOAT(Types.FLOAT),<br>  REAL(Types.REAL),<br>  DOUBLE(Types.DOUBLE),<br>  NUMERIC(Types.NUMERIC),<br>  DECIMAL(Types.DECIMAL),<br>  CHAR(Types.CHAR),<br>  VARCHAR(Types.VARCHAR),<br>  LONGVARCHAR(Types.LONGVARCHAR),<br>  DATE(Types.DATE),<br>  TIME(Types.TIME),<br>  TIMESTAMP(Types.TIMESTAMP),<br>  BINARY(Types.BINARY),<br>  VARBINARY(Types.VARBINARY),<br>  LONGVARBINARY(Types.LONGVARBINARY),<br>  NULL(Types.NULL),<br>  OTHER(Types.OTHER),<br>  BLOB(Types.BLOB),<br>  CLOB(Types.CLOB),<br>  BOOLEAN(Types.BOOLEAN),<br>  CURSOR(-<span class="hljs-number">10</span>), <span class="hljs-comment">// Oracle</span><br>  UNDEFINED(Integer.MIN_VALUE + <span class="hljs-number">1000</span>),<br>  <span class="hljs-comment">// 太周到了，还考虑jdk5兼容性，jdk6的常量都不是直接引用</span><br>  NVARCHAR(Types.NVARCHAR), <span class="hljs-comment">// JDK6</span><br>  NCHAR(Types.NCHAR), <span class="hljs-comment">// JDK6</span><br>  NCLOB(Types.NCLOB), <span class="hljs-comment">// JDK6</span><br>  STRUCT(Types.STRUCT);<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> TYPE_CODE;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Map&lt;Integer,JdbcType&gt; codeLookup = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;Integer,JdbcType&gt;();<br><br>  <span class="hljs-comment">// 缓存，提升查询性能</span><br>  <span class="hljs-comment">// 可以参考 https://mp.weixin.qq.com/s/CLr5bcxsG7C8v6qSsagEbw 进行扩展</span><br>  <span class="hljs-keyword">static</span> &#123;<br>    <span class="hljs-keyword">for</span> (JdbcType type : JdbcType.values()) &#123;<br>      codeLookup.put(type.TYPE_CODE, type);<br>    &#125;<br>  &#125;<br><br>  JdbcType(<span class="hljs-type">int</span> code) &#123;<br>    <span class="hljs-built_in">this</span>.TYPE_CODE = code;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> JdbcType <span class="hljs-title function_">forCode</span><span class="hljs-params">(<span class="hljs-type">int</span> code)</span>  &#123;<br>    <span class="hljs-keyword">return</span> codeLookup.get(code);<br>  &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="MappedTypes"><a href="#MappedTypes" class="headerlink" title="MappedTypes"></a>MappedTypes</h4><p>    看代码是标记自定义的类型处理器对应的Java类型</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> MappedTypes &#123; <br>  <span class="hljs-keyword">public</span> Class&lt;?&gt;[] value();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="MappedJdbcTypes"><a href="#MappedJdbcTypes" class="headerlink" title="MappedJdbcTypes"></a>MappedJdbcTypes</h4><p>     用于标记类型处理器可以处理 Java类型和哪些Jdbc类型 的互相转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> MappedJdbcTypes &#123;<br>  <span class="hljs-keyword">public</span> JdbcType[] value(); <br>  <span class="hljs-comment">// 是否将类型处理器注册为能处理 Java类型和Jdbc Null类型的互相转换</span><br>  <span class="hljs-type">boolean</span> <span class="hljs-title function_">includeNullJdbcType</span><span class="hljs-params">()</span> <span class="hljs-keyword">default</span> <span class="hljs-literal">false</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="TypeAliasRegistry"><a href="#TypeAliasRegistry" class="headerlink" title="TypeAliasRegistry"></a>TypeAliasRegistry</h4><p>    类型别名注册机</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TypeAliasRegistry</span> &#123; <br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;String, Class&lt;?&gt;&gt; TYPE_ALIASES = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;String, Class&lt;?&gt;&gt;();<br> <br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">TypeAliasRegistry</span><span class="hljs-params">()</span> &#123;<br>	<span class="hljs-comment">// 构造函数里注册系统内置的类型别名</span><br>    registerAlias(<span class="hljs-string">&quot;string&quot;</span>, String.class);<br><br>	<span class="hljs-comment">// 基本包装类型</span><br>    registerAlias(<span class="hljs-string">&quot;byte&quot;</span>, Byte.class);<br>    registerAlias(<span class="hljs-string">&quot;long&quot;</span>, Long.class);<br>    registerAlias(<span class="hljs-string">&quot;short&quot;</span>, Short.class);<br>    registerAlias(<span class="hljs-string">&quot;int&quot;</span>, Integer.class);<br>    registerAlias(<span class="hljs-string">&quot;integer&quot;</span>, Integer.class);<br>    registerAlias(<span class="hljs-string">&quot;double&quot;</span>, Double.class);<br>    registerAlias(<span class="hljs-string">&quot;float&quot;</span>, Float.class);<br>    registerAlias(<span class="hljs-string">&quot;boolean&quot;</span>, Boolean.class);<br><br>	<span class="hljs-comment">// 基本数组包装类型</span><br>    registerAlias(<span class="hljs-string">&quot;byte[]&quot;</span>, Byte[].class);<br>    registerAlias(<span class="hljs-string">&quot;long[]&quot;</span>, Long[].class);<br>    registerAlias(<span class="hljs-string">&quot;short[]&quot;</span>, Short[].class);<br>    registerAlias(<span class="hljs-string">&quot;int[]&quot;</span>, Integer[].class);<br>    registerAlias(<span class="hljs-string">&quot;integer[]&quot;</span>, Integer[].class);<br>    registerAlias(<span class="hljs-string">&quot;double[]&quot;</span>, Double[].class);<br>    registerAlias(<span class="hljs-string">&quot;float[]&quot;</span>, Float[].class);<br>    registerAlias(<span class="hljs-string">&quot;boolean[]&quot;</span>, Boolean[].class);<br><br>	<span class="hljs-comment">// 加个下划线，就变成了基本类型</span><br>    registerAlias(<span class="hljs-string">&quot;_byte&quot;</span>, <span class="hljs-type">byte</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_long&quot;</span>, <span class="hljs-type">long</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_short&quot;</span>, <span class="hljs-type">short</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_int&quot;</span>, <span class="hljs-type">int</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_integer&quot;</span>, <span class="hljs-type">int</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_double&quot;</span>, <span class="hljs-type">double</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_float&quot;</span>, <span class="hljs-type">float</span>.class);<br>    registerAlias(<span class="hljs-string">&quot;_boolean&quot;</span>, <span class="hljs-type">boolean</span>.class);<br><br>	<span class="hljs-comment">// 加个下划线，就变成了基本数组类型</span><br>    registerAlias(<span class="hljs-string">&quot;_byte[]&quot;</span>, <span class="hljs-type">byte</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_long[]&quot;</span>, <span class="hljs-type">long</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_short[]&quot;</span>, <span class="hljs-type">short</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_int[]&quot;</span>, <span class="hljs-type">int</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_integer[]&quot;</span>, <span class="hljs-type">int</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_double[]&quot;</span>, <span class="hljs-type">double</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_float[]&quot;</span>, <span class="hljs-type">float</span>[].class);<br>    registerAlias(<span class="hljs-string">&quot;_boolean[]&quot;</span>, <span class="hljs-type">boolean</span>[].class);<br><br>	<span class="hljs-comment">// 日期数字型</span><br>    registerAlias(<span class="hljs-string">&quot;date&quot;</span>, Date.class);<br>    registerAlias(<span class="hljs-string">&quot;decimal&quot;</span>, BigDecimal.class);<br>    registerAlias(<span class="hljs-string">&quot;bigdecimal&quot;</span>, BigDecimal.class);<br>    registerAlias(<span class="hljs-string">&quot;biginteger&quot;</span>, BigInteger.class);<br>    registerAlias(<span class="hljs-string">&quot;object&quot;</span>, Object.class);<br><br>    registerAlias(<span class="hljs-string">&quot;date[]&quot;</span>, Date[].class);<br>    registerAlias(<span class="hljs-string">&quot;decimal[]&quot;</span>, BigDecimal[].class);<br>    registerAlias(<span class="hljs-string">&quot;bigdecimal[]&quot;</span>, BigDecimal[].class);<br>    registerAlias(<span class="hljs-string">&quot;biginteger[]&quot;</span>, BigInteger[].class);<br>    registerAlias(<span class="hljs-string">&quot;object[]&quot;</span>, Object[].class);<br><br>	<span class="hljs-comment">// 集合型</span><br>    registerAlias(<span class="hljs-string">&quot;map&quot;</span>, Map.class);<br>    registerAlias(<span class="hljs-string">&quot;hashmap&quot;</span>, HashMap.class);<br>    registerAlias(<span class="hljs-string">&quot;list&quot;</span>, List.class);<br>    registerAlias(<span class="hljs-string">&quot;arraylist&quot;</span>, ArrayList.class);<br>    registerAlias(<span class="hljs-string">&quot;collection&quot;</span>, Collection.class);<br>    registerAlias(<span class="hljs-string">&quot;iterator&quot;</span>, Iterator.class);<br><br>	<span class="hljs-comment">// 还有个ResultSet型</span><br>    registerAlias(<span class="hljs-string">&quot;ResultSet&quot;</span>, ResultSet.class);<br>  &#125;<br><br>  <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>  <span class="hljs-comment">// throws class cast exception as well if types cannot be assigned</span><br>  <span class="hljs-keyword">public</span> &lt;T&gt; Class&lt;T&gt; <span class="hljs-title function_">resolveAlias</span><span class="hljs-params">(String string)</span> &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">if</span> (string == <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>      &#125;<br>      <span class="hljs-comment">// issue #748 (这里的issue在 google code上，已经无了)</span><br>      <span class="hljs-comment">// 先转成小写再解析</span><br>      <span class="hljs-comment">// 比如如果本地语言是Turkish，那i转成大写就不是I了，而是另外一个字符（İ）。这样土耳其的机器就用不了mybatis了！这是一个很大的bug，但是基本上每个人都会犯......</span><br>      <span class="hljs-type">String</span> <span class="hljs-variable">key</span> <span class="hljs-operator">=</span> string.toLowerCase(Locale.ENGLISH);<br>      Class&lt;T&gt; value;<br>      <span class="hljs-comment">// 原理就很简单了，从HashMap里找对应的键值，找到则返回类型别名对应的Class</span><br>      <span class="hljs-keyword">if</span> (TYPE_ALIASES.containsKey(key)) &#123;<br>        value = (Class&lt;T&gt;) TYPE_ALIASES.get(key);<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 找不到，再试着将String直接转成Class、</span><br>        <span class="hljs-comment">// 这样怪不得我们也可以直接用java.lang.Integer的方式定义</span><br>        value = (Class&lt;T&gt;) Resources.classForName(string);<br>      &#125;<br>      <span class="hljs-keyword">return</span> value;<br>    &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;Could not resolve type alias &#x27;&quot;</span> + string + <span class="hljs-string">&quot;&#x27;.  Cause: &quot;</span> + e, e);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 注册包下所有类，并为其取一个别名</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerAliases</span><span class="hljs-params">(String packageName)</span>&#123;<br>    registerAliases(packageName, Object.class);<br>  &#125; <br><br>  <span class="hljs-comment">// 扫描并注册包下所有继承于superType的类型别名</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerAliases</span><span class="hljs-params">(String packageName, Class&lt;?&gt; superType)</span>&#123;<br>    ResolverUtil&lt;Class&lt;?&gt;&gt; resolverUtil = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResolverUtil</span>&lt;Class&lt;?&gt;&gt;();<br>    resolverUtil.find(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ResolverUtil</span>.IsA(superType), packageName);<br>    Set&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Class</span>&lt;?&gt;&gt;&gt; typeSet = resolverUtil.getClasses();<br>    <span class="hljs-keyword">for</span>(Class&lt;?&gt; type : typeSet)&#123;<br>      <span class="hljs-comment">// Ignore inner classes and interfaces (including package-info.java)</span><br>      <span class="hljs-comment">// Skip also inner classes. See issue #6</span><br>      <span class="hljs-keyword">if</span> (!type.isAnonymousClass() &amp;&amp; !type.isInterface() &amp;&amp; !type.isMemberClass()) &#123;<br>        registerAlias(type);<br>      &#125;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 注册类型别名</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerAlias</span><span class="hljs-params">(Class&lt;?&gt; type)</span> &#123;<br>    <span class="hljs-comment">// 如果没有类型别名，用Class.getSimpleName来注册</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">alias</span> <span class="hljs-operator">=</span> type.getSimpleName();<br>	<span class="hljs-comment">// 或者通过Alias注解来注册(Class.getAnnotation)</span><br>    <span class="hljs-type">Alias</span> <span class="hljs-variable">aliasAnnotation</span> <span class="hljs-operator">=</span> type.getAnnotation(Alias.class);<br>    <span class="hljs-keyword">if</span> (aliasAnnotation != <span class="hljs-literal">null</span>) &#123;<br>      alias = aliasAnnotation.value();<br>    &#125; <br>    registerAlias(alias, type);<br>  &#125; <br><br>  <span class="hljs-comment">// 注册类型别名</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerAlias</span><span class="hljs-params">(String alias, Class&lt;?&gt; value)</span> &#123;<br>    <span class="hljs-keyword">if</span> (alias == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;The parameter alias cannot be null&quot;</span>);<br>    &#125;<br>    <span class="hljs-comment">// issue #748</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">key</span> <span class="hljs-operator">=</span> alias.toLowerCase(Locale.ENGLISH);<br>    <span class="hljs-comment">// 如果已经存在key了，且value和之前不一致，报错</span><br>    <span class="hljs-keyword">if</span> (TYPE_ALIASES.containsKey(key) &amp;&amp; TYPE_ALIASES.get(key) != <span class="hljs-literal">null</span> &amp;&amp; !TYPE_ALIASES.get(key).equals(value)) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;The alias &#x27;&quot;</span> + alias + <span class="hljs-string">&quot;&#x27; is already mapped to the value &#x27;&quot;</span> + TYPE_ALIASES.get(key).getName() + <span class="hljs-string">&quot;&#x27;.&quot;</span>);<br>    &#125;<br>    TYPE_ALIASES.put(key, value);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">registerAlias</span><span class="hljs-params">(String alias, String value)</span> &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      registerAlias(alias, Resources.classForName(value));<br>    &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;Error registering type alias &quot;</span>+alias+<span class="hljs-string">&quot; for &quot;</span>+value+<span class="hljs-string">&quot;. Cause: &quot;</span> + e, e);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 获取所有类型别名信息</span><br>  <span class="hljs-keyword">public</span> Map&lt;String, Class&lt;?&gt;&gt; getTypeAliases() &#123;<br>    <span class="hljs-keyword">return</span> Collections.unmodifiableMap(TYPE_ALIASES);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="TypeHandler"><a href="#TypeHandler" class="headerlink" title="TypeHandler"></a>TypeHandler</h4><p>    类型处理器接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">TypeHandler</span>&lt;T&gt; &#123;<br><br>  <span class="hljs-comment">// 设置参数</span><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">setParameter</span><span class="hljs-params">(PreparedStatement ps, <span class="hljs-type">int</span> i, T parameter, JdbcType jdbcType)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>  <span class="hljs-comment">// 取得结果,供普通select用</span><br>  T <span class="hljs-title function_">getResult</span><span class="hljs-params">(ResultSet rs, String columnName)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>  <span class="hljs-comment">// 取得结果,供普通select用</span><br>  T <span class="hljs-title function_">getResult</span><span class="hljs-params">(ResultSet rs, <span class="hljs-type">int</span> columnIndex)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>  <span class="hljs-comment">// 取得结果,供SP用</span><br>  T <span class="hljs-title function_">getResult</span><span class="hljs-params">(CallableStatement cs, <span class="hljs-type">int</span> columnIndex)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="TypeReference"><a href="#TypeReference" class="headerlink" title="TypeReference"></a>TypeReference</h4><p>      3.1新加的类型引用,为了引用一个泛型类型</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TypeReference</span>&lt;T&gt; &#123; <br>  <span class="hljs-comment">// 引用的原生类型</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Type rawType; <br><br>  <span class="hljs-keyword">protected</span> <span class="hljs-title function_">TypeReference</span><span class="hljs-params">()</span> &#123;<br>    rawType = getSuperclassTypeParameter(getClass());<br>  &#125;<br><br>  Type <span class="hljs-title function_">getSuperclassTypeParameter</span><span class="hljs-params">(Class&lt;?&gt; clazz)</span> &#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * class.getGenericSuperclass()</span><br><span class="hljs-comment">     * 返回表示此类所表示的实体(类、接口、基元类型或void)的直接父类的类型。</span><br><span class="hljs-comment">     * 如果父类是参数化类型（泛型），则返回的类型对象必须准确反映源代码中使用的实际类型参数。</span><br><span class="hljs-comment">     * 如果以前没有创建过表示父类的参数化类型，则会创建它</span><br><span class="hljs-comment">     * 有关参数化类型创建过程的语义，请参见ParameterizedType的声明。</span><br><span class="hljs-comment">     * 如果该类表示对象类、接口、基本类型或void，则返回null。</span><br><span class="hljs-comment">     * 如果这个对象代表一个数组类，则返回代表该对象类的类对象</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-type">Type</span> <span class="hljs-variable">genericSuperclass</span> <span class="hljs-operator">=</span> clazz.getGenericSuperclass();<br>	<span class="hljs-comment">// 不是参数化类型，看其父类是否是参数化类型</span><br>    <span class="hljs-keyword">if</span> (genericSuperclass <span class="hljs-keyword">instanceof</span> Class) &#123;<br>      <span class="hljs-comment">// try to climb up the hierarchy until meet something useful</span><br>      <span class="hljs-comment">// 一直找到 TypeReference.class</span><br>      <span class="hljs-keyword">if</span> (TypeReference.class != genericSuperclass) &#123;<br>        <span class="hljs-keyword">return</span> getSuperclassTypeParameter(clazz.getSuperclass());<br>      &#125;<br>      <span class="hljs-comment">// 其所有父类都不是参数化类型，报错</span><br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;&#x27;&quot;</span> + getClass() + <span class="hljs-string">&quot;&#x27; extends TypeReference but misses the type parameter. &quot;</span><br>        + <span class="hljs-string">&quot;Remove the extension or add a type parameter to it.&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// 获取泛型类型</span><br>    <span class="hljs-type">Type</span> <span class="hljs-variable">rawType</span> <span class="hljs-operator">=</span> ((ParameterizedType) genericSuperclass).getActualTypeArguments()[<span class="hljs-number">0</span>];<br>    <span class="hljs-comment">// TODO remove this when Reflector is fixed to return Types</span><br>    <span class="hljs-keyword">if</span> (rawType <span class="hljs-keyword">instanceof</span> ParameterizedType) &#123;<br>      rawType = ((ParameterizedType) rawType).getRawType();<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> rawType;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Type <span class="hljs-title function_">getRawType</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> rawType;<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> rawType.toString();<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="BaseTypeHandler"><a href="#BaseTypeHandler" class="headerlink" title="BaseTypeHandler"></a>BaseTypeHandler</h4><p>    类型处理器的基类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BaseTypeHandler</span>&lt;T&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title class_">TypeReference</span>&lt;T&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title class_">TypeHandler</span>&lt;T&gt; &#123;<br>  <span class="hljs-keyword">protected</span> Configuration configuration;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setConfiguration</span><span class="hljs-params">(Configuration c)</span> &#123;<br>    <span class="hljs-built_in">this</span>.configuration = c;<br>  &#125;<br> <br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setParameter</span><span class="hljs-params">(PreparedStatement ps, <span class="hljs-type">int</span> i, T parameter, JdbcType jdbcType)</span> <span class="hljs-keyword">throws</span> SQLException &#123;<br>    <span class="hljs-comment">// 特殊情况，设置NULL</span><br>    <span class="hljs-keyword">if</span> (parameter == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">if</span> (jdbcType == <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-comment">// 如果没设置jdbcType，报错啦</span><br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;JDBC requires that the JdbcType must be specified for all nullable parameters.&quot;</span>);<br>      &#125;<br>      <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 设成NULL</span><br>        ps.setNull(i, jdbcType.TYPE_CODE);<br>      &#125; <span class="hljs-keyword">catch</span> (SQLException e) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;Error setting null for parameter #&quot;</span> + i + <span class="hljs-string">&quot; with JdbcType &quot;</span> + jdbcType + <span class="hljs-string">&quot; . &quot;</span> +<br>                <span class="hljs-string">&quot;Try setting a different JdbcType for this parameter or a different jdbcTypeForNull configuration property. &quot;</span> +<br>                <span class="hljs-string">&quot;Cause: &quot;</span> + e, e);<br>      &#125;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// 非NULL情况，怎么设还得交给不同的子类完成, setNonNullParameter是一个抽象方法</span><br>      setNonNullParameter(ps, i, parameter, jdbcType);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-comment">// 根据列名获取结果</span><br>  <span class="hljs-keyword">public</span> T <span class="hljs-title function_">getResult</span><span class="hljs-params">(ResultSet rs, String columnName)</span> <span class="hljs-keyword">throws</span> SQLException &#123;<br>    <span class="hljs-type">T</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> getNullableResult(rs, columnName);<br>    <span class="hljs-comment">// 通过ResultSet.wasNull判断是否为NULL</span><br>    <span class="hljs-keyword">if</span> (rs.wasNull()) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> result;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-comment">// 根据列下标获取结果</span><br>  <span class="hljs-keyword">public</span> T <span class="hljs-title function_">getResult</span><span class="hljs-params">(ResultSet rs, <span class="hljs-type">int</span> columnIndex)</span> <span class="hljs-keyword">throws</span> SQLException &#123;<br>    <span class="hljs-type">T</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> getNullableResult(rs, columnIndex);<br>    <span class="hljs-keyword">if</span> (rs.wasNull()) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> result;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> T <span class="hljs-title function_">getResult</span><span class="hljs-params">(CallableStatement cs, <span class="hljs-type">int</span> columnIndex)</span> <span class="hljs-keyword">throws</span> SQLException &#123;<br>    <span class="hljs-type">T</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> getNullableResult(cs, columnIndex);<br>	<span class="hljs-comment">// 通过CallableStatement.wasNull判断是否为NULL</span><br>    <span class="hljs-keyword">if</span> (cs.wasNull()) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> result;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 非NULL情况，怎么设参数还得交给不同的子类完成</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setNonNullParameter</span><span class="hljs-params">(PreparedStatement ps, <span class="hljs-type">int</span> i, T parameter, JdbcType jdbcType)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>  <span class="hljs-comment">// 以下3个方法是取得可能为null的结果，具体交给子类完成</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> T <span class="hljs-title function_">getNullableResult</span><span class="hljs-params">(ResultSet rs, String columnName)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> T <span class="hljs-title function_">getNullableResult</span><span class="hljs-params">(ResultSet rs, <span class="hljs-type">int</span> columnIndex)</span> <span class="hljs-keyword">throws</span> SQLException;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> T <span class="hljs-title function_">getNullableResult</span><span class="hljs-params">(CallableStatement cs, <span class="hljs-type">int</span> columnIndex)</span> <span class="hljs-keyword">throws</span> SQLException;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="其他TypeHandle-略"><a href="#其他TypeHandle-略" class="headerlink" title="其他TypeHandle 略"></a>其他TypeHandle 略</h4><h4 id="TypeHandlerRegistry"><a href="#TypeHandlerRegistry" class="headerlink" title="TypeHandlerRegistry"></a>TypeHandlerRegistry</h4><p>    类型处理器注册机</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">TypeHandlerRegistry</span> &#123; <br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;JdbcType, TypeHandler&lt;?&gt;&gt; JDBC_TYPE_HANDLER_MAP = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EnumMap</span>&lt;JdbcType, TypeHandler&lt;?&gt;&gt;(JdbcType.class);<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;Type, Map&lt;JdbcType, TypeHandler&lt;?&gt;&gt;&gt; TYPE_HANDLER_MAP = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;Type, Map&lt;JdbcType, TypeHandler&lt;?&gt;&gt;&gt;();<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> TypeHandler&lt;Object&gt; UNKNOWN_TYPE_HANDLER = <span class="hljs-keyword">new</span> <span class="hljs-title class_">UnknownTypeHandler</span>(<span class="hljs-built_in">this</span>);<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;Class&lt;?&gt;, TypeHandler&lt;?&gt;&gt; ALL_TYPE_HANDLERS_MAP = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;Class&lt;?&gt;, TypeHandler&lt;?&gt;&gt;(); <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">TypeHandlerRegistry</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// 构造函数里注册系统内置的类型处理器</span><br>    <span class="hljs-comment">// 以下是为多个类型注册到同一个handler</span><br>    register(Boolean.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanTypeHandler</span>());<br>    register(<span class="hljs-type">boolean</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanTypeHandler</span>());<br>    register(JdbcType.BOOLEAN, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanTypeHandler</span>());<br>    register(JdbcType.BIT, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanTypeHandler</span>());<br><br>    register(Byte.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteTypeHandler</span>());<br>    register(<span class="hljs-type">byte</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteTypeHandler</span>());<br>    register(JdbcType.TINYINT, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteTypeHandler</span>());<br><br>    register(Short.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ShortTypeHandler</span>());<br>    register(<span class="hljs-type">short</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ShortTypeHandler</span>());<br>    register(JdbcType.SMALLINT, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ShortTypeHandler</span>());<br><br>    register(Integer.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerTypeHandler</span>());<br>    register(<span class="hljs-type">int</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerTypeHandler</span>());<br>    register(JdbcType.INTEGER, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerTypeHandler</span>());<br><br>    register(Long.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">LongTypeHandler</span>());<br>    register(<span class="hljs-type">long</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">LongTypeHandler</span>());<br><br>    register(Float.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">FloatTypeHandler</span>());<br>    register(<span class="hljs-type">float</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">FloatTypeHandler</span>());<br>    register(JdbcType.FLOAT, <span class="hljs-keyword">new</span> <span class="hljs-title class_">FloatTypeHandler</span>());<br><br>    register(Double.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DoubleTypeHandler</span>());<br>    register(<span class="hljs-type">double</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DoubleTypeHandler</span>());<br>    register(JdbcType.DOUBLE, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DoubleTypeHandler</span>());<br><br>    <span class="hljs-comment">// 以下是为同一个类型的多种变种注册到多个不同的handler</span><br>    register(String.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTypeHandler</span>());<br>    register(String.class, JdbcType.CHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTypeHandler</span>());<br>    register(String.class, JdbcType.CLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClobTypeHandler</span>());<br>    register(String.class, JdbcType.VARCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTypeHandler</span>());<br>    register(String.class, JdbcType.LONGVARCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClobTypeHandler</span>());<br>    register(String.class, JdbcType.NVARCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">NStringTypeHandler</span>());<br>    register(String.class, JdbcType.NCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">NStringTypeHandler</span>());<br>    register(String.class, JdbcType.NCLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">NClobTypeHandler</span>());<br>    register(JdbcType.CHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTypeHandler</span>());<br>    register(JdbcType.VARCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTypeHandler</span>());<br>    register(JdbcType.CLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClobTypeHandler</span>());<br>    register(JdbcType.LONGVARCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClobTypeHandler</span>());<br>    register(JdbcType.NVARCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">NStringTypeHandler</span>());<br>    register(JdbcType.NCHAR, <span class="hljs-keyword">new</span> <span class="hljs-title class_">NStringTypeHandler</span>());<br>    register(JdbcType.NCLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">NClobTypeHandler</span>());<br><br>    register(Object.class, JdbcType.ARRAY, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayTypeHandler</span>());<br>    register(JdbcType.ARRAY, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayTypeHandler</span>());<br><br>    register(BigInteger.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigIntegerTypeHandler</span>());<br>    register(JdbcType.BIGINT, <span class="hljs-keyword">new</span> <span class="hljs-title class_">LongTypeHandler</span>());<br><br>    register(BigDecimal.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigDecimalTypeHandler</span>());<br>    register(JdbcType.REAL, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigDecimalTypeHandler</span>());<br>    register(JdbcType.DECIMAL, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigDecimalTypeHandler</span>());<br>    register(JdbcType.NUMERIC, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BigDecimalTypeHandler</span>());<br><br>    register(Byte[].class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteObjectArrayTypeHandler</span>());<br>    register(Byte[].class, JdbcType.BLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlobByteObjectArrayTypeHandler</span>());<br>    register(Byte[].class, JdbcType.LONGVARBINARY, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlobByteObjectArrayTypeHandler</span>());<br>    register(<span class="hljs-type">byte</span>[].class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteArrayTypeHandler</span>());<br>    register(<span class="hljs-type">byte</span>[].class, JdbcType.BLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlobTypeHandler</span>());<br>    register(<span class="hljs-type">byte</span>[].class, JdbcType.LONGVARBINARY, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlobTypeHandler</span>());<br>    register(JdbcType.LONGVARBINARY, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlobTypeHandler</span>());<br>    register(JdbcType.BLOB, <span class="hljs-keyword">new</span> <span class="hljs-title class_">BlobTypeHandler</span>());<br><br>    register(Object.class, UNKNOWN_TYPE_HANDLER);<br>    register(Object.class, JdbcType.OTHER, UNKNOWN_TYPE_HANDLER);<br>    register(JdbcType.OTHER, UNKNOWN_TYPE_HANDLER);<br><br>    register(Date.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DateTypeHandler</span>());<br>    register(Date.class, JdbcType.DATE, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DateOnlyTypeHandler</span>());<br>    register(Date.class, JdbcType.TIME, <span class="hljs-keyword">new</span> <span class="hljs-title class_">TimeOnlyTypeHandler</span>());<br>    register(JdbcType.TIMESTAMP, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DateTypeHandler</span>());<br>    register(JdbcType.DATE, <span class="hljs-keyword">new</span> <span class="hljs-title class_">DateOnlyTypeHandler</span>());<br>    register(JdbcType.TIME, <span class="hljs-keyword">new</span> <span class="hljs-title class_">TimeOnlyTypeHandler</span>());<br><br>    register(java.sql.Date.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">SqlDateTypeHandler</span>());<br>    register(java.sql.Time.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">SqlTimeTypeHandler</span>());<br>    register(java.sql.Timestamp.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">SqlTimestampTypeHandler</span>());<br><br>    <span class="hljs-comment">// issue #273</span><br>    register(Character.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">CharacterTypeHandler</span>());<br>    register(<span class="hljs-type">char</span>.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">CharacterTypeHandler</span>());<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> TypeHandler&lt;?&gt; getMappingTypeHandler(Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">TypeHandler</span>&lt;?&gt;&gt; handlerType) &#123;<br>    <span class="hljs-keyword">return</span> ALL_TYPE_HANDLERS_MAP.get(handlerType);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">hasTypeHandler</span><span class="hljs-params">(Class&lt;?&gt; javaType)</span> &#123;<br>    <span class="hljs-keyword">return</span> hasTypeHandler(javaType, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">hasTypeHandler</span><span class="hljs-params">(TypeReference&lt;?&gt; javaTypeReference)</span> &#123;<br>    <span class="hljs-keyword">return</span> hasTypeHandler(javaTypeReference, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">hasTypeHandler</span><span class="hljs-params">(Class&lt;?&gt; javaType, JdbcType jdbcType)</span> &#123;<br>    <span class="hljs-keyword">return</span> javaType != <span class="hljs-literal">null</span> &amp;&amp; getTypeHandler((Type) javaType, jdbcType) != <span class="hljs-literal">null</span>;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">hasTypeHandler</span><span class="hljs-params">(TypeReference&lt;?&gt; javaTypeReference, JdbcType jdbcType)</span> &#123;<br>    <span class="hljs-keyword">return</span> javaTypeReference != <span class="hljs-literal">null</span> &amp;&amp; getTypeHandler(javaTypeReference, jdbcType) != <span class="hljs-literal">null</span>;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; TypeHandler&lt;T&gt; <span class="hljs-title function_">getTypeHandler</span><span class="hljs-params">(Class&lt;T&gt; type)</span> &#123;<br>    <span class="hljs-keyword">return</span> getTypeHandler((Type) type, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; TypeHandler&lt;T&gt; <span class="hljs-title function_">getTypeHandler</span><span class="hljs-params">(TypeReference&lt;T&gt; javaTypeReference)</span> &#123;<br>    <span class="hljs-keyword">return</span> getTypeHandler(javaTypeReference, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> TypeHandler&lt;?&gt; getTypeHandler(JdbcType jdbcType) &#123;<br>    <span class="hljs-keyword">return</span> JDBC_TYPE_HANDLER_MAP.get(jdbcType);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; TypeHandler&lt;T&gt; <span class="hljs-title function_">getTypeHandler</span><span class="hljs-params">(Class&lt;T&gt; type, JdbcType jdbcType)</span> &#123;<br>    <span class="hljs-keyword">return</span> getTypeHandler((Type) type, jdbcType);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; TypeHandler&lt;T&gt; <span class="hljs-title function_">getTypeHandler</span><span class="hljs-params">(TypeReference&lt;T&gt; javaTypeReference, JdbcType jdbcType)</span> &#123;<br>    <span class="hljs-keyword">return</span> getTypeHandler(javaTypeReference.getRawType(), jdbcType);<br>  &#125; <br><br>  <span class="hljs-comment">// 根据java类型和jdbc类型获取 TypeHandler</span><br>  <span class="hljs-keyword">private</span> &lt;T&gt; TypeHandler&lt;T&gt; <span class="hljs-title function_">getTypeHandler</span><span class="hljs-params">(Type type, JdbcType jdbcType)</span> &#123;<br>    Map&lt;JdbcType, TypeHandler&lt;?&gt;&gt; jdbcHandlerMap = TYPE_HANDLER_MAP.get(type);<br>    TypeHandler&lt;?&gt; handler = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">if</span> (jdbcHandlerMap != <span class="hljs-literal">null</span>) &#123;<br>      handler = jdbcHandlerMap.get(jdbcType);<br>      <span class="hljs-keyword">if</span> (handler == <span class="hljs-literal">null</span>) &#123;<br>        handler = jdbcHandlerMap.get(<span class="hljs-literal">null</span>);<br>      &#125;<br>    &#125;<br>    <span class="hljs-comment">// type 为 枚举类型</span><br>    <span class="hljs-keyword">if</span> (handler == <span class="hljs-literal">null</span> &amp;&amp; type != <span class="hljs-literal">null</span> &amp;&amp; type <span class="hljs-keyword">instanceof</span> Class &amp;&amp; Enum.class.isAssignableFrom((Class&lt;?&gt;) type)) &#123;<br>      handler = <span class="hljs-keyword">new</span> <span class="hljs-title class_">EnumTypeHandler</span>((Class&lt;?&gt;) type);<br>    &#125;<br>    <span class="hljs-comment">// type drives generics here</span><br>    <span class="hljs-keyword">return</span> (TypeHandler&lt;T&gt;) handler;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> TypeHandler&lt;Object&gt; <span class="hljs-title function_">getUnknownTypeHandler</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> UNKNOWN_TYPE_HANDLER;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(JdbcType jdbcType, TypeHandler&lt;?&gt; handler)</span> &#123;<br>    JDBC_TYPE_HANDLER_MAP.put(jdbcType, handler);<br>  &#125; <br><br>  <span class="hljs-comment">//</span><br>  <span class="hljs-comment">// REGISTER INSTANCE</span><br>  <span class="hljs-comment">//</span><br><br>  <span class="hljs-comment">// Only handler</span><br><br>  <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>  <span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(TypeHandler&lt;T&gt; typeHandler)</span> &#123;<br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">mappedTypeFound</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br>    <span class="hljs-type">MappedTypes</span> <span class="hljs-variable">mappedTypes</span> <span class="hljs-operator">=</span> typeHandler.getClass().getAnnotation(MappedTypes.class);<br>    <span class="hljs-keyword">if</span> (mappedTypes != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">for</span> (Class&lt;?&gt; handledType : mappedTypes.value()) &#123;<br>        register(handledType, typeHandler);<br>        mappedTypeFound = <span class="hljs-literal">true</span>;<br>      &#125;<br>    &#125;<br>    <span class="hljs-comment">// @since 3.1.0 - try to auto-discover the mapped type </span><br>    <span class="hljs-comment">// 注册系统内置的实现了 TypeReference 的 TypeHandler</span><br>    <span class="hljs-keyword">if</span> (!mappedTypeFound &amp;&amp; typeHandler <span class="hljs-keyword">instanceof</span> TypeReference) &#123;<br>      <span class="hljs-keyword">try</span> &#123;<br>        TypeReference&lt;T&gt; typeReference = (TypeReference&lt;T&gt;) typeHandler;<br>        register(typeReference.getRawType(), typeHandler);<br>        mappedTypeFound = <span class="hljs-literal">true</span>;<br>      &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>        <span class="hljs-comment">// maybe users define the TypeReference with a different type and are not assignable, so just ignore it</span><br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (!mappedTypeFound) &#123;<br>      register((Class&lt;T&gt;) <span class="hljs-literal">null</span>, typeHandler);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// java type + handler</span><br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Class&lt;T&gt; javaType, TypeHandler&lt;? extends T&gt; typeHandler)</span> &#123;<br>    register((Type) javaType, typeHandler);<br>  &#125; <br><br>  <span class="hljs-keyword">private</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Type javaType, TypeHandler&lt;? extends T&gt; typeHandler)</span> &#123;<br>	<span class="hljs-comment">// MappedJdbcTypes的注解的用法可参考测试类StringTrimmingTypeHandler</span><br>	<span class="hljs-comment">// 另外在文档中也提到，这是扩展自定义的typeHandler所需要的</span><br>	<span class="hljs-comment">// (你可以重写类型处理器或创建你自己的类型处理器来处理不支持的或非标准的类型)</span><br>    <span class="hljs-type">MappedJdbcTypes</span> <span class="hljs-variable">mappedJdbcTypes</span> <span class="hljs-operator">=</span> typeHandler.getClass().getAnnotation(MappedJdbcTypes.class);<br>    <span class="hljs-keyword">if</span> (mappedJdbcTypes != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">for</span> (JdbcType handledJdbcType : mappedJdbcTypes.value()) &#123;<br>        register(javaType, handledJdbcType, typeHandler);<br>      &#125;<br>      <span class="hljs-keyword">if</span> (mappedJdbcTypes.includeNullJdbcType()) &#123;<br>        register(javaType, <span class="hljs-literal">null</span>, typeHandler);<br>      &#125;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      register(javaType, <span class="hljs-literal">null</span>, typeHandler);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(TypeReference&lt;T&gt; javaTypeReference, TypeHandler&lt;? extends T&gt; handler)</span> &#123;<br>    register(javaTypeReference.getRawType(), handler);<br>  &#125; <br><br>  <span class="hljs-comment">// java type + jdbc type + handler</span><br><br>  <span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Class&lt;T&gt; type, JdbcType jdbcType, TypeHandler&lt;? extends T&gt; handler)</span> &#123;<br>    register((Type) type, jdbcType, handler);<br>  &#125; <br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Type javaType, JdbcType jdbcType, TypeHandler&lt;?&gt; handler)</span> &#123;<br>    <span class="hljs-keyword">if</span> (javaType != <span class="hljs-literal">null</span>) &#123;<br>      Map&lt;JdbcType, TypeHandler&lt;?&gt;&gt; map = TYPE_HANDLER_MAP.get(javaType);<br>      <span class="hljs-keyword">if</span> (map == <span class="hljs-literal">null</span>) &#123;<br>        map = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;JdbcType, TypeHandler&lt;?&gt;&gt;();<br>        TYPE_HANDLER_MAP.put(javaType, map);<br>      &#125;<br>      map.put(jdbcType, handler);<br>    &#125; <br>    <span class="hljs-comment">// TypeHandler 全集 </span><br>    ALL_TYPE_HANDLERS_MAP.put(handler.getClass(), handler); <br>  &#125; <br><br>  <span class="hljs-comment">//</span><br>  <span class="hljs-comment">// REGISTER CLASS</span><br>  <span class="hljs-comment">//</span><br><br>  <span class="hljs-comment">// Only handler type</span><br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Class&lt;?&gt; typeHandlerClass)</span> &#123;<br>    <span class="hljs-type">boolean</span> <span class="hljs-variable">mappedTypeFound</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br>    <span class="hljs-type">MappedTypes</span> <span class="hljs-variable">mappedTypes</span> <span class="hljs-operator">=</span> typeHandlerClass.getAnnotation(MappedTypes.class);<br>    <span class="hljs-keyword">if</span> (mappedTypes != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">for</span> (Class&lt;?&gt; javaTypeClass : mappedTypes.value()) &#123;<br>        register(javaTypeClass, typeHandlerClass);<br>        mappedTypeFound = <span class="hljs-literal">true</span>;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (!mappedTypeFound) &#123;<br>      register(getInstance(<span class="hljs-literal">null</span>, typeHandlerClass));<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// java type + handler type</span><br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Class&lt;?&gt; javaTypeClass, Class&lt;?&gt; typeHandlerClass)</span> &#123;<br>    register(javaTypeClass, getInstance(javaTypeClass, typeHandlerClass));<br>  &#125; <br><br>  <span class="hljs-comment">// java type + jdbc type + handler type</span><br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Class&lt;?&gt; javaTypeClass, JdbcType jdbcType, Class&lt;?&gt; typeHandlerClass)</span> &#123;<br>    register(javaTypeClass, jdbcType, getInstance(javaTypeClass, typeHandlerClass));<br>  &#125; <br><br>  <span class="hljs-comment">// Construct a handler (used also from Builders)</span><br><br>  <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>  <span class="hljs-keyword">public</span> &lt;T&gt; TypeHandler&lt;T&gt; <span class="hljs-title function_">getInstance</span><span class="hljs-params">(Class&lt;?&gt; javaTypeClass, Class&lt;?&gt; typeHandlerClass)</span> &#123;<br>    <span class="hljs-keyword">if</span> (javaTypeClass != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 内置的 TypeHandler 中只有 EnumTypeHandler 和 EnumOrdinalTypeHandler</span><br>        <span class="hljs-comment">// 有这个构造函数</span><br>        Constructor&lt;?&gt; c = typeHandlerClass.getConstructor(Class.class);<br>        <span class="hljs-keyword">return</span> (TypeHandler&lt;T&gt;) c.newInstance(javaTypeClass);<br>      &#125; <span class="hljs-keyword">catch</span> (NoSuchMethodException ignored) &#123;<br>        <span class="hljs-comment">// ignored</span><br>      &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;Failed invoking constructor for handler &quot;</span> + typeHandlerClass, e);<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>      Constructor&lt;?&gt; c = typeHandlerClass.getConstructor();<br>      <span class="hljs-keyword">return</span> (TypeHandler&lt;T&gt;) c.newInstance();<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TypeException</span>(<span class="hljs-string">&quot;Unable to find a usable constructor for &quot;</span> + typeHandlerClass, e);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>    还有一个<code>SimpleTypeRegistry</code>给忘了，读者可以自己去看看代码，功能是判断class是否为known common type</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">Mybatis源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Mybatis/">#Mybatis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>5-type</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/06/25/5-type/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年6月25日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/11/SpringBoot%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E6%B5%85%E6%9E%90/" title="SpringBoot自动配置浅析">
+                        <span class="hidden-mobile">SpringBoot自动配置浅析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
