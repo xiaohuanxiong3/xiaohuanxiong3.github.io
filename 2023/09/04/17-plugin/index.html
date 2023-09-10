@@ -1,0 +1,633 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Signature    签名 12345678910@Retention(RetentionPolicy.RUNTIME)@Target(ElementType.TYPE)public @interface Signature &amp;#123;  &#x2F;&#x2F; 就是定义哪些类，方法，参数需要被拦截  Class&lt;?&gt; type();  String method();  Class&lt;?&amp;g">
+<meta property="og:type" content="article">
+<meta property="og:title" content="17-plugin">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/09/04/17-plugin/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="Signature    签名 12345678910@Retention(RetentionPolicy.RUNTIME)@Target(ElementType.TYPE)public @interface Signature &amp;#123;  &#x2F;&#x2F; 就是定义哪些类，方法，参数需要被拦截  Class&lt;?&gt; type();  String method();  Class&lt;?&amp;g">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-04T15:49:25.000Z">
+<meta property="article:modified_time" content="2023-09-05T15:23:04.308Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>17-plugin - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/complaint/">
+                <i class="iconfont icon-user-fill"></i>
+                日常吐槽
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="17-plugin"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-09-04 23:49" pubdate>
+          2023年9月4日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          42 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">17-plugin</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h4 id="Signature"><a href="#Signature" class="headerlink" title="Signature"></a>Signature</h4><p>    签名</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> Signature &#123;<br>  <span class="hljs-comment">// 就是定义哪些类，方法，参数需要被拦截</span><br>  Class&lt;?&gt; type();<br><br>  String <span class="hljs-title function_">method</span><span class="hljs-params">()</span>;<br><br>  Class&lt;?&gt;[] args();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Intercepts"><a href="#Intercepts" class="headerlink" title="Intercepts"></a>Intercepts</h4><p>    <code>@Intercepts</code>注解用于表明当前的对象是一个拦截器。其配置值是一个<code>@Signature</code>数组，而<code>@Signature</code>则用于声明要拦截的接口、方法以及对应的参数列表.所谓拦截器的作用就是可以拦截某些方法的调用，和Spring中的AOP是完全一致的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="hljs-meta">@Target(ElementType.TYPE)</span><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@interface</span> Intercepts &#123;<br>  Signature[] value();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Interceptor"><a href="#Interceptor" class="headerlink" title="Interceptor"></a>Interceptor</h4><p>    拦截器抽象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Interceptor</span> &#123;<br><br>  <span class="hljs-comment">// 拦截</span><br>  Object <span class="hljs-title function_">intercept</span><span class="hljs-params">(Invocation invocation)</span> <span class="hljs-keyword">throws</span> Throwable;<br><br>  <span class="hljs-comment">// 返回代理类</span><br>  Object <span class="hljs-title function_">plugin</span><span class="hljs-params">(Object target)</span>;<br><br>  <span class="hljs-comment">// 设置属性</span><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">setProperties</span><span class="hljs-params">(Properties properties)</span>;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Plugin"><a href="#Plugin" class="headerlink" title="Plugin"></a>Plugin</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Plugin</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">InvocationHandler</span> &#123; <br><br>  <span class="hljs-comment">// 被代理的对象</span><br>  <span class="hljs-keyword">private</span> Object target;<br>  <span class="hljs-comment">// 拦截器</span><br>  <span class="hljs-keyword">private</span> Interceptor interceptor;<br>  <span class="hljs-comment">// 要代理的方法</span><br>  <span class="hljs-keyword">private</span> Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; signatureMap; <br><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">Plugin</span><span class="hljs-params">(Object target, Interceptor interceptor, Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; signatureMap)</span> &#123;<br>    <span class="hljs-built_in">this</span>.target = target;<br>    <span class="hljs-built_in">this</span>.interceptor = interceptor;<br>    <span class="hljs-built_in">this</span>.signatureMap = signatureMap;<br>  &#125; <br><br>  <span class="hljs-comment">// 生成代理类</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title function_">wrap</span><span class="hljs-params">(Object target, Interceptor interceptor)</span> &#123;<br>    <span class="hljs-comment">// 取得签名Map</span><br>    Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; signatureMap = getSignatureMap(interceptor);<br>    <span class="hljs-comment">// 取得要改变行为的类(ParameterHandler|ResultSetHandler|StatementHandler|Executor)</span><br>    Class&lt;?&gt; type = target.getClass();<br>    <span class="hljs-comment">// 取得接口</span><br>    Class&lt;?&gt;[] interfaces = getAllInterfaces(type, signatureMap);<br>    <span class="hljs-comment">// 产生代理</span><br>    <span class="hljs-keyword">if</span> (interfaces.length &gt; <span class="hljs-number">0</span>) &#123;<br>      <span class="hljs-keyword">return</span> Proxy.newProxyInstance(<br>          type.getClassLoader(),<br>          interfaces,<br>          <span class="hljs-keyword">new</span> <span class="hljs-title class_">Plugin</span>(target, interceptor, signatureMap));<br>    &#125;<br>    <span class="hljs-keyword">return</span> target;<br>  &#125; <br><br>  <span class="hljs-comment">// 取得签名Map</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; getSignatureMap(Interceptor interceptor) &#123;<br>    <span class="hljs-comment">// 取Intercepts注解，例子可参见ExamplePlugin.java</span><br>    <span class="hljs-type">Intercepts</span> <span class="hljs-variable">interceptsAnnotation</span> <span class="hljs-operator">=</span> interceptor.getClass().getAnnotation(Intercepts.class);<br>    <span class="hljs-comment">// issue #251</span><br>    <span class="hljs-comment">// 必须得有Intercepts注解，没有报错</span><br>    <span class="hljs-keyword">if</span> (interceptsAnnotation == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PluginException</span>(<span class="hljs-string">&quot;No @Intercepts annotation was found in interceptor &quot;</span> + interceptor.getClass().getName());      <br>    &#125;<br>    <span class="hljs-comment">// value是数组型，Signature的数组</span><br>    Signature[] sigs = interceptsAnnotation.value();<br>    <span class="hljs-comment">// 每个class里有多个Method需要被拦截,所以这么定义</span><br>    Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; signatureMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt;();<br>    <span class="hljs-keyword">for</span> (Signature sig : sigs) &#123;<br>      Set&lt;Method&gt; methods = signatureMap.get(sig.type());<br>      <span class="hljs-keyword">if</span> (methods == <span class="hljs-literal">null</span>) &#123;<br>        methods = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;Method&gt;();<br>        signatureMap.put(sig.type(), methods);<br>      &#125;<br>      <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-type">Method</span> <span class="hljs-variable">method</span> <span class="hljs-operator">=</span> sig.type().getMethod(sig.method(), sig.args());<br>        methods.add(method);<br>      &#125; <span class="hljs-keyword">catch</span> (NoSuchMethodException e) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PluginException</span>(<span class="hljs-string">&quot;Could not find method on &quot;</span> + sig.type() + <span class="hljs-string">&quot; named &quot;</span> + sig.method() + <span class="hljs-string">&quot;. Cause: &quot;</span> + e, e);<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> signatureMap;<br>  &#125; <br><br>  <span class="hljs-comment">// 取得接口</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Class&lt;?&gt;[] getAllInterfaces(Class&lt;?&gt; type, Map&lt;Class&lt;?&gt;, Set&lt;Method&gt;&gt; signatureMap) &#123;<br>    Set&lt;Class&lt;?&gt;&gt; interfaces = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;Class&lt;?&gt;&gt;();<br>    <span class="hljs-keyword">while</span> (type != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">for</span> (Class&lt;?&gt; c : type.getInterfaces()) &#123;<br>        <span class="hljs-comment">// 貌似只能拦截ParameterHandler|ResultSetHandler|StatementHandler|Executor</span><br>        <span class="hljs-comment">// 拦截其他的无效</span><br>        <span class="hljs-comment">// 当然我们可以覆盖Plugin.wrap方法，达到拦截其他类的功能</span><br>        <span class="hljs-keyword">if</span> (signatureMap.containsKey(c)) &#123;<br>          interfaces.add(c);<br>        &#125;<br>      &#125;<br>      type = type.getSuperclass();<br>    &#125;<br>    <span class="hljs-keyword">return</span> interfaces.toArray(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>&lt;?&gt;[interfaces.size()]);<br>  &#125; <br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] args)</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// 看看如何拦截</span><br>      Set&lt;Method&gt; methods = signatureMap.get(method.getDeclaringClass());<br>      <span class="hljs-comment">// 看哪些方法需要拦截</span><br>      <span class="hljs-keyword">if</span> (methods != <span class="hljs-literal">null</span> &amp;&amp; methods.contains(method)) &#123;<br>        <span class="hljs-comment">// 调用Interceptor.intercept，也即插入了我们自己的逻辑</span><br>        <span class="hljs-keyword">return</span> interceptor.intercept(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Invocation</span>(target, method, args));<br>      &#125;<br>      <span class="hljs-comment">// 没有拦截的话执行原来逻辑</span><br>      <span class="hljs-keyword">return</span> method.invoke(target, args);<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>      <span class="hljs-keyword">throw</span> ExceptionUtil.unwrapThrowable(e);<br>    &#125;<br>  &#125; <br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Invocation"><a href="#Invocation" class="headerlink" title="Invocation"></a>Invocation</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Invocation</span> &#123;<br><br>  <span class="hljs-comment">// 调用的对象</span><br>  <span class="hljs-keyword">private</span> Object target;<br>  <span class="hljs-comment">// 调用的方法</span><br>  <span class="hljs-keyword">private</span> Method method;<br>  <span class="hljs-comment">// 参数</span><br>  <span class="hljs-keyword">private</span> Object[] args;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">Invocation</span><span class="hljs-params">(Object target, Method method, Object[] args)</span> &#123;<br>    <span class="hljs-built_in">this</span>.target = target;<br>    <span class="hljs-built_in">this</span>.method = method;<br>    <span class="hljs-built_in">this</span>.args = args;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">getTarget</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> target;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Method <span class="hljs-title function_">getMethod</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> method;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Object[] getArgs() &#123;<br>    <span class="hljs-keyword">return</span> args;<br>  &#125;<br><br>  <span class="hljs-comment">// 继续做下去</span><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">proceed</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InvocationTargetException, IllegalAccessException &#123;<br>    <span class="hljs-keyword">return</span> method.invoke(target, args);<br>  &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="InterceptorChain"><a href="#InterceptorChain" class="headerlink" title="InterceptorChain"></a>InterceptorChain</h4><p>    拦截器链</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">InterceptorChain</span> &#123;<br><br>  <span class="hljs-comment">// 内部就是一个拦截器的List</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> List&lt;Interceptor&gt; interceptors = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Interceptor&gt;();<br><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">pluginAll</span><span class="hljs-params">(Object target)</span> &#123;<br>    <span class="hljs-comment">// 循环调用每个Interceptor.plugin方法</span><br>    <span class="hljs-keyword">for</span> (Interceptor interceptor : interceptors) &#123;<br>      target = interceptor.plugin(target);<br>    &#125;<br>    <span class="hljs-keyword">return</span> target;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addInterceptor</span><span class="hljs-params">(Interceptor interceptor)</span> &#123;<br>    interceptors.add(interceptor);<br>  &#125;<br>  <br>  <span class="hljs-keyword">public</span> List&lt;Interceptor&gt; <span class="hljs-title function_">getInterceptors</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> Collections.unmodifiableList(interceptors);<br>  &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">Mybatis源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Mybatis/">#Mybatis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>17-plugin</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/09/04/17-plugin/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年9月4日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/09/05/mybatis-configuration%E7%B1%BB/" title="mybatis-configuration类">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">mybatis-configuration类</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/08/28/16-executor/" title="16-executor">
+                        <span class="hidden-mobile">16-executor</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
