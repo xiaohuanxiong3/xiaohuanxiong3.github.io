@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>SpringMVC请求流程图</title>
+    <link href="/2024/04/20/SpringMVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E5%9B%BE/"/>
+    <url>/2024/04/20/SpringMVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E5%9B%BE/</url>
+    
+    <content type="html"><![CDATA[<p><img src="/2024/04/20/SpringMVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E5%9B%BE/331228498888800.jpg"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>流程图</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Spring</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>ScheduledThreadPoolExecutor源码解析</title>
     <link href="/2023/11/06/ScheduledThreadPoolExecutor%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/"/>
     <url>/2023/11/06/ScheduledThreadPoolExecutor%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</url>
