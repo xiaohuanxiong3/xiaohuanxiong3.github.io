@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="JBoss6VFS​ 一个使用JBoss6提供的VFS API的VFS实现 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6-io">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/07/06/mybatis-source-code/6-io/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="JBoss6VFS​ 一个使用JBoss6提供的VFS API的VFS实现 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-07-06T14:13:58.000Z">
+<meta property="article:modified_time" content="2023-07-06T14:14:36.096Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>6-io - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/poem/">
+                <i class="iconfont icon-user-fill"></i>
+                古诗词
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/thinking/">
+                <i class="iconfont icon-user-fill"></i>
+                思考ing
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="6-io"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-07-06 22:13" pubdate>
+          2023年7月6日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          24k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          199 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">6-io</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h4 id="JBoss6VFS"><a href="#JBoss6VFS" class="headerlink" title="JBoss6VFS"></a>JBoss6VFS</h4><p>​ 一个使用JBoss6提供的VFS API的VFS实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JBoss6VFS</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span> &#123;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Log</span> <span class="hljs-variable">log</span> <span class="hljs-operator">=</span> LogFactory.getLog(ResolverUtil.class);<br><br>  <span class="hljs-comment">// 一个模仿JBoss VirtualFile类的微小子集的类</span><br>  <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VirtualFile</span> &#123;<br>    <span class="hljs-keyword">static</span> Class&lt;?&gt; VirtualFile;<br>    <span class="hljs-keyword">static</span> Method getPathNameRelativeTo, getChildrenRecursively;<br><br>    Object virtualFile;<br><br>    VirtualFile(Object virtualFile) &#123;<br>      <span class="hljs-built_in">this</span>.virtualFile = virtualFile;<br>    &#125;<br><br>    String <span class="hljs-title function_">getPathNameRelativeTo</span><span class="hljs-params">(VirtualFile parent)</span> &#123;<br>      <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">return</span> invoke(getPathNameRelativeTo, virtualFile, parent.virtualFile);<br>      &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>        <span class="hljs-comment">// This exception is not thrown by the called method</span><br>        log.error(<span class="hljs-string">&quot;This should not be possible. VirtualFile.getPathNameRelativeTo() threw IOException.&quot;</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>      &#125;<br>    &#125;<br><br>    List&lt;VirtualFile&gt; <span class="hljs-title function_">getChildren</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>      List&lt;?&gt; objects = invoke(getChildrenRecursively, virtualFile);<br>      List&lt;VirtualFile&gt; children = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;VirtualFile&gt;(objects.size());<br>      <span class="hljs-keyword">for</span> (Object object : objects) &#123;<br>        children.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">VirtualFile</span>(object));<br>      &#125;<br>      <span class="hljs-keyword">return</span> children;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 一个模仿JBoss VFS类的微小子集的类</span><br>  <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VFS</span> &#123;<br>    <span class="hljs-keyword">static</span> Class&lt;?&gt; VFS;<br>    <span class="hljs-keyword">static</span> Method getChild;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">VFS</span><span class="hljs-params">()</span> &#123;<br>      <span class="hljs-comment">// Prevent Instantiation</span><br>    &#125;<br><br>    <span class="hljs-keyword">static</span> VirtualFile <span class="hljs-title function_">getChild</span><span class="hljs-params">(URL url)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>      <span class="hljs-type">Object</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> invoke(getChild, VFS, url);<br>      <span class="hljs-keyword">return</span> o == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : <span class="hljs-keyword">new</span> <span class="hljs-title class_">VirtualFile</span>(o);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 执行方法并抛出异常</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> &lt;T&gt; T <span class="hljs-title function_">invoke</span><span class="hljs-params">(Method method, Object object, Object... parameters)</span><br>      <span class="hljs-keyword">throws</span> IOException, RuntimeException &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">return</span> (T) method.invoke(object, parameters);<br>    &#125; <span class="hljs-keyword">catch</span> (IllegalArgumentException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>    &#125; <span class="hljs-keyword">catch</span> (IllegalAccessException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>    &#125; <span class="hljs-keyword">catch</span> (InvocationTargetException e) &#123;<br>      <span class="hljs-keyword">if</span> (e.getTargetException() <span class="hljs-keyword">instanceof</span> IOException) &#123;<br>        <span class="hljs-keyword">throw</span> (IOException) e.getTargetException();<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>      &#125;<br>    &#125;<br>    &#125;    <br><br>  <span class="hljs-comment">// 表示这个VFS在当前环境下是否可用</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Boolean valid;<br><br>  <span class="hljs-comment">// 找到访问JBoss 6 VFS所需的所有类和方法</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">initialize</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">if</span> (valid == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-comment">// Assume valid. It will get flipped later if something goes wrong.</span><br>      valid = Boolean.TRUE;<br><br>      <span class="hljs-comment">// Look up and verify required classes</span><br>      VFS.VFS = checkNotNull(getClass(<span class="hljs-string">&quot;org.jboss.vfs.VFS&quot;</span>));<br>      VirtualFile.VirtualFile = checkNotNull(getClass(<span class="hljs-string">&quot;org.jboss.vfs.VirtualFile&quot;</span>));<br><br>      <span class="hljs-comment">// Look up and verify required methods</span><br>      VFS.getChild = checkNotNull(getMethod(VFS.VFS, <span class="hljs-string">&quot;getChild&quot;</span>, URL.class));<br>      VirtualFile.getChildrenRecursively = checkNotNull(getMethod(VirtualFile.VirtualFile,<br>          <span class="hljs-string">&quot;getChildrenRecursively&quot;</span>));<br>      VirtualFile.getPathNameRelativeTo = checkNotNull(getMethod(VirtualFile.VirtualFile,<br>          <span class="hljs-string">&quot;getPathNameRelativeTo&quot;</span>, VirtualFile.VirtualFile));<br><br>      <span class="hljs-comment">// Verify that the API has not changed</span><br>      checkReturnType(VFS.getChild, VirtualFile.VirtualFile);<br>      checkReturnType(VirtualFile.getChildrenRecursively, List.class);<br>      checkReturnType(VirtualFile.getPathNameRelativeTo, String.class);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 通过当前线程的上下文类加载器根据类名获取类</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> Class&lt;?&gt; getClass(String className) &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">return</span> Thread.currentThread().getContextClassLoader().loadClass(className);<br><span class="hljs-comment">//      return ReflectUtil.findClass(className);</span><br>    &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>      log.debug(<span class="hljs-string">&quot;Class not found: &quot;</span> + className);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 如果对象为null，表示JBoss 6 VFS API在当前环境下不可用</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> &lt;T&gt; T <span class="hljs-title function_">checkNotNull</span><span class="hljs-params">(T object)</span> &#123;<br>    <span class="hljs-keyword">if</span> (object == <span class="hljs-literal">null</span>) &#123;<br>      setInvalid();<br>    &#125;<br>    <span class="hljs-keyword">return</span> object;<br>  &#125;  <br><br>  <span class="hljs-comment">// 根据方法名和参数获取类的某个方法</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> Method <span class="hljs-title function_">getMethod</span><span class="hljs-params">(Class&lt;?&gt; clazz, String methodName, Class&lt;?&gt;... parameterTypes)</span> &#123;<br>    <span class="hljs-keyword">if</span> (clazz == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">return</span> clazz.getMethod(methodName, parameterTypes);<br>    &#125; <span class="hljs-keyword">catch</span> (SecurityException e) &#123;<br>      log.error(<span class="hljs-string">&quot;Security exception looking for method &quot;</span> + clazz.getName() + <span class="hljs-string">&quot;.&quot;</span> + methodName + <span class="hljs-string">&quot;.  Cause: &quot;</span> + e);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125; <span class="hljs-keyword">catch</span> (NoSuchMethodException e) &#123;<br>      log.error(<span class="hljs-string">&quot;Method not found &quot;</span> + clazz.getName() + <span class="hljs-string">&quot;.&quot;</span> + methodName + <span class="hljs-string">&quot;.&quot;</span> + methodName + <span class="hljs-string">&quot;.  Cause: &quot;</span> + e);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>  &#125;  <br><br>  <span class="hljs-comment">// 检查方法的返回值是否和预期的相同，以此来检查方法是否发生了变化，</span><br>  <span class="hljs-comment">// 如果方法发生了变化，设置JBoss 6 VFS API在当前环境下不可用</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkReturnType</span><span class="hljs-params">(Method method, Class&lt;?&gt; expected)</span> &#123;<br>    <span class="hljs-keyword">if</span> (method != <span class="hljs-literal">null</span> &amp;&amp; !expected.isAssignableFrom(method.getReturnType())) &#123;<br>      log.error(<span class="hljs-string">&quot;Method &quot;</span> + method.getClass().getName() + <span class="hljs-string">&quot;.&quot;</span> + method.getName()<br>          + <span class="hljs-string">&quot;(..) should return &quot;</span> + expected.getName() + <span class="hljs-string">&quot; but returns &quot;</span><br>          + method.getReturnType().getName() + <span class="hljs-string">&quot; instead.&quot;</span>);<br>      setInvalid();<br>    &#125;<br>  &#125;  <br><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setInvalid</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">if</span> (JBoss6VFS.valid == Boolean.TRUE) &#123;<br>      log.debug(<span class="hljs-string">&quot;JBoss 6 VFS API is not available in this environment.&quot;</span>);<br>      JBoss6VFS.valid = Boolean.FALSE;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-keyword">static</span> &#123;<br>    initialize();<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-comment">// 递归列出所有资源的完整资源路径，这些资源是由URL标识的资源的子资源。</span><br>  <span class="hljs-keyword">public</span> List&lt;String&gt; <span class="hljs-title function_">list</span><span class="hljs-params">(URL url, String path)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    VirtualFile directory;<br>    directory = VFS.getChild(url);<br>    <span class="hljs-keyword">if</span> (directory == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> Collections.emptyList();<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!path.endsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>      path += <span class="hljs-string">&quot;/&quot;</span>;<br>    &#125;<br><br>    List&lt;VirtualFile&gt; children = directory.getChildren();<br>    List&lt;String&gt; names = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;(children.size());<br>    <span class="hljs-keyword">for</span> (VirtualFile vf : children) &#123;<br>      names.add(path + vf.getPathNameRelativeTo(directory));<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> names;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="DefaultVFS"><a href="#DefaultVFS" class="headerlink" title="DefaultVFS"></a>DefaultVFS</h4><p>默认的VFS实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DefaultVFS</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span> &#123; <br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Log</span> <span class="hljs-variable">log</span> <span class="hljs-operator">=</span> LogFactory.getLog(ResolverUtil.class);<br> <br>  <span class="hljs-comment">/** The magic header that indicates a JAR (ZIP) file. */</span><br>  <span class="hljs-comment">// 表示jar类型文件的魔数头</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">byte</span>[] JAR_MAGIC = &#123; <span class="hljs-string">&#x27;P&#x27;</span>, <span class="hljs-string">&#x27;K&#x27;</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span> &#125;;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isValid</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>  &#125; <br><br>  <span class="hljs-comment">// 试图解构给定的URL，以找到一个包含该URL所引用的资源的JAR文件。</span><br>  <span class="hljs-comment">// 也就是说，假设该URL引用了一个JAR条目，</span><br>  <span class="hljs-comment">// 该方法将返回一个引用一个JAR文件的URL，这个JAR文件包含此条目。</span><br>  <span class="hljs-comment">// 如果不能找到JAR，那么这个方法就会返回null。</span><br>  <span class="hljs-keyword">protected</span> URL <span class="hljs-title function_">findJarForResource</span><span class="hljs-params">(URL url)</span> <span class="hljs-keyword">throws</span> MalformedURLException &#123;<br>    log.debug(<span class="hljs-string">&quot;Find JAR URL: &quot;</span> + url);<br><br>    <span class="hljs-comment">// If the file part of the URL is itself a URL, then that URL probably points to the JAR</span><br>    <span class="hljs-comment">// 如果URL的文件部分本身是一个URL，那么其可能指向jar</span><br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">for</span> (;;) &#123;<br>        url = <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(url.getFile());<br>        log.debug(<span class="hljs-string">&quot;Inner URL: &quot;</span> + url);<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (MalformedURLException e) &#123;<br>      <span class="hljs-comment">// This will happen at some point and serves as a break in the loop</span><br>    &#125;<br><br>    <span class="hljs-comment">// Look for the .jar extension and chop off everything after that</span><br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">jarUrl</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>(url.toExternalForm());<br>    <span class="hljs-type">int</span> <span class="hljs-variable">index</span> <span class="hljs-operator">=</span> jarUrl.lastIndexOf(<span class="hljs-string">&quot;.jar&quot;</span>);<br>    <span class="hljs-keyword">if</span> (index &gt;= <span class="hljs-number">0</span>) &#123;<br>      jarUrl.setLength(index + <span class="hljs-number">4</span>);<br>      log.debug(<span class="hljs-string">&quot;Extracted JAR URL: &quot;</span> + jarUrl);<br>    &#125;<br>    <span class="hljs-keyword">else</span> &#123;<br>      log.debug(<span class="hljs-string">&quot;Not a JAR: &quot;</span> + jarUrl);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// Try to open and test it</span><br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-type">URL</span> <span class="hljs-variable">testUrl</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(jarUrl.toString());<br>      <span class="hljs-keyword">if</span> (isJar(testUrl)) &#123;<br>        <span class="hljs-keyword">return</span> testUrl;<br>      &#125;<br>      <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// WebLogic fix: check if the URL&#x27;s file exists in the filesystem.</span><br>        log.debug(<span class="hljs-string">&quot;Not a JAR: &quot;</span> + jarUrl);<br>        jarUrl.replace(<span class="hljs-number">0</span>, jarUrl.length(), testUrl.getFile());<br>        <span class="hljs-type">File</span> <span class="hljs-variable">file</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(jarUrl.toString());<br><br>        <span class="hljs-comment">// File name might be URL-encoded</span><br>        <span class="hljs-keyword">if</span> (!file.exists()) &#123;<br>          <span class="hljs-keyword">try</span> &#123;<br>            file = <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(URLEncoder.encode(jarUrl.toString(), <span class="hljs-string">&quot;UTF-8&quot;</span>));<br>          &#125; <span class="hljs-keyword">catch</span> (UnsupportedEncodingException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(<span class="hljs-string">&quot;Unsupported encoding?  UTF-8?  That&#x27;s unpossible.&quot;</span>);<br>          &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (file.exists()) &#123;<br>          log.debug(<span class="hljs-string">&quot;Trying real file: &quot;</span> + file.getAbsolutePath());<br>          testUrl = file.toURI().toURL();<br>          <span class="hljs-keyword">if</span> (isJar(testUrl)) &#123;<br>            <span class="hljs-keyword">return</span> testUrl;<br>          &#125;<br>        &#125;<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (MalformedURLException e) &#123;<br>      log.warn(<span class="hljs-string">&quot;Invalid JAR URL: &quot;</span> + jarUrl);<br>    &#125;<br><br>    log.debug(<span class="hljs-string">&quot;Not a JAR: &quot;</span> + jarUrl);<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>  &#125; <br><br>  <span class="hljs-comment">// 判断给定URL所代表的资源是否是一个jar文件</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isJar</span><span class="hljs-params">(URL url)</span> &#123;<br>    <span class="hljs-keyword">return</span> isJar(url, <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[JAR_MAGIC.length]);<br>  &#125; <br><br>  <span class="hljs-comment">// 具体是通过魔数进行的判断</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isJar</span><span class="hljs-params">(URL url, <span class="hljs-type">byte</span>[] buffer)</span> &#123;<br>    <span class="hljs-type">InputStream</span> <span class="hljs-variable">is</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>      is = url.openStream();<br>      is.read(buffer, <span class="hljs-number">0</span>, JAR_MAGIC.length);<br>      <span class="hljs-comment">// 只有魔数匹配，才认为是jar</span><br>      <span class="hljs-keyword">if</span> (Arrays.equals(buffer, JAR_MAGIC)) &#123;<br>        log.debug(<span class="hljs-string">&quot;Found JAR: &quot;</span> + url);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>      <span class="hljs-comment">// Failure to read the stream means this is not a JAR</span><br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>      <span class="hljs-keyword">if</span> (is != <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>          is.close();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>          <span class="hljs-comment">// Ignore</span><br>        &#125;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>  &#125; <br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> List&lt;String&gt; <span class="hljs-title function_">list</span><span class="hljs-params">(URL url, String path)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">InputStream</span> <span class="hljs-variable">is</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>      List&lt;String&gt; resources = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;();<br><br>      <span class="hljs-comment">// First, try to find the URL of a JAR file containing the requested resource. If a JAR</span><br>      <span class="hljs-comment">// file is found, then we&#x27;ll list child resources by reading the JAR.</span><br>      <span class="hljs-type">URL</span> <span class="hljs-variable">jarUrl</span> <span class="hljs-operator">=</span> findJarForResource(url);<br>      <span class="hljs-keyword">if</span> (jarUrl != <span class="hljs-literal">null</span>) &#123;<br>        is = jarUrl.openStream();<br>        log.debug(<span class="hljs-string">&quot;Listing &quot;</span> + url);<br>        <span class="hljs-comment">// 用JDK自带的JarInputStream来读取jar包</span><br>        resources = listResources(<span class="hljs-keyword">new</span> <span class="hljs-title class_">JarInputStream</span>(is), path);<br>      &#125;<br>      <span class="hljs-keyword">else</span> &#123;<br>        List&lt;String&gt; children = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;();<br>        <span class="hljs-keyword">try</span> &#123;<br>          <span class="hljs-keyword">if</span> (isJar(url)) &#123;<br>            <span class="hljs-comment">// Some versions of JBoss VFS might give a JAR stream even if the resource</span><br>            <span class="hljs-comment">// referenced by the URL isn&#x27;t actually a JAR</span><br>            is = url.openStream();<br>            <span class="hljs-type">JarInputStream</span> <span class="hljs-variable">jarInput</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">JarInputStream</span>(is);<br>            log.debug(<span class="hljs-string">&quot;Listing &quot;</span> + url);<br>            <span class="hljs-keyword">for</span> (JarEntry entry; (entry = jarInput.getNextJarEntry()) != <span class="hljs-literal">null</span>;) &#123;<br>              log.debug(<span class="hljs-string">&quot;Jar entry: &quot;</span> + entry.getName());<br>              children.add(entry.getName());<br>            &#125;<br>            jarInput.close();<br>          &#125;<br>          <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-comment">/*</span><br><span class="hljs-comment">             * Some servlet containers allow reading from directory resources like a</span><br><span class="hljs-comment">             * text file, listing the child resources one per line. However, there is no</span><br><span class="hljs-comment">             * way to differentiate between directory and file resources just by reading</span><br><span class="hljs-comment">             * them. To work around that, as each line is read, try to look it up via</span><br><span class="hljs-comment">             * the class loader as a child of the current resource. If any line fails</span><br><span class="hljs-comment">             * then we assume the current resource is not a directory.</span><br><span class="hljs-comment">             */</span><br>            <span class="hljs-comment">// 一些servlet容器允许像文本文件一样从目录资源中读取，每行列出一个子资源。</span><br>            <span class="hljs-comment">// 然而，仅仅通过读取目录资源和文件资源是没有办法区分的。</span><br>            <span class="hljs-comment">// 为了解决这个问题，在读取每一行时，</span><br>            <span class="hljs-comment">// 尝试通过类加载器将其作为当前资源的一个子资源来查找。</span><br>            <span class="hljs-comment">// 如果任何一行失败 那么我们就假设当前资源不是一个目录。</span><br>            is = url.openStream();<br>            <span class="hljs-type">BufferedReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BufferedReader</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(is));<br>            List&lt;String&gt; lines = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;();<br>            <span class="hljs-keyword">for</span> (String line; (line = reader.readLine()) != <span class="hljs-literal">null</span>;) &#123;<br>              log.debug(<span class="hljs-string">&quot;Reader entry: &quot;</span> + line);<br>              lines.add(line);<br>              <span class="hljs-keyword">if</span> (getResources(path + <span class="hljs-string">&quot;/&quot;</span> + line).isEmpty()) &#123;<br>                lines.clear();<br>                <span class="hljs-keyword">break</span>;<br>              &#125;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (!lines.isEmpty()) &#123;<br>              log.debug(<span class="hljs-string">&quot;Listing &quot;</span> + url);<br>              children.addAll(lines);<br>            &#125;<br>          &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>          <span class="hljs-comment">/*</span><br><span class="hljs-comment">           * For file URLs the openStream() call might fail, depending on the servlet</span><br><span class="hljs-comment">           * container, because directories can&#x27;t be opened for reading. If that happens,</span><br><span class="hljs-comment">           * then list the directory directly instead.</span><br><span class="hljs-comment">           */</span><br>          <span class="hljs-comment">// 有的servlet容器 openStream()方法可能会报错，因为目录不能被打开用于read</span><br>          <span class="hljs-comment">// 因此如果出现相应的报错，直接递归调用list遍历目录</span><br>          <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;file&quot;</span>.equals(url.getProtocol())) &#123;<br>            <span class="hljs-type">File</span> <span class="hljs-variable">file</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(url.getFile());<br>            log.debug(<span class="hljs-string">&quot;Listing directory &quot;</span> + file.getAbsolutePath());<br>            <span class="hljs-keyword">if</span> (file.isDirectory()) &#123;<br>              log.debug(<span class="hljs-string">&quot;Listing &quot;</span> + url);<br>              children = Arrays.asList(file.list());<br>            &#125;<br>          &#125;<br>          <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-comment">// No idea where the exception came from so rethrow it</span><br>            <span class="hljs-keyword">throw</span> e;<br>          &#125;<br>        &#125;<br><br>        <span class="hljs-comment">// The URL prefix to use when recursively listing child resources</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">prefix</span> <span class="hljs-operator">=</span> url.toExternalForm();<br>        <span class="hljs-keyword">if</span> (!prefix.endsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>          prefix = prefix + <span class="hljs-string">&quot;/&quot;</span>;<br>        &#125;<br><br>        <span class="hljs-comment">// Iterate over immediate children, adding files and recursing into directories</span><br>        <span class="hljs-comment">// 对子目录进行递归调用</span><br>        <span class="hljs-keyword">for</span> (String child : children) &#123;<br>          <span class="hljs-type">String</span> <span class="hljs-variable">resourcePath</span> <span class="hljs-operator">=</span> path + <span class="hljs-string">&quot;/&quot;</span> + child;<br>          resources.add(resourcePath);<br>          <span class="hljs-type">URL</span> <span class="hljs-variable">childUrl</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(prefix + child);<br>          resources.addAll(list(childUrl, resourcePath));<br>        &#125;<br>      &#125;<br><br>      <span class="hljs-keyword">return</span> resources;<br>    &#125; <span class="hljs-keyword">finally</span> &#123;<br>      <span class="hljs-keyword">if</span> (is != <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>          is.close();<br>        &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>          <span class="hljs-comment">// Ignore</span><br>        &#125;<br>      &#125;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">protected</span> List&lt;String&gt; <span class="hljs-title function_">listResources</span><span class="hljs-params">(JarInputStream jar, String path)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-comment">// Include the leading and trailing slash when matching names</span><br>    <span class="hljs-keyword">if</span> (!path.startsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>      path = <span class="hljs-string">&quot;/&quot;</span> + path;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (!path.endsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>      path = path + <span class="hljs-string">&quot;/&quot;</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// Iterate over the entries and collect those that begin with the requested path</span><br>    List&lt;String&gt; resources = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;();<br>    <span class="hljs-keyword">for</span> (JarEntry entry; (entry = jar.getNextJarEntry()) != <span class="hljs-literal">null</span>;) &#123;<br>      <span class="hljs-keyword">if</span> (!entry.isDirectory()) &#123;<br>        <span class="hljs-comment">// Add leading slash if it&#x27;s missing</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> entry.getName();<br>        <span class="hljs-keyword">if</span> (!name.startsWith(<span class="hljs-string">&quot;/&quot;</span>)) &#123;<br>          name = <span class="hljs-string">&quot;/&quot;</span> + name;<br>        &#125;<br><br>        <span class="hljs-comment">// Check file name</span><br>        <span class="hljs-keyword">if</span> (name.startsWith(path)) &#123;<br>          log.debug(<span class="hljs-string">&quot;Found resource: &quot;</span> + name);<br>          <span class="hljs-comment">// Trim leading slash</span><br>          resources.add(name.substring(<span class="hljs-number">1</span>));<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> resources;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="VFS"><a href="#VFS" class="headerlink" title="VFS"></a>VFS</h4><p>虚拟文件系统，用来读取应用服务器里的资源</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VFS</span> &#123; <br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Log</span> <span class="hljs-variable">log</span> <span class="hljs-operator">=</span> LogFactory.getLog(ResolverUtil.class);<br>  <span class="hljs-comment">/** The built-in implementations. */</span><br>  <span class="hljs-comment">// 默认提供2个实现 JBoss6VFS,DefaultVFS</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Class&lt;?&gt;[] IMPLEMENTATIONS = &#123; JBoss6VFS.class, DefaultVFS.class &#125;;<br><br>  <span class="hljs-comment">/** The list to which implementations are added by &#123;<span class="hljs-doctag">@link</span> #addImplClass(Class)&#125;. */</span><br>  <span class="hljs-comment">// 这里是提供一个用户扩展点，可以让用户自定义VFS实现</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> List&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span>&gt;&gt; USER_IMPLEMENTATIONS = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span>&gt;&gt;();<br><br>  <span class="hljs-comment">/** Singleton instance. */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> VFS instance; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> VFS <span class="hljs-title function_">getInstance</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">if</span> (instance != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> instance;<br>    &#125;<br><br>    <span class="hljs-comment">// Try the user implementations first, then the built-ins</span><br>    List&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span>&gt;&gt; impls = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span>&gt;&gt;();<br>    impls.addAll(USER_IMPLEMENTATIONS);<br>    impls.addAll(Arrays.asList((Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span>&gt;[]) IMPLEMENTATIONS));<br><br>    <span class="hljs-comment">// Try each implementation class until a valid one is found</span><br>    <span class="hljs-comment">// 遍历查找实现类，返回第一个找到的</span><br>    <span class="hljs-type">VFS</span> <span class="hljs-variable">vfs</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; vfs == <span class="hljs-literal">null</span> || !vfs.isValid(); i++) &#123;<br>      Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">VFS</span>&gt; impl = impls.get(i);<br>      <span class="hljs-keyword">try</span> &#123;<br>        vfs = impl.newInstance();<br>        <span class="hljs-keyword">if</span> (vfs == <span class="hljs-literal">null</span> || !vfs.isValid()) &#123;<br>          log.debug(<span class="hljs-string">&quot;VFS implementation &quot;</span> + impl.getName() +<br>              <span class="hljs-string">&quot; is not valid in this environment.&quot;</span>);<br>        &#125;<br>      &#125; <span class="hljs-keyword">catch</span> (InstantiationException e) &#123;<br>        log.error(<span class="hljs-string">&quot;Failed to instantiate &quot;</span> + impl, e);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>      &#125; <span class="hljs-keyword">catch</span> (IllegalAccessException e) &#123;<br>        log.error(<span class="hljs-string">&quot;Failed to instantiate &quot;</span> + impl, e);<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>      &#125;<br>    &#125;<br><br>    log.debug(<span class="hljs-string">&quot;Using VFS adapter &quot;</span> + vfs.getClass().getName());<br>    VFS.instance = vfs;<br>    <span class="hljs-keyword">return</span> VFS.instance;<br>  &#125; <br><br>  <span class="hljs-comment">// 添加自定义VFS实现类</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addImplClass</span><span class="hljs-params">(Class&lt;? extends VFS&gt; clazz)</span> &#123;<br>    <span class="hljs-keyword">if</span> (clazz != <span class="hljs-literal">null</span>) &#123;<br>      USER_IMPLEMENTATIONS.add(clazz);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 通过类名获取类</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> Class&lt;?&gt; getClass(String className) &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">return</span> Thread.currentThread().getContextClassLoader().loadClass(className);<br><span class="hljs-comment">//      return ReflectUtil.findClass(className);</span><br>    &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>      log.debug(<span class="hljs-string">&quot;Class not found: &quot;</span> + className);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 根据方法名和参数获取类的方法</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> Method <span class="hljs-title function_">getMethod</span><span class="hljs-params">(Class&lt;?&gt; clazz, String methodName, Class&lt;?&gt;... parameterTypes)</span> &#123;<br>    <span class="hljs-keyword">if</span> (clazz == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">return</span> clazz.getMethod(methodName, parameterTypes);<br>    &#125; <span class="hljs-keyword">catch</span> (SecurityException e) &#123;<br>      log.error(<span class="hljs-string">&quot;Security exception looking for method &quot;</span> + clazz.getName() + <span class="hljs-string">&quot;.&quot;</span> + methodName + <span class="hljs-string">&quot;.  Cause: &quot;</span> + e);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125; <span class="hljs-keyword">catch</span> (NoSuchMethodException e) &#123;<br>      log.error(<span class="hljs-string">&quot;Method not found &quot;</span> + clazz.getName() + <span class="hljs-string">&quot;.&quot;</span> + methodName + <span class="hljs-string">&quot;.&quot;</span> + methodName + <span class="hljs-string">&quot;.  Cause: &quot;</span> + e);<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 执行方法</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> &lt;T&gt; T <span class="hljs-title function_">invoke</span><span class="hljs-params">(Method method, Object object, Object... parameters)</span><br>      <span class="hljs-keyword">throws</span> IOException, RuntimeException &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">return</span> (T) method.invoke(object, parameters);<br>    &#125; <span class="hljs-keyword">catch</span> (IllegalArgumentException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>    &#125; <span class="hljs-keyword">catch</span> (IllegalAccessException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>    &#125; <span class="hljs-keyword">catch</span> (InvocationTargetException e) &#123;<br>      <span class="hljs-keyword">if</span> (e.getTargetException() <span class="hljs-keyword">instanceof</span> IOException) &#123;<br>        <span class="hljs-keyword">throw</span> (IOException) e.getTargetException();<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>      &#125;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 使用线程上下文类加载器获取资源</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> List&lt;URL&gt; <span class="hljs-title function_">getResources</span><span class="hljs-params">(String path)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-keyword">return</span> Collections.list(Thread.currentThread().getContextClassLoader().getResources(path));<br>  &#125; <br><br>  <span class="hljs-comment">// 用于判断VFS实现类是否可用</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isValid</span><span class="hljs-params">()</span>; <br><br>  <span class="hljs-comment">// 递归地列出所有资源的完整资源路径，这些资源是由一个URL确定的资源的子代。</span><br>  <span class="hljs-keyword">protected</span> <span class="hljs-keyword">abstract</span> List&lt;String&gt; <span class="hljs-title function_">list</span><span class="hljs-params">(URL url, String forPath)</span> <span class="hljs-keyword">throws</span> IOException;<br><br>  <span class="hljs-comment">// 递归地列出所有资源的完整资源路径，这些资源是在指定路径找到的所有资源的子资源。</span><br>  <span class="hljs-keyword">public</span> List&lt;String&gt; <span class="hljs-title function_">list</span><span class="hljs-params">(String path)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    List&lt;String&gt; names = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;String&gt;();<br>    <span class="hljs-keyword">for</span> (URL url : getResources(path)) &#123;<br>      names.addAll(list(url, path));<br>    &#125;<br>    <span class="hljs-keyword">return</span> names;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="ClassLoaderWrapper"><a href="#ClassLoaderWrapper" class="headerlink" title="ClassLoaderWrapper"></a>ClassLoaderWrapper</h4><p>封装了几个类加载器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ClassLoaderWrapper</span> &#123; <br>  <span class="hljs-comment">// defaultClassLoader在 Resources 类中需要手动设置</span><br>  ClassLoader defaultClassLoader;<br>  ClassLoader systemClassLoader;<br><br>  ClassLoaderWrapper() &#123;<br>    <span class="hljs-keyword">try</span> &#123; <br>      <span class="hljs-comment">// 初始化系统类加载器</span><br>      systemClassLoader = ClassLoader.getSystemClassLoader();<br>    &#125; <span class="hljs-keyword">catch</span> (SecurityException ignored) &#123;<br>      <span class="hljs-comment">// AccessControlException on Google App Engine   </span><br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 下面获取URL型的resource、获取InputStream的resource以及根据名称获取类</span><br>  <span class="hljs-comment">// 都是委托给默认的类加载器实现的，如果提供了类加载器，则先用提供的类加载器尝试</span><br>  <span class="hljs-keyword">public</span> URL <span class="hljs-title function_">getResourceAsURL</span><span class="hljs-params">(String resource)</span> &#123;<br>    <span class="hljs-keyword">return</span> getResourceAsURL(resource, getClassLoaders(<span class="hljs-literal">null</span>));<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> URL <span class="hljs-title function_">getResourceAsURL</span><span class="hljs-params">(String resource, ClassLoader classLoader)</span> &#123;<br>    <span class="hljs-keyword">return</span> getResourceAsURL(resource, getClassLoaders(classLoader));<br>  &#125; <br><br>  URL <span class="hljs-title function_">getResourceAsURL</span><span class="hljs-params">(String resource, ClassLoader[] classLoader)</span> &#123;<br>    URL url;<br>    <span class="hljs-keyword">for</span> (ClassLoader cl : classLoader) &#123;<br>      <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != cl) &#123;<br>        <span class="hljs-comment">// look for the resource as passed in...</span><br>        url = cl.getResource(resource);<br>        <span class="hljs-comment">// ...but some class loaders want this leading &quot;/&quot;, so we&#x27;ll add it</span><br>        <span class="hljs-comment">// and try again if we didn&#x27;t find the resource</span><br>        <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> == url) &#123;<br>          url = cl.getResource(<span class="hljs-string">&quot;/&quot;</span> + resource);<br>        &#125;<br>        <span class="hljs-comment">// &quot;It&#x27;s always in the last place I look for it!&quot;</span><br>        <span class="hljs-comment">// ... because only an idiot would keep looking for it after finding it, so stop looking already.</span><br>        <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != url) &#123;<br>          <span class="hljs-keyword">return</span> url;<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-comment">// didn&#x27;t find it anywhere.</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> InputStream <span class="hljs-title function_">getResourceAsStream</span><span class="hljs-params">(String resource)</span> &#123;<br>    <span class="hljs-keyword">return</span> getResourceAsStream(resource, getClassLoaders(<span class="hljs-literal">null</span>));<br>  &#125;    <br><br>  <span class="hljs-keyword">public</span> InputStream <span class="hljs-title function_">getResourceAsStream</span><span class="hljs-params">(String resource, ClassLoader classLoader)</span> &#123;<br>    <span class="hljs-keyword">return</span> getResourceAsStream(resource, getClassLoaders(classLoader));<br>  &#125; <br><br>  InputStream <span class="hljs-title function_">getResourceAsStream</span><span class="hljs-params">(String resource, ClassLoader[] classLoader)</span> &#123;<br>    <span class="hljs-keyword">for</span> (ClassLoader cl : classLoader) &#123;<br>      <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != cl) &#123;<br>        <span class="hljs-comment">// try to find the resource as passed</span><br>        <span class="hljs-type">InputStream</span> <span class="hljs-variable">returnValue</span> <span class="hljs-operator">=</span> cl.getResourceAsStream(resource);<br>        <span class="hljs-comment">// now, some class loaders want this leading &quot;/&quot;, so we&#x27;ll add it and try again if we didn&#x27;t find the resource</span><br>        <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> == returnValue) &#123;<br>          returnValue = cl.getResourceAsStream(<span class="hljs-string">&quot;/&quot;</span> + resource);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != returnValue) &#123;<br>          <span class="hljs-keyword">return</span> returnValue;<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Class&lt;?&gt; classForName(String name) <span class="hljs-keyword">throws</span> ClassNotFoundException &#123;<br>    <span class="hljs-keyword">return</span> classForName(name, getClassLoaders(<span class="hljs-literal">null</span>));<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Class&lt;?&gt; classForName(String name, ClassLoader classLoader) <span class="hljs-keyword">throws</span> ClassNotFoundException &#123;<br>    <span class="hljs-keyword">return</span> classForName(name, getClassLoaders(classLoader));<br>  &#125; <br><br>  Class&lt;?&gt; classForName(String name, ClassLoader[] classLoader) <span class="hljs-keyword">throws</span> ClassNotFoundException &#123;<br>    <span class="hljs-keyword">for</span> (ClassLoader cl : classLoader) &#123;<br>      <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != cl) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>          Class&lt;?&gt; c = Class.forName(name, <span class="hljs-literal">true</span>, cl);<br>          <span class="hljs-keyword">if</span> (<span class="hljs-literal">null</span> != c) &#123;<br>            <span class="hljs-keyword">return</span> c;<br>          &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>          <span class="hljs-comment">// we&#x27;ll ignore this until all classloaders fail to locate the class</span><br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClassNotFoundException</span>(<span class="hljs-string">&quot;Cannot find class: &quot;</span> + name);<br>  &#125; <br><br>  ClassLoader[] getClassLoaders(ClassLoader classLoader) &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClassLoader</span>[]&#123;<br>        classLoader,<br>        defaultClassLoader,<br>        Thread.currentThread().getContextClassLoader(),<br>        getClass().getClassLoader(),<br>        systemClassLoader&#125;;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Resources"><a href="#Resources" class="headerlink" title="Resources"></a>Resources</h4><p>通过类加载器获取resource的辅助类  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Resources</span> &#123;<br>    <br>  <span class="hljs-comment">// 大多数方法都是委托给ClassLoaderWrapper，再去做真正的事</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">ClassLoaderWrapper</span> <span class="hljs-variable">classLoaderWrapper</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ClassLoaderWrapper</span>();<br><br>  <span class="hljs-comment">/*</span><br><span class="hljs-comment">   * Charset to use when calling getResourceAsReader.</span><br><span class="hljs-comment">   * null means use the system default.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Charset charset; <br><br>  Resources() &#123;<br>  &#125; <br><br>  <span class="hljs-comment">// 返回默认的classloader（可能为null），没有手动设置就为null</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> ClassLoader <span class="hljs-title function_">getDefaultClassLoader</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> classLoaderWrapper.defaultClassLoader;<br>  &#125; <br><br>  <span class="hljs-comment">// 设置默认的classloader</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setDefaultClassLoader</span><span class="hljs-params">(ClassLoader defaultClassLoader)</span> &#123;<br>    classLoaderWrapper.defaultClassLoader = defaultClassLoader;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> URL <span class="hljs-title function_">getResourceURL</span><span class="hljs-params">(String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>      <span class="hljs-comment">// issue #625</span><br>      <span class="hljs-keyword">return</span> getResourceURL(<span class="hljs-literal">null</span>, resource);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> URL <span class="hljs-title function_">getResourceURL</span><span class="hljs-params">(ClassLoader loader, String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">URL</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> classLoaderWrapper.getResourceAsURL(resource, loader);<br>    <span class="hljs-keyword">if</span> (url == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IOException</span>(<span class="hljs-string">&quot;Could not find resource &quot;</span> + resource);<br>    &#125;<br>    <span class="hljs-keyword">return</span> url;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> InputStream <span class="hljs-title function_">getResourceAsStream</span><span class="hljs-params">(String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-keyword">return</span> getResourceAsStream(<span class="hljs-literal">null</span>, resource);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> InputStream <span class="hljs-title function_">getResourceAsStream</span><span class="hljs-params">(ClassLoader loader, String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">InputStream</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> classLoaderWrapper.getResourceAsStream(resource, loader);<br>    <span class="hljs-keyword">if</span> (in == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IOException</span>(<span class="hljs-string">&quot;Could not find resource &quot;</span> + resource);<br>    &#125;<br>    <span class="hljs-keyword">return</span> in;<br>  &#125; <br><br>  <span class="hljs-comment">// 解析resource，返回Properties</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Properties <span class="hljs-title function_">getResourceAsProperties</span><span class="hljs-params">(String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">Properties</span> <span class="hljs-variable">props</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();<br>    <span class="hljs-type">InputStream</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> getResourceAsStream(resource);<br>    props.load(in);<br>    in.close();<br>    <span class="hljs-keyword">return</span> props;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Properties <span class="hljs-title function_">getResourceAsProperties</span><span class="hljs-params">(ClassLoader loader, String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">Properties</span> <span class="hljs-variable">props</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();<br>    <span class="hljs-type">InputStream</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> getResourceAsStream(loader, resource);<br>    props.load(in);<br>    in.close();<br>    <span class="hljs-keyword">return</span> props;<br>  &#125; <br><br>  <span class="hljs-comment">// 解析resource，返回Reader</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Reader <span class="hljs-title function_">getResourceAsReader</span><span class="hljs-params">(String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    Reader reader;<br>    <span class="hljs-keyword">if</span> (charset == <span class="hljs-literal">null</span>) &#123;<br>      reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(getResourceAsStream(resource));<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(getResourceAsStream(resource), charset);<br>    &#125;<br>    <span class="hljs-keyword">return</span> reader;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Reader <span class="hljs-title function_">getResourceAsReader</span><span class="hljs-params">(ClassLoader loader, String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    Reader reader;<br>    <span class="hljs-keyword">if</span> (charset == <span class="hljs-literal">null</span>) &#123;<br>      reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(getResourceAsStream(loader, resource));<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(getResourceAsStream(loader, resource), charset);<br>    &#125;<br>    <span class="hljs-keyword">return</span> reader;<br>  &#125; <br><br>  <span class="hljs-comment">// Returns a resource on the classpath as a File object</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> File <span class="hljs-title function_">getResourceAsFile</span><span class="hljs-params">(String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(getResourceURL(resource).getFile());<br>  &#125; <br><br>  <span class="hljs-comment">// Returns a resource on the classpath as a File object</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> File <span class="hljs-title function_">getResourceAsFile</span><span class="hljs-params">(ClassLoader loader, String resource)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">File</span>(getResourceURL(loader, resource).getFile());<br>  &#125; <br><br>  <span class="hljs-comment">// Gets a URL as an input stream</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> InputStream <span class="hljs-title function_">getUrlAsStream</span><span class="hljs-params">(String urlString)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">URL</span> <span class="hljs-variable">url</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">URL</span>(urlString);<br>    <span class="hljs-type">URLConnection</span> <span class="hljs-variable">conn</span> <span class="hljs-operator">=</span> url.openConnection();<br>    <span class="hljs-keyword">return</span> conn.getInputStream();<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Reader <span class="hljs-title function_">getUrlAsReader</span><span class="hljs-params">(String urlString)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    Reader reader;<br>    <span class="hljs-keyword">if</span> (charset == <span class="hljs-literal">null</span>) &#123;<br>      reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(getUrlAsStream(urlString));<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      reader = <span class="hljs-keyword">new</span> <span class="hljs-title class_">InputStreamReader</span>(getUrlAsStream(urlString), charset);<br>    &#125;<br>    <span class="hljs-keyword">return</span> reader;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Properties <span class="hljs-title function_">getUrlAsProperties</span><span class="hljs-params">(String urlString)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-type">Properties</span> <span class="hljs-variable">props</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();<br>    <span class="hljs-type">InputStream</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> getUrlAsStream(urlString);<br>    props.load(in);<br>    in.close();<br>    <span class="hljs-keyword">return</span> props;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Class&lt;?&gt; classForName(String className) <span class="hljs-keyword">throws</span> ClassNotFoundException &#123;<br>    <span class="hljs-keyword">return</span> classLoaderWrapper.classForName(className);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Charset <span class="hljs-title function_">getCharset</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> charset;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setCharset</span><span class="hljs-params">(Charset charset)</span> &#123;<br>    Resources.charset = charset;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="ExternalResources"><a href="#ExternalResources" class="headerlink" title="ExternalResources"></a>ExternalResources</h4><p>此类中的方法未在任何地方使用，因此不做分析</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">Mybatis源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Mybatis/">#Mybatis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>6-io</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/07/06/mybatis-source-code/6-io/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年7月6日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/07/10/mybatis-source-code/7-reflection/" title="7-reflection">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">7-reflection</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/25/mybatis-source-code/5-type/" title="5-type">
+                        <span class="hidden-mobile">5-type</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

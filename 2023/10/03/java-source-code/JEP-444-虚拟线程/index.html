@@ -1,0 +1,971 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="JEP 444 虚拟线程   Author Ron Pressler &amp; Alan Bateman    Owner Alan Bateman   Type Feature   Scope SE   Status Closed &#x2F; Delivered   Release 21   Component core-libs   Discussion loom dash dev at">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JEP-444:虚拟线程">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/10/03/java-source-code/JEP-444-%E8%99%9A%E6%8B%9F%E7%BA%BF%E7%A8%8B/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="JEP 444 虚拟线程   Author Ron Pressler &amp; Alan Bateman    Owner Alan Bateman   Type Feature   Scope SE   Status Closed &#x2F; Delivered   Release 21   Component core-libs   Discussion loom dash dev at">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://bugs.openjdk.org/secure/attachment/98212/threaddump-700.png">
+<meta property="article:published_time" content="2023-10-03T13:06:25.000Z">
+<meta property="article:modified_time" content="2023-10-03T13:10:55.882Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://bugs.openjdk.org/secure/attachment/98212/threaddump-700.png">
+  
+  
+  
+  <title>JEP-444:虚拟线程 - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/poem/">
+                <i class="iconfont icon-user-fill"></i>
+                古诗词
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/thinking/">
+                <i class="iconfont icon-user-fill"></i>
+                思考ing
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JEP-444:虚拟线程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-10-03 21:06" pubdate>
+          2023年10月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          19k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          161 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JEP-444:虚拟线程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="JEP-444-虚拟线程"><a href="#JEP-444-虚拟线程" class="headerlink" title="JEP 444 虚拟线程"></a><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444">JEP 444 虚拟线程</a></h3><table>
+<thead>
+<tr>
+<th>Author</th>
+<th>Ron Pressler &amp; Alan Bateman</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Owner</td>
+<td>Alan Bateman</td>
+</tr>
+<tr>
+<td>Type</td>
+<td>Feature</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>SE</td>
+</tr>
+<tr>
+<td>Status</td>
+<td>Closed &#x2F; Delivered</td>
+</tr>
+<tr>
+<td>Release</td>
+<td>21</td>
+</tr>
+<tr>
+<td>Component</td>
+<td>core-libs</td>
+</tr>
+<tr>
+<td>Discussion</td>
+<td>loom dash dev at openjdk dot org</td>
+</tr>
+<tr>
+<td>Relates to</td>
+<td><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/436">JEP 436: Virtual Threads (Second Preview)</a></td>
+</tr>
+<tr>
+<td>Reviewed by</td>
+<td>Alex Buckley</td>
+</tr>
+<tr>
+<td>Endorsed by</td>
+<td>Brian Goetz</td>
+</tr>
+<tr>
+<td>Created</td>
+<td>2023&#x2F;03&#x2F;06 18:00</td>
+</tr>
+<tr>
+<td>Updated</td>
+<td>2023&#x2F;09&#x2F;22 16:54</td>
+</tr>
+<tr>
+<td>Issue</td>
+<td><a target="_blank" rel="noopener" href="https://bugs.openjdk.org/browse/JDK-8303683">8303683</a></td>
+</tr>
+</tbody></table>
+<h4 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h4><p>​ 将虚拟线程引入Java平台。虚拟线程是轻量级线程，可以显著减少编写、维护和观察高吞吐量并发应用程序的工作量</p>
+<h4 id="History"><a href="#History" class="headerlink" title="History"></a>History</h4><p>​ 虚拟线程由JEP 425提议作为预览特性，并首先在JDK 19中提供。为了留出时间进行反馈并获得更多体验，JEP 436再次提议将虚拟线程作为预览特性（feature）并在JDK 20中提供。根据开发者反馈，此JEP建议在JDK 21中完成虚拟线程，并对JDK20进行以下更改：</p>
+<ul>
+<li>虚拟线程现在始终支持线程局部变量。与预览版本中一样，不再允许创建不能持有线程局部变量的虚拟线程。对线程局部变量的有保证的支持确保了更多现有库可以在虚拟线程中不加修改地使用，并有助于将面向代码的任务迁移到使用虚拟线程。</li>
+<li>默认情况下，直接使用 Thread.Builder API 创建的虚拟线程（而不是通过 Executors.newVirtualThreadPerTaskExecutor() 创建的虚拟线程）现在也在其整个生命周期中受到监视，并且可以通过 <em>Observing virtual threads</em> 章节描述的新的线程堆栈观察</li>
+</ul>
+<h4 id="Goals"><a href="#Goals" class="headerlink" title="Goals"></a>Goals</h4><ul>
+<li>使得以简单的一个请求一个线程的风格编写的服务应用程序能够以接近最佳的硬件利用率进行扩展</li>
+<li>使得使用java.lang.Thread API的现有代码能够以最小的改动适配虚拟线程</li>
+<li>能够使用现有的JDK工具进行轻松的虚拟线程故障排除(troubleshooting)、调试(debugging)和分析(profiling)</li>
+</ul>
+<h4 id="Non-Goals"><a href="#Non-Goals" class="headerlink" title="Non-Goals"></a>Non-Goals</h4><ul>
+<li>移除传统的线程实现或是将现有应用程序静默地迁移至使用虚拟线程并不是我们的目标</li>
+<li>改变Java的基本并发模型也不是目标</li>
+<li>在Java语言或Java库中提供新的数据并行结构并不是我们的目标。Stream API仍然是并行处理大型数据集的首选方式</li>
+</ul>
+<h4 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h4><p>​ 近三十年来，Java开发人员一直依赖线程作为并发服务器应用程序的构建块。每个方法的每个语句都在一个线程内执行，并且由于Java是多线程的，因此多个线程的执行同时发生。线程是Java的并发单元：一段与其它此类单元同时运行且很大程度上独立的顺序代码。每个线程都提供一个堆栈来存储局部变量和协调方法调用，以及出现问题时的上下文：异常是由同一线程中的方法抛出和捕获的，因此开发人员可以使用线程的堆栈跟踪来找出发生了什么。线程也是一些工具的核心概念：调试器逐步执行线程方法中的语句；分析器可视化多个线程的行为以帮助了解其性能。</p>
+<h4 id="The-thread-per-request-style"><a href="#The-thread-per-request-style" class="headerlink" title="The thread-per-request style"></a>The thread-per-request style</h4><p>​ 服务器应用程序通常处理彼此独立的并发用户请求，因此应用程序通过 使用一个线程在此请求的持续时间内专用于此请求 来处理请求是有意义的。这种一个请求一个线程的风格易于理解、易于编程、易于调试和分析，因为它使用平台的并发单元来表示应用程序的并发单元。</p>
+<p>​ 服务器应用程序的可扩展性收到利特尔定律（Little‘s Law）的约束，该定律与延迟、并发性、吞吐量相关：对于给定的请求处理持续时间（即延迟），应用程序同时处理的请求数量（即并发性）必须与到达率（即吞吐量）成比例增长。假如，假设平均延迟为50ms的应用程序通过同时处理10个请求，实现了每秒200个请求的吞吐量。为了使该应用程序扩展到每秒2000个请求的吞吐量，需要同时处理100个请求。如果每个请求在请求持续时间内都在一个线程中处理，那么为了让应用程序跟上，线程数量必须随着吞吐量的增长而增长。</p>
+<p>​ 不幸的是，可用线程的数量是有限的，因为JDK通过包装操作系统（OS）线程来实现线程。操作系统线程的成本很高，因此我们不能拥有太多线程，这使得JDK的线程实现不适合一个请求一个线程的风格。如果每个请求在其持续时间内占用（原文用的是consume，我觉得翻译成占用更合适）一个线程，从而占用一个操作系统线程，那么在其它资源（例如CPU或网络连接）耗尽之前，线程数量通常会成为限制因素。JDK当前的线程实现将应用程序的吞吐量限制在远低于硬件可支持的水平。即使线程被池化，也会发生这种情况，因为池化有助于避免启动新线程的高成本，但不会增加线程总数。</p>
+<h4 id="Improving-scalability-with-the-asynchronous-style"><a href="#Improving-scalability-with-the-asynchronous-style" class="headerlink" title="Improving scalability with the asynchronous style"></a>Improving scalability with the asynchronous style</h4><p>​ 一些希望充分利用硬件的开发人员已经放弃了一个请求一个线程的风格，转而采用线程共享风格。请求处理代码不是在一个线程上从头到尾处理请求，而是在等待另一I&#x2F;O操作完成时将其线程返回到池中，以便该线程可以为其它请求提供服务。这种细粒度的线程共享–在这种共享中线程仅在执行计算时而不是在等待I&#x2F;O时持有线程–允许大量的并发操作而无需占用大量线程。虽然它消除了操作系统线程稀缺对吞吐量的限制，但它的代价很高：它需要所谓的异步编程风格，采用一组单独的I&#x2F;O方法，这些方法不等待I&#x2F;O操作完成，而是稍后向回调发出其完成信号。如果没有专用线程，开发人员必须将他们的请求处理逻辑分解为一些小步骤，通常编写为lambda表达式，然后使用API将她们组合成顺序管道（例如，可以参考CompletableFuture或所谓的“反应式”框架）。因此，它们放弃了语言的基本顺序组合运算符，例如循环和try&#x2F;catch块。</p>
+<p>​ 在异步风格中，请求的每个阶段可能在不同的线程上执行，并且每个线程以交错的方式运行属于不同请求的阶段。这对于理解程序行为具有深远的影响：堆栈跟踪不提供可用的上下文，调试器无法单步执行请求处理逻辑，分析器无法将操作的成本与其调用者关联起来。当使用Java的流API处理短管道中的数据时，编写lambda表达式是可以管理的，但当应用程序中的所有请求处理代码必须以这种方式编写时，就会出现问题。这种编程风格与Java平台不一致，因为应用程序的并发单位（异步管道）不再是平台的并发单位。</p>
+<h4 id="Preserving-the-thread-per-request-style-with-virtual-threads"><a href="#Preserving-the-thread-per-request-style-with-virtual-threads" class="headerlink" title="Preserving the thread-per-request style with virtual threads"></a>Preserving the thread-per-request style with virtual threads</h4><p>​ 为了使应用程序能够扩展，同时与平台保持和谐，我们应该努力保留一个请求一个线程的风格。我们可以通过更有效地实现线程来做到这一点，这样它们就可以更加丰富。操作系统无法更有效地实现操作系统线程，因为不同的语言和运行时以不同的方式使用线程堆栈。然而，Java运行时可以通过切断Java线程与操作系统线程的一对一对应关系的方式来实现Java线程。正如操作系统通过将大的虚拟地址空间映射到有限的物理RAM来提供充足内存的假象一样，Java运行时也可以通过将大量的虚拟线程映射到少量操作系统线程来提供充足线程的假象。</p>
+<p>​ 虚拟线程是java.lang.Thread的一个实例，它不依赖于特定的操作系统线程。相比之下，平台线程是以传统方式实现的java.lang.Thread实例，作为操作系统线程的薄包装器。</p>
+<p>​ 一个请求一个线程风格的应用程序代码可以在请求的整个持续时间内在虚拟线程中运行，但虚拟线程仅在CPU上执行计算时才会占用操作系统线程。这样的结果是与异步风格相同的可扩展性，只不过它是透明实现的：当虚拟线程中运行的代码调用java.*API中的阻塞I&#x2F;O操作时，运行时会执行非阻塞操作系统调用并自动挂起虚拟线程，知道稍后I&#x2F;O操作执行完后虚拟线程可以恢复。对于Java开发人员来说，虚拟线程只是创建成本低廉且数量几乎无限的线程。硬件利用率接近最佳，允许高水平的并发性，从而实现高吞吐量，同时应用程序与Java平台及其工具的多线程设计保持协调。</p>
+<h4 id="Implications-of-virtual-threads"><a href="#Implications-of-virtual-threads" class="headerlink" title="Implications of virtual threads"></a>Implications of virtual threads</h4><p>​ 虚拟线程成本低廉且充足，因此永远不应该被池化：应该为每个应用程序任务创建一个新的虚拟线程。因此，大多数虚拟线程的生命周期都很短，并且具有较浅的调用堆栈，只执行单个HTTP客户端调用或单个JDBC查询。相比之下，平台线程重且昂贵，因此通常必须进行池化。它们往往寿命很长，具有很深的调用堆栈，并且在许多任务之间共享。</p>
+<p>​ 总而言之，虚拟线程保留了可靠的一个请求一个线程的风格，该风格与Java平台的设计相协调，同时最佳地利用了可用的硬件。使用虚拟线程不需要学习新概念，尽管它可能需要放弃为应对当今线程的高成本而养成的习惯。虚拟线程不仅可以帮助应用程序开发人员，还可以帮助框架设计人员提供易于使用、不影响扩展性的API，并且这些API与平台的设计兼容。</p>
+<h4 id="Description"><a href="#Description" class="headerlink" title="Description"></a>Description</h4><p>​ 如今，JDK中java.lang.Thread的每个实例都是一个平台线程。平台线程在底层操作系统线程上运行Java代码，并在代码的整个生命周期内占有操作系统线程。平台线程数受限于操作系统线程数。</p>
+<p>​ 虚拟线程是java.lang.Thread的一个实例，它在底层操作系统线程上运行Java代码，但不会在代码的整个生命周期内占有操作系统线程。这意味着许多虚拟线程可以在同一个操作系统线程上运行它们的Java代码，从而有效地共享操作系统线程。平台线程独占宝贵的操作系统线程，但虚拟线程不然。虚拟线程的数量可以比操作系统线程大得多。</p>
+<p>​ 虚拟线程是JDK而不是操作系统提供的轻量级线程实现。它们是用户模式线程的一种形式，在其它多线程语言中已经取得了成功（例如，Go中的goroutine和Erlang中的进程）。当操作系统线程尚未成熟和普及时，用户模式线程甚至在Java的早期版本中被称为所谓的[“绿色线程”](<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/Green_thread">Green thread - Wikipedia</a>)。然而，Java的绿色线程都共享一个操作系统线程（M:1调度），并且最终被作为操作系统线程包装器实现的平台线程所超越（1:1调度）。虚拟线程采用M:N调度，其中大量（M）虚拟线程被调度在较少数量（N）的操作系统线程上运行。</p>
+<h4 id="Using-virtual-threads-vs-platform-threads"><a href="#Using-virtual-threads-vs-platform-threads" class="headerlink" title="Using virtual threads vs. platform threads"></a>Using virtual threads vs. platform threads</h4><p>​ 开发者可以选择使用虚拟线程还是平台线程。下面是一个创建大量虚拟线程的示例程序。程序首先获取一个ExecutorService，它将为每个提交的任务创建一个新的虚拟线程。然后它提交10000个任务并等待所有任务完成：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">try</span> (<span class="hljs-type">var</span> <span class="hljs-variable">executor</span> <span class="hljs-operator">=</span> Executors.newVirtualThreadPerTaskExecutor()) &#123;<br>    IntStream.range(<span class="hljs-number">0</span>, <span class="hljs-number">10_000</span>).forEach(i -&gt; &#123;<br>        executor.submit(() -&gt; &#123;<br>            Thread.sleep(Duration.ofSeconds(<span class="hljs-number">1</span>));<br>            <span class="hljs-keyword">return</span> i;<br>        &#125;);<br>    &#125;);<br>&#125;  <span class="hljs-comment">// executor.close() is called implicitly, and waits</span><br></code></pre></td></tr></table></figure>
+
+<p>此示例中的任务是简单的代码（休眠一秒钟），现代硬件可以轻松支持10000个虚拟线程同时运行此类代码。在后台，JDK在少量操作系统线程（可能只有一个）上运行代码。</p>
+<p>​ 如果该程序使用ExecutorService为每个任务创建一个新的平台线程，例如Executors.newCachedThreadPool(),情况将会非常不同。ExecutorService将尝试创建10000个平台线程，从而创建10000个操作系统线程，并且程序可能会崩溃，这具体取决于计算机和操作系统。</p>
+<p>​ 如果程序使用从池中获取平台线程的ExecutorService，例如Executors.newFixedThreadPool(200)，情况也不会好多少。ExecutorService将创建200个平台线程供所有10000个任务共享，因此许多任务将顺序运行而不是并发运行，并且程序将需要很长时间才能完成。对于该程序，具有200个平台线程的池只能实现每秒200个任务的吞吐量，而虚拟线程可实现每秒约10000个任务的吞吐量（在充分预热后）。此外，如果示例程序中的10_000更改为1_000_000，则该程序将提交1000000个任务，创建1000000个并发运行的虚拟线程，并（在充分预热后），实现每秒约1000000个任务的吞吐量。</p>
+<p>​ 如果该程序中的任务执行一秒钟的计算（例如，对一个巨大的数组进行排序），而不是仅仅休眠，那么增加线程数量超出处理器核心的数量将无济于事，无论它们是虚拟线程还是平台线程。虚拟线程并不是更快的线程—-它们运行代码的速度并不必平台线程快。<strong>它们的存在是为了提供规模（更高的吞吐量），而不是速度（更低的延迟）</strong>。它们的数量可以比平台线程多得多，因此根据利特尔定律，它们使得更高吞吐量所需的更高并发性成为可能。</p>
+<p>​ 换句话说，当满足下面情况时，虚拟线程可以显著提高应用程序的吞吐量</p>
+<ul>
+<li>并发任务数较高（数千以上）</li>
+<li>工作负载不受CPU限制，因为在这种情况下，线程数多于处理器核心数无法提高吞吐量</li>
+</ul>
+<p>​ 虚拟线程有助于提高典型服务器应用程序的吞吐量，因为此类应用程序由大量并发任务组成，而这些任务大部分时间都在等待。</p>
+<p>​ 平台线程可以运行的任何代码，虚拟线程都可以运行。特别是，虚拟线程支持线程局部变量和线程中断，就像平台线程一样。这意味着处理请求的现有Java代码可以轻松地在虚拟线程中运行。许多服务器框架会选择自动地为每个传入请求启动一个新的虚拟线程并在其中运行应用程序的业务逻辑。</p>
+<p>​ 下面是聚合其它两个服务的结果的服务器应用程序的示例。假设有一个服务器框架（未出示）为每个请求创建一个新的虚拟线程，并在该虚拟线程中运行应用程序的句柄代码。应用程序代码反过来创建两个新的虚拟线程，通过与第一个示例相同的ExecutorService同时获取多个资源：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">void</span> <span class="hljs-title function_">handle</span><span class="hljs-params">(Request request, Response response)</span> &#123;<br>    <span class="hljs-type">var</span> <span class="hljs-variable">url1</span> <span class="hljs-operator">=</span> ...<br>    <span class="hljs-type">var</span> <span class="hljs-variable">url2</span> <span class="hljs-operator">=</span> ...<br><br>    <span class="hljs-keyword">try</span> (<span class="hljs-type">var</span> <span class="hljs-variable">executor</span> <span class="hljs-operator">=</span> Executors.newVirtualThreadPerTaskExecutor()) &#123;<br>        <span class="hljs-type">var</span> <span class="hljs-variable">future1</span> <span class="hljs-operator">=</span> executor.submit(() -&gt; fetchURL(url1));<br>        <span class="hljs-type">var</span> <span class="hljs-variable">future2</span> <span class="hljs-operator">=</span> executor.submit(() -&gt; fetchURL(url2));<br>        response.send(future1.get() + future2.get());<br>    &#125; <span class="hljs-keyword">catch</span> (ExecutionException | InterruptedException e) &#123;<br>        response.fail(e);<br>    &#125;<br>&#125;<br><br>String <span class="hljs-title function_">fetchURL</span><span class="hljs-params">(URL url)</span> <span class="hljs-keyword">throws</span> IOException &#123;<br>    <span class="hljs-keyword">try</span> (<span class="hljs-type">var</span> <span class="hljs-variable">in</span> <span class="hljs-operator">=</span> url.openStream()) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(in.readAllBytes(), StandardCharsets.UTF_8);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>像这样的服务器应用程序具有简单的阻塞代码，可以很好地扩展，因为它可以使用大量的虚拟线程。</p>
+<p>​ Executor.newVirtualThreadPerTaskExecutor()并不是创建虚拟线程的唯一方法。下面要讨论的新java.lang.Thread.Builder API可以创建和启动虚拟线程。此外，结构化并发提供了更强大的API来创建和管理虚拟线程，特别是在类似于这个服务器示例的代码中，由此平台及其工具可以了解线程之间的关系。</p>
+<h4 id="Do-not-pool-virtual-threads"><a href="#Do-not-pool-virtual-threads" class="headerlink" title="Do not pool virtual threads"></a>Do not pool virtual threads</h4><p>​ 开发人员通常会将应用程序代码从基于传统线程池的ExecutorService迁移到一个任务一个虚拟线程的ExecutorService。与任何资源池一样，线程池旨在共享昂贵的资源，但虚拟线程并不昂贵，因此不需要将它们池化。</p>
+<p>​ 开发人员有时会使用线程池来限制对有限资源的并发访问。例如，如果某个服务无法处理超过20个并发请求，则通过提交到大小为20的线程池的任务向该服务发送请求来确保对服务资源的限制访问。这种习惯用法已经变得无处不在，因为平台线程的高成本使得线程池无处不在，但不要试图池化虚拟线程以限制并发性。相反，请使用专门为此目的设计的数据结构，例如信号量。</p>
+<p>​ 结合线程池，开发人员有时侯会使用线程局部变量在共享同一线程的多个任务之间共享昂贵的资源。例如，如果创建数据库连接的成本很高，那么您可以打开一次数据库连接并将其存储在线程局部变量中，以供同一线程中的其他任务稍后使用。如果您将代码从使用线程池迁移到使用一个任务一个虚拟线程，请谨慎使用此习惯用法，因为为每个虚拟线程创建昂贵的资源可能会显著降低性能。更改此类代码至使用可替代的缓存策略，以便可以在大量虚拟线程之间有效共享昂贵的资源。</p>
+<h4 id="Observing-virtual-threads"><a href="#Observing-virtual-threads" class="headerlink" title="Observing virtual threads"></a>Observing virtual threads</h4><p>​ 编写清晰的代码并不是故事的全部。清晰地呈现正在运行地程序地状态对于故障排查、维护和优化也至关重要，并且JDK长期以来一直提供调试、分析和监控线程的机制。这些工具应该对虚拟线程同样有效–也许会根据它们很大的数量进行一些调整–因为它们毕竟是Java.lang.Thread的实例。</p>
+<p>Java调试器可以单步执行虚拟线程、显示调用堆栈以及查看堆栈帧中的变量。JDK Flight Recorder（JFR）是JDK的低开销分析和监控工具，可以将应用程序代码中的事件（例如对象分配和I&#x2F;O操作）与正确的虚拟线程关联起来。这些工具无法为以异步风格编写的应用程序执行这些操作。在异步风格中，任务与线程无关，因此调试器无法显示或操作任务的状态，并且分析器无法判断任务花费了多少时间等待I&#x2F;O。</p>
+<p>线程dump是另一种流行的工具，用于对以一个请求一个线程风格编写的应用程序进行故障排除。不幸的是，JDK的传统线程转储（使用jstack或jcmd获得）提供了一个简单的线程列表。这适用于数十或数百个平台线程，但不适合数千或数百万虚拟线程。因此，我们不会扩展传统的线程转储以包含虚拟线程；相反，我们将在 jcmd 中引入一种新型线程转储，以将虚拟线程与平台线程一起呈现，所有这些都以有意义的方式分组。当程序使用[结构化并发](<a target="_blank" rel="noopener" href="https://openjdk.org/jeps/428">JEP 428: Structured Concurrency (Incubator) (openjdk.org)</a>)时，可以显示线程之间更丰富的关系。</p>
+<p>由于可视化和分析大量线程可以从分析中收益，因此除了存文本之外，jcmd还可以以json格式发出新的线程dump命令：</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs tcl">$ jcmd &lt;<span class="hljs-keyword">pid</span>&gt; Thread.dump_to_file -<span class="hljs-keyword">format</span>=json &lt;<span class="hljs-keyword">file</span>&gt;<br></code></pre></td></tr></table></figure>
+
+<p>新的线程dump格式不包括对象地址、锁、JNI统计信息、堆统计信息以及传统线程dump中出现的其他统计信息。此外，由于它可能需要列出大量线程，因此生成新的线程dump不会暂停应用程序。</p>
+<p>如果系统属性<code>jdk.trackAllThreads</code>设置为false，即使用<code>-Djdk.trackAllThreads=false</code>命令行选项，使用Thread.Builder API直接创建的虚拟线程不会始终被运行时跟踪，并且可能不会出现在新的线程dump中。在这种情况下，新的线程dump将列出在网络I&#x2F;O操作中被阻止的虚拟线程，以及由上面所示的新的一个任务一个线程风格的ExecutorService创建的虚拟线程。</p>
+<p>以下是此类线程转储的示例，取自与上面第二个示例类似的应用程序，在 JSON 查看器中呈现（单击可放大）：</p>
+<p><img src="https://bugs.openjdk.org/secure/attachment/98212/threaddump-700.png" srcset="/img/loading.gif" lazyload></p>
+<p>由于虚拟线程是在 JDK 中实现的，并且不依赖于任何特定的操作系统线程，因此它们对于操作系统来说是不可见的，操作系统不知道它们的存在。操作系统级的监控将观察到 JDK 进程使用的操作系统线程少于虚拟线程。</p>
+<h4 id="Scheduling-virtual-threads"><a href="#Scheduling-virtual-threads" class="headerlink" title="Scheduling virtual threads"></a>Scheduling virtual threads</h4><p>为了完成有用的工作，需要调度线程，即分配线程在处理器核心上工作。对于作为操作系统线程实现的平台线程，JDK依赖于操作系统中的调度程序。相比之下，对于虚拟线程，JDK有自己的调度程序。JDK的调度程序不是直接将虚拟线程分配给处理器，而是将虚拟线程分配给平台线程（这就是前面提到的虚拟线程的M:N调度）。然后，操作系统像往常一样调度平台线程。</p>
+<p>JDK的虚拟线程调度程序是一个work-stealing的ForkJoinPool，它以FIFO模式运行。调度程序的并行度是可用于调度虚拟线程的平台线程数。默认情况下，它等于可用处理器的数量，但可以使用系统属性jdk.virtualThreadScheduler.parallelism进行调整。此ForkJoinPool与一般的池不同，一般的池用于例如并行流的实现，以LIFO模式运行。</p>
+<p>调度程序为其分配虚拟线程的平台线程称为虚拟线程的载体。虚拟线程在其生命周期内可以被调度到不同的载体上；换句话说，调度程序不维护虚拟线程和任何特定平台线程之间的关联性。从Java代码的角度来看，一个正在运行的虚拟线程在逻辑上独立于它当前的载体：</p>
+<ul>
+<li><p>虚拟线程无法获取载体的身份。 Thread.currentThread() 返回的值始终是虚拟线程本身。</p>
+</li>
+<li><p>载体和虚拟线程的堆栈跟踪是分开的。 虚拟线程中抛出的异常将不包括载体的堆栈帧。 线程dump不会显示虚拟线程堆栈中载体的堆栈帧，反之亦然。</p>
+</li>
+<li><p>载体的线程局部变量对于虚拟线程不可用，反之亦然。</p>
+</li>
+</ul>
+<p>另外，从Java代码的角度来看，虚拟线程及其载体暂时共享一个操作系统线程这一事实是不可见的。相比之下，从native代码的角度来看，虚拟线程及其载体都运行在同一个native线程上。因此，在同一虚拟线程上多次调用的native代码可能会在每次调用时观察到不同的操作系统线程标识符。</p>
+<p>调度程序目前没有实现虚拟线程的时间共享。时间共享是对消耗了分配的 CPU 时间的线程进行强制抢占。虽然当平台线程数量相对较少且 CPU 利用率为 100% 时，时间共享可以有效减少某些任务的延迟，但尚不清楚时间共享对于 100 万个虚拟线程是否同样有效。</p>
+<h4 id="Executing-virtual-threads"><a href="#Executing-virtual-threads" class="headerlink" title="Executing virtual threads"></a>Executing virtual threads</h4><p>要使用虚拟线程，无需重写程序。虚拟线程不需要或期望应用程序代码将控制权显式交还给调度程序；换句话说，虚拟线程是不合作的。用户代码不得对如何或何时将虚拟线程分配给平台线程做出任何假设，就像不得对如何或何时将平台线程分配给处理器内核做出假设一样。</p>
+<p>为了在虚拟线程中运行代码，JDK的虚拟线程调度程序通过将虚拟线程挂载到平台线程上来分配虚拟线程在平台线程上执行。这使得平台线程成为虚拟线程的载体。稍后，在运行一些代码后，虚拟线程可以从其载体上卸载。此时平台线程是空闲的，因此调度程序可以在其上挂载另一个虚拟线程，从而使其再次成为载体。</p>
+<p>通常，当虚拟线程被 I&#x2F;O 操作或 JDK 中的某些其他阻塞操作（例如 BlockingQueue.take()）阻塞时，它将卸载。当阻塞操作准备完成时（例如，套接字上已接收到字节），它将虚拟线程提交回调度程序，调度程序将虚拟线程挂载在载体上以恢复执行。</p>
+<p>虚拟线程的挂载和卸载频繁且透明地发生，并且不会阻塞任何操作系统线程。例如，前面显示的服务器应用程序包含以下代码行，其中包含对阻塞操作的调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">response.send(future1.get() + future2.get());<br></code></pre></td></tr></table></figure>
+
+<p>通常每次调用 get() 一次，并且可能在 send(…) 执行 I&#x2F;O 的过程中多次。</p>
+<p>JDK中绝大多数的阻塞操作都会卸载虚拟线程，释放其载体和底层OS线程来承担新的工作。然而，JDK中的一些阻塞操作不会卸载虚拟线程，从而阻塞其载体和底层操作系统线程。这是因为操作系统级别（例如，许多文件系统操作）或 JDK 级别（例如，Object.wait()）的限制。这些阻塞操作的实现通过暂时扩展调度程序的并行性来补偿操作系统线程的捕获。因此，调度程序的 ForkJoinPool 中的平台线程数量可能会暂时超过可用处理器的数量。调度程序可用的最大平台线程数可以使用系统属性 jdk.virtualThreadScheduler.maxPoolSize 进行调整。</p>
+<p>在两种情况下，虚拟线程在阻塞操作期间无法卸载，因为它被固定到其载体上：</p>
+<ol>
+<li><p>当它在同步块或方法内执行代码时，或者</p>
+</li>
+<li><p>当它执行native方法或外部函数时</p>
+</li>
+</ol>
+<p>固定（Pinning）不会使应用程序不正确，但可能会妨碍其可扩展性。如果虚拟线程在固定时执行阻塞操作，例如 I&#x2F;O 或 BlockingQueue.take()，则其载体和底层操作系统线程在操作期间将被阻塞。长时间频繁固定可能会通过捕获载体来损害应用程序的可扩展性。</p>
+<p>调度程序不会通过扩展其并行性来补偿固定。相反，通过修改经常运行的同步代码块或方法来避免频繁且 长期的固定，使用java.util.concurrent.locks.ReentrantLock来保护潜在的长时间I&#x2F;O操作。无需替换不经常使用（例如，仅在启动时执行）或保护内存中的操作的同步块和方法。一如既往，努力保持加锁策略简单明了。</p>
+<p>新的诊断有助于将代码迁移到虚拟线程，并评估是否应该用 java.util.concurrent 锁替换同步的特定用法：</p>
+<ul>
+<li><p>A JDK Flight Recorder (JFR) event is emitted when a thread blocks while pinned (see <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#JDK-Flight-Recorder-JFR">JDK Flight Recorder</a>).</p>
+</li>
+<li><p>当线程在固定状态下阻塞时，系统属性 jdk.tracePinnedThreads 会触发堆栈跟踪。当线程在固定时阻塞时，带有 -Djdk.tracePinnedThreads&#x3D;full 属性会打印完整的堆栈跟踪，突出显示本机帧和持有监视器的帧。 -Djdk.tracePinnedThreads&#x3D;short 将限制仅输出有问题的帧。</p>
+</li>
+</ul>
+<h4 id="Memory-use-and-interaction-with-garbage-collection"><a href="#Memory-use-and-interaction-with-garbage-collection" class="headerlink" title="Memory use and interaction with garbage collection"></a>Memory use and interaction with garbage collection</h4><p>虚拟线程的堆栈作为堆栈块对象存储在 Java 的垃圾收集堆中。堆栈随着应用程序的运行而增长和缩小，既是为了提高内存效率，也是为了容纳深度达到 JVM 配置的平台线程堆栈大小的堆栈。这种效率使得大量虚拟线程成为可能，从而使服务器应用程序中一个请求一个线程风格保持持续的可行性。</p>
+<p>在上面的第二个示例中，回想一下假设的框架通过创建新的虚拟线程并调用句柄方法来处理每个请求。即使它在深度调用堆栈的末尾调用句柄（在身份验证、事务等之后），句柄本身也会生成多个仅执行短期任务的虚拟线程。因此，对于每个具有深调用堆栈的虚拟线程，都会有多个具有浅调用堆栈的虚拟线程，消耗很少的内存。</p>
+<p>一般来说，虚拟线程所需的堆空间和垃圾收集器活动量很难与异步代码进行比较。一百万个虚拟线程需要至少一百万个对象，但共享平台线程池的一百万个任务也需要一百万个对象。此外，处理请求的应用程序代码通常会跨 I&#x2F;O 操作维护数据。一个请求一个线程风格的代码可以将该数据保存在局部变量中，这些变量存储在堆中的虚拟线程堆栈上，而异步代码必须将相同的数据保存在从管道的一个阶段传递到下一阶段的堆对象中。一方面，虚拟线程所需的栈帧布局比紧凑对象更浪费；另一方面，虚拟线程可以在许多情况下改变和重用它们的堆栈（取决于低级 GC 交互），而异步管道总是需要分配新对象，因此虚拟线程可能需要更少的分配。总体而言，每个请求线程与异步代码的堆消耗和垃圾收集器活动应该大致相似。随着时间的推移，我们希望使虚拟线程堆栈的内部表示更加紧凑。</p>
+<p>与平台线程堆栈不同，虚拟线程堆栈不是 GC root。因此，它们包含的引用不会被执行并发堆扫描的垃圾收集器（例如 G1）在stop-the-world暂停的情况下遍历。这也意味着，如果一个虚拟线程被阻塞，例如，BlockingQueue.take()，并且没有其他线程可以获得对虚拟线程或队列的引用，那么该线程可以被垃圾收集——这很好，因为这种虚拟线程永远不会被中断或解除阻塞。当然，如果虚拟线程正在运行或者被阻塞并且可以被解除阻塞，则它不会被垃圾回收。</p>
+<p>当前对虚拟线程的限制是 G1 GC 不支持巨大的堆栈块对象。如果虚拟线程的堆栈达到区域大小的一半（可能小至 512KB），则可能会引发 StackOverflowError。</p>
+<h4 id="Detail-changes"><a href="#Detail-changes" class="headerlink" title="Detail changes"></a>Detail changes</h4><p>其余小节详细描述了我们在 Java 平台及其实现中提出的更改：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#java-lang-Thread">java.lang.Thread</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#Thread-local-variables">Thread-local variables</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#java-util-concurrent">java.util.concurrent</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#Networking">Networking</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#java-io">java.io</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#Java-Native-Interface-JNI">Java Native Interface (JNI)</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#Debugging">Debugging (JVM TI, JDWP, and JDI)</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#JDK-Flight-Recorder-JFR">JDK Flight Recorder (JFR)</a></li>
+<li><a target="_blank" rel="noopener" href="https://openjdk.org/jeps/444#Java-Management-Extensions-JMX">Java Management Extensions (JMX)</a></li>
+</ul>
+<h5 id="java-lang-Thread"><a href="#java-lang-Thread" class="headerlink" title="java.lang.Thread"></a>java.lang.Thread</h5><p>我们更新 java.lang.Thread API 如下：</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.Builder.html"><code>Thread.Builder</code></a>, <a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html#ofVirtual()"><code>Thread.ofVirtual()</code></a>, and <a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html#ofPlatform()"><code>Thread.ofPlatform()</code></a> 是用于创建虚拟线程和平台线程的新 API。例如，</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey"><span class="hljs-keyword">Thread</span> <span class="hljs-keyword">thread</span> = <span class="hljs-keyword">Thread</span>.ofVirtual().name(<span class="hljs-string">&quot;duke&quot;</span>).unstarted(runnable)<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure>
+
+<p>创建一个名为“duke”的新的未启动虚拟线程。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html#startVirtualThread(java.lang.Runnable)"><code>Thread.startVirtualThread(Runnable)</code></a>是创建然后启动虚拟线程的便捷方法。</p>
+</li>
+<li><p>Thread.Builder 可以创建线程或 <a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadFactory.html"><code>ThreadFactory</code></a>，然后 ThreadFactory 可以创建具有相同属性的多个线程。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html#isVirtual()"><code>Thread.isVirtual()</code></a>测试线程是否是虚拟线程。</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/docs/api/java.base/java/lang/Thread.html#getAllStackTraces()"><code>Thread.getAllStackTraces()</code></a> 现在返回所有平台线程的映射，而不是所有线程。</p>
+</li>
+</ul>
+<p>java.lang.Thread API 在其他方面在此 JEP 中没有改变。与以前一样，Thread 类定义的构造函数创建平台线程。没有新的公共构造函数。</p>
+<p>（Thread 中为虚拟线程抛出 UnsupportedOperationException 的三个方法 — stop()、suspend() 和resume() — 在 JDK 20 中进行了更改，也为平台线程抛出 UnsupportedOperationException。）</p>
+<p>虚拟线程和平台线程之间的主要 API 差异是：</p>
+<ul>
+<li><p>公共 Thread 构造函数无法创建虚拟线程。</p>
+</li>
+<li><p>虚拟线程始终是守护线程 。Thread.setDaemon(boolean)方法无法将虚拟线程更改为非守护线程。</p>
+</li>
+<li><p>虚拟线程具有固定的优先级 Thread.NORM_PRIORITY。 Thread.setPriority(int) 方法对虚拟线程没有影响。未来版本中可能会重新考虑此限制。</p>
+</li>
+<li><p>虚拟线程不是线程组的活动成员。在虚拟线程上调用时，Thread.getThreadGroup() 返回一个名为“VirtualThreads”的占位符线程组。Thread.Builder API 没有定义设置虚拟线程的线程组的方法。</p>
+</li>
+<li><p>当使用 SecurityManager 集运行时，虚拟线程没有权限。</p>
+</li>
+</ul>
+<h5 id="Thread-local-variables"><a href="#Thread-local-variables" class="headerlink" title="Thread-local variables"></a>Thread-local variables</h5><p>虚拟线程支持线程局部变量 (ThreadLocal) 和可继承的线程局部变量 (InheritableThreadLocal)，就像平台线程一样，因此它们可以运行使用线程局部变量的现有代码。但是，由于虚拟线程可能非常多，因此只有在仔细考虑后才能使用线程局部变量。特别是，不要使用线程局部变量在线程池中共享同一线程的多个任务之间池化昂贵的资源。虚拟线程永远不应该被池化，因为每个虚拟线程在其生命周期内只运行一个任务。我们从 JDK 的 java.base 模块中删除了许多线程局部变量的使用，为虚拟线程做准备，以便在运行数百万个线程时减少内存占用。</p>
+<p>当虚拟线程设置任何线程局部变量的值时，系统属性 jdk.traceVirtualThreadLocals 可用于触发堆栈跟踪。当迁移代码以使用虚拟线程时，此诊断输出可能有助于删除线程局部变量。将系统属性设置为 true 以触发堆栈跟踪；默认值为 false。</p>
+<p>对于某些用例，作用域值（<a target="_blank" rel="noopener" href="https://openjdk.org/jeps/429">JEP 429</a>）可能被证明是线程局部变量的更好替代方案。</p>
+<h5 id="java-util-concurrent"><a href="#java-util-concurrent" class="headerlink" title="java.util.concurrent"></a>java.util.concurrent</h5><p>支持锁定的原始 API java.util.concurrent.LockSupport 现在支持虚拟线程：park虚拟线程会释放底层平台线程以执行其他工作，unpark虚拟线程会安排其继续运行。对 LockSupport 的这一更改使所有使用它的 API（Lock, Semaphores, blocking queues等）在虚拟线程中调用时能够正常停放。</p>
+<p>此外，Executors.newThreadPerTaskExecutor(ThreadFactory) 和 Executors.newVirtualThreadPerTaskExecutor() 创建一个 ExecutorService，为每个任务创建一个新线程。这些方法支持与使用线程池和 ExecutorService 的现有代码进行迁移和互操作。</p>
+<h5 id="Networking"><a href="#Networking" class="headerlink" title="Networking"></a>Networking</h5><p>java.net 和 java.nio.channels 包中网络 API 的实现现在可以使用虚拟线程：虚拟线程上的操作会阻塞，例如建立网络连接或从套接字读取，释放底层平台线程以执行其他工作。</p>
+<p>为了允许中断和取消，由 java.net.Socket、ServerSocket 和 DatagramSocket 定义的阻塞 I&#x2F;O 方法现在被指定为在虚拟线程中调用时可中断：中断套接字上阻塞的虚拟线程将取消该线程的驻留并关闭套接字。从 InterruptibleChannel 获取时，这些类型的套接字上的阻塞 I&#x2F;O 操作始终是可中断的，因此此更改使这些 API 在使用其构造函数创建时的行为与从通道获取时的行为保持一致。</p>
+<h5 id="java-io"><a href="#java-io" class="headerlink" title="java.io"></a>java.io</h5><p>java.io 包提供了字节流和字符流的 API。这些 API 的实现高度同步，需要进行更改以避免在虚拟线程中使用它们时固定。</p>
+<p>作为背景，面向字节的输入&#x2F;输出流未指定为线程安全的，并且未指定在读取或写入方法中阻塞线程时调用 close() 时的预期行为。在大多数情况下，使用来自多个并发线程的特定输入或输出流是没有意义的。面向字符的读取器&#x2F;写入器也未指定为线程安全的，但它们确实为子类公开了锁对象。除了固定之外，这些类中的同步也存在问题且不一致；例如，InputStreamReader 和 OutputStreamWriter 使用的流解码器和编码器在流对象而不是锁定对象上同步。</p>
+<p>为了防止固定，现在的实现如下：</p>
+<ul>
+<li><p>BufferedInputStream、BufferedOutputStream、BufferedReader、BufferedWriter、PrintStream 和 PrintWriter 现在在直接使用时使用显式锁而不是monitor。这些类在被子类化时会像以前一样同步。</p>
+</li>
+<li><p>InputStreamReader 和 OutputStreamWriter 使用的流解码器和编码器现在使用与封闭的 InputStreamReader 或 OutputStreamWriter 相同的锁。</p>
+</li>
+</ul>
+<p>进一步消除所有这些通常不必要的锁定超出了本 JEP 的范围。</p>
+<p>此外，BufferedOutputStream、BufferedWriter 和 OutputStreamWriter 的流编码器使用的缓冲区的初始大小现在更小，以便在堆中存在许多流或写入器时减少内存使用量（如果存在一百万个虚拟线程，则可能会出现这种情况） ，每个在套接字连接上都有一个缓冲流。</p>
+<h5 id="Java-Native-Interface（JNI）"><a href="#Java-Native-Interface（JNI）" class="headerlink" title="Java Native Interface（JNI）"></a>Java Native Interface（JNI）</h5><p>JNI 定义了一个新函数 IsVirtualThread，用于测试对象是否为虚拟线程。</p>
+<p>JNI 规范在其他方面保持不变。</p>
+<h4 id="Debugging"><a href="#Debugging" class="headerlink" title="Debugging"></a>Debugging</h4><p>调试架构由三个接口组成：JVM 工具接口 (JVM TI)、Java 调试线协议 (JDWP) 和 Java 调试接口 (JDI)。所有三个接口现在都支持虚拟线程。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/specs/jvmti.html">JVM TI</a> 的更新是：</p>
+<ul>
+<li><p>使用 jthread（即对 Thread 对象的 JNI 引用）调用的大多数函数都可以通过对虚拟线程的引用来调用。虚拟线程上不支持或可选择支持少数函数，即 AgentStartFunction、PopFrame、ForceEarlyReturn<em>、StopThread 和 GetThreadCpuTime。SetLocal</em> 函数仅限于在断点或单步事件处挂起的虚拟线程的最顶层框架中设置局部变量。</p>
+</li>
+<li><p>现在指定 GetAllThreads 和 GetAllStackTraces 函数返回所有平台线程而不是所有线程。</p>
+</li>
+<li><p>除早期 VM 启动期间或堆迭代期间发布的事件外，所有事件都可以在虚拟线程上下文中调用事件回调。</p>
+</li>
+<li><p>挂起&#x2F;恢复实现允许调试器挂起和恢复虚拟线程，并且允许在挂载虚拟线程时挂起平台线程。</p>
+</li>
+<li><p>新功能 can_support_virtual_threads 使代理可以更好地控制虚拟线程的线程启动和结束事件。</p>
+</li>
+<li><p>新功能支持虚拟线程批量暂停和恢复；这些需要 can_support_virtual_threads 功能。</p>
+</li>
+</ul>
+<p>现有的 JVM TI 代理大部分会像以前一样工作，但如果它们调用虚拟线程不支持的函数，则可能会遇到错误。当不知道虚拟线程的代理与使用虚拟线程的应用程序一起使用时，就会出现这些问题。对 GetAllThreads 进行更改以返回仅包含平台线程的数组对于某些代理来说可能是一个问题。启用 ThreadStart 和 ThreadEnd 事件的现有代理可能会遇到性能问题，因为它们缺乏将这些事件限制为平台线程的能力。</p>
+<p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/specs/jdwp/jdwp-protocol.html">JDWP</a> 的更新如下：</p>
+<ul>
+<li><p>新命令允许调试器测试线程是否是虚拟线程。</p>
+</li>
+<li><p>EventRequest 命令上的新修饰符允许调试器将线程启动和结束事件限制为平台线程。</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://docs.oracle.com/en/java/javase/21/docs/api/jdk.jdi/module-summary.html">JDI</a>的更新如下：</p>
+<ul>
+<li><p>com.sun.jdi.ThreadReference 中的新方法测试线程是否为虚拟线程。</p>
+</li>
+<li><p>com.sun.jdi.request.ThreadStartRequest 和 com.sun.jdi.request.ThreadDeathRequest 中的新方法限制了为平台线程请求生成的事件。</p>
+</li>
+</ul>
+<p>如上所述，虚拟线程不被视为线程组中的活动线程。因此，JVM TI 函数 GetThreadGroupChildren、JDWP 命令 ThreadGroupReference&#x2F;Children 和 JDI 方法 com.sun.jdi.ThreadGroupReference.threads() 返回的线程列表仅包含平台线程。</p>
+<h4 id="JDK-Flight-Recorder（JFR）"><a href="#JDK-Flight-Recorder（JFR）" class="headerlink" title="JDK Flight Recorder（JFR）"></a>JDK Flight Recorder（JFR）</h4><p>JFR 支持具有多个新事件的虚拟线程：</p>
+<ul>
+<li><p>jdk.VirtualThreadStart 和 jdk.VirtualThreadEnd 表示虚拟线程的开始和结束。默认情况下禁用这些事件。</p>
+</li>
+<li><p>jdk.VirtualThreadPinned 表示虚拟线程在固定时被park，即没有释放其平台线程（见上文）。该事件默认启用，阈值为 20 毫秒。</p>
+</li>
+<li><p>dk.VirtualThreadSubmitFailed 表示启动或取消停放虚拟线程失败，可能是由于资源问题。该事件默认启用。</p>
+</li>
+</ul>
+<h4 id="Java-Management-Extensions（JMX）"><a href="#Java-Management-Extensions（JMX）" class="headerlink" title="Java Management Extensions（JMX）"></a>Java Management Extensions（JMX）</h4><p>java.lang.management.ThreadMXBean 仅支持平台线程的监控和管理。findDeadlockedThreads() 方法查找处于死锁状态的平台线程的周期；它不找处于死锁状态的虚拟线程循环。</p>
+<p>com.sun.management.HotSpotDiagnosticsMXBean 中的新方法生成上述新型线程dump。还可以通过平台 MBeanServer 从本地或远程 JMX 工具间接调用此方法。</p>
+<h4 id="Alternatives"><a href="#Alternatives" class="headerlink" title="Alternatives"></a>Alternatives</h4><ul>
+<li><p>继续依赖异步API。异步 API 很难与同步 API 集成，创建相同 I&#x2F;O 操作的两种表示的分裂世界，并且没有提供可供平台用作故障排除、监视、调试上下文的操作序列的统一概念 和分析。</p>
+</li>
+<li><p>将句法无堆栈协程（即 async&#x2F;await）添加到 Java 语言中。这些比用户模式线程更容易实现，并且将提供表示操作序列上下文的统一构造。</p>
+<p>然而，该构造将是新的，并且与线程分开，在许多方面与线程相似，但在某些细微差别上有所不同。它将在为线程设计的 API 和为协程设计的 API 之间划分世界，并且需要将新的类似线程的构造引入到平台及其工具的所有层中。这将需要更长的时间才能被生态系统采用，并且不会像用户模式线程那样与平台优雅和谐。</p>
+<p>大多数采用语法协程的语言都是由于无法实现用户模式线程（例如 Kotlin）、遗留语义保证（例如固有的单线程 JavaScript）或特定于语言的技术限制（例如 C++）而这样做的。 ）。 这些限制不适用于 Java。</p>
+</li>
+<li><p>引入一个新的公共类来表示用户模式线程，与 java.lang.Thread 无关。这将是一个抛弃 Thread 类 25 年来积累的不需要的包袱的机会。我们探索并原型化了这种方法的几种变体，但在每种情况下都要解决如何运行现有代码的问题。</p>
+<p>主要问题是 Thread.currentThread() 在现有代码中直接或间接普遍使用（例如，确定锁所有权或线程局部变量）。此方法必须返回一个表示当前执行线程的对象。如果我们引入一个新类来表示用户模式线程，那么 currentThread() 必须返回某种看起来像 Thread 但委托给用户模式线程对象的包装对象。</p>
+<p>让两个对象代表当前执行线程会令人困惑，因此我们最终得出结论，保留旧的 Thread API 并不是一个重大障碍。除了 currentThread() 等少数方法外，开发人员很少直接使用 Thread API；它们主要使用更高级别的 API（例如 ExecutorService）进行交互。随着时间的推移，我们将通过弃用和删除过时的方法，从 Thread 类和相关类（例如 ThreadGroup）中抛弃不需要的包袱。</p>
+</li>
+</ul>
+<h4 id="Testing"><a href="#Testing" class="headerlink" title="Testing"></a>Testing</h4><ul>
+<li><p>现有的测试将确保我们在此提出的更改不会导致运行它们的多种配置和执行模式出现意外的回归。</p>
+</li>
+<li><p>我们将扩展 jtreg 测试工具，以允许现有测试在虚拟线程的上下文中运行。这将避免需要许多测试出现两个版本。</p>
+</li>
+<li><p>新的测试将测试所有新的和修订的 API，并且所有区域都将更改为支持虚拟线程。</p>
+</li>
+<li><p>新的压力测试将针对对可靠性和性能至关重要的领域。</p>
+</li>
+<li><p>新的微基准测试将针对性能关键领域。</p>
+</li>
+<li><p>我们将使用许多现有服务器（包括 Helidon 和 Jetty）进行更大规模的测试。</p>
+</li>
+</ul>
+<h4 id="Risks-and-Assumptions"><a href="#Risks-and-Assumptions" class="headerlink" title="Risks and Assumptions"></a>Risks and Assumptions</h4><p>该提案的主要风险是由于现有 API 及其实现的变化而导致的兼容性风险：</p>
+<ul>
+<li>java.io.BufferedInputStream、BufferedOutputStream、BufferedReader、BufferedWriter、PrintStream 和 PrintWriter 类中使用的内部（未记录的）锁定协议的修订可能会影响假定 I&#x2F;O 方法在调用它们的流上同步的代码 。 这些更改不会影响继承这些类并假定由超类锁定的代码，也不会影响继承 java.io.Reader 或 java.io.Writer 并使用这些 API 公开的锁对象的代码。</li>
+</ul>
+<p>一些源代码和二进制文件不兼容的更改可能会影响继承 java.lang.Thread 的代码：</p>
+<ul>
+<li><p>Thread 定义了几个新方法。如果现有源文件中的代码继承了 Thread 并且子类中的方法与任何新的 Thread 方法发生冲突，则该文件将无法在不进行更改的情况下进行编译。</p>
+</li>
+<li><p>Thread.Builder 是一个新的嵌套接口。如果现有源文件中的代码继承了 Thread，导入名为 Builder 的类，并且子类中的代码引用 Builder 作为简单名称，则该文件将无法在不进行更改的情况下进行编译。</p>
+</li>
+<li><p>Thread.isVirtual() 是一个新的final方法。如果存在继承 Thread 的现有编译代码，并且子类声明了具有相同名称和返回类型的方法，则在加载子类时将在运行时抛出 IncompleteClassChangeError 。</p>
+</li>
+</ul>
+<p>将现有代码与使用虚拟线程或新 API 的新代码混合时，可能会观察到平台线程和虚拟线程之间的一些行为差异（上面都提到过，这里做了总结）：</p>
+<ul>
+<li><p>Thread.setPriority(int) 方法对虚拟线程没有影响，虚拟线程始终具有 Thread.NORM_PRIORITY 优先级。</p>
+</li>
+<li><p>Thread.setDaemon(boolean) 方法对虚拟线程没有影响，虚拟线程始终是守护线程。</p>
+</li>
+<li><p>Thread.getAllStackTraces() 现在返回所有平台线程的映射，而不是所有线程的映射。</p>
+</li>
+<li><p>现在，当在虚拟线程上下文中调用时，由 java.net.Socket、ServerSocket 和 DatagramSocket 定义的阻塞 I&#x2F;O 方法是可中断的。当在套接字操作上阻塞的线程被中断时，现有代码可能会中断，这将唤醒线程并关闭套接字。</p>
+</li>
+<li><p>虚拟线程不是线程组的活动成员。在虚拟线程上调用 Thread.getThreadGroup() 将返回一个空的虚拟“VirtualThreads”组。</p>
+</li>
+<li><p>当使用安全管理器集运行时，虚拟线程没有权限。有关在 Java 17 及更高版本上运行安全管理器的信息，请参阅 <a target="_blank" rel="noopener" href="https://openjdk.org/jeps/411">JEP 411 (Deprecate the Security Manager for Removal)</a>。</p>
+</li>
+<li><p>在 JVM TI 中，GetAllThreads 和 GetAllStackTraces 函数不返回虚拟线程。启用 ThreadStart 和 ThreadEnd 事件的现有代理可能会遇到性能问题，因为它们缺乏将事件限制为平台线程的能力。</p>
+</li>
+<li><p>java.lang.management.ThreadMXBean API 支持平台线程的监视和管理，但不支持虚拟线程。</p>
+</li>
+<li><p>-XX:+PreserveFramePointer 标志对虚拟线程性能有巨大的负面影响。</p>
+</li>
+</ul>
+<h4 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h4><ul>
+<li><p>JDK 18 中的 <a target="_blank" rel="noopener" href="https://openjdk.java.net/jeps/416">JEP 416 (Reimplement Core Reflection with Method Handles)</a>删除了虚拟机本机反射实现。这允许虚拟线程在反射调用方法时优雅地park。</p>
+</li>
+<li><p>JDK 13 中的<a target="_blank" rel="noopener" href="https://openjdk.java.net/jeps/353">JEP 353 (Reimplement the Legacy Socket API)</a>和 JDK 15 中的  <a target="_blank" rel="noopener" href="https://openjdk.java.net/jeps/373">JEP 373 (Reimplement the Legacy DatagramSocket API)</a>用设计用于虚拟线程的新实现替换了 java.net.Socket、ServerSocket 和 DatagramSocket 的实现 。</p>
+</li>
+<li><p>JDK 18 中的 <a target="_blank" rel="noopener" href="https://openjdk.java.net/jeps/418">JEP 418 (Internet-Address Resolution SPI)</a>定义了用于主机名和地址查找的服务提供者接口。 这将允许第三方库实现替代的 java.net.InetAddress 解析器，这些解析器在主机查找期间不会固定线程。</p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%96%87%E7%AB%A0%E7%BF%BB%E8%AF%91/" class="category-chain-item">文章翻译</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java/">#Java</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>JEP-444:虚拟线程</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/10/03/java-source-code/JEP-444-虚拟线程/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年10月3日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/11/06/java-source-code/ScheduledThreadPoolExecutor%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" title="ScheduledThreadPoolExecutor源码解析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">ScheduledThreadPoolExecutor源码解析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/09/05/mybatis-source-code/mybatis-configuration%E7%B1%BB/" title="mybatis-configuration类">
+                        <span class="hidden-mobile">mybatis-configuration类</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

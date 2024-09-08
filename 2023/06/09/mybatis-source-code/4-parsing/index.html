@@ -1,0 +1,645 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="这个模块提供了通用的字符串解析（替换）接口，并封装了 org.w3c.dom.Node 和  javax.xml.xpath.XPath等 TokenHandler    TokenHandler 是 提供了对匹配到的字符串进行处理的接口 1234public interface TokenHandler &amp;#123;  &#x2F;&#x2F; 处理content  String handleToken(S">
+<meta property="og:type" content="article">
+<meta property="og:title" content="4-parsing">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/06/09/mybatis-source-code/4-parsing/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="这个模块提供了通用的字符串解析（替换）接口，并封装了 org.w3c.dom.Node 和  javax.xml.xpath.XPath等 TokenHandler    TokenHandler 是 提供了对匹配到的字符串进行处理的接口 1234public interface TokenHandler &amp;#123;  &#x2F;&#x2F; 处理content  String handleToken(S">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-09T12:38:48.000Z">
+<meta property="article:modified_time" content="2023-06-09T14:45:59.775Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>4-parsing - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/poem/">
+                <i class="iconfont icon-user-fill"></i>
+                古诗词
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/thinking/">
+                <i class="iconfont icon-user-fill"></i>
+                思考ing
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="4-parsing"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-06-09 20:38" pubdate>
+          2023年6月9日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          21k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          174 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">4-parsing</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>    这个模块提供了通用的字符串解析（替换）接口，并封装了 <code>org.w3c.dom.Node</code> 和  <code>javax.xml.xpath.XPath</code>等</p>
+<h4 id="TokenHandler"><a href="#TokenHandler" class="headerlink" title="TokenHandler"></a>TokenHandler</h4><p>    TokenHandler 是 提供了对匹配到的字符串进行处理的接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">TokenHandler</span> &#123;<br>  <span class="hljs-comment">// 处理content</span><br>  String <span class="hljs-title function_">handleToken</span><span class="hljs-params">(String content)</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="GenericTokenParser"><a href="#GenericTokenParser" class="headerlink" title="GenericTokenParser"></a>GenericTokenParser</h4><p>    通用记号解析器，用于处理#{}和${}参数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">GenericTokenParser</span> &#123;<br>  <span class="hljs-comment">// 开始标记和结束标记</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String openToken;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String closeToken; <br><br>  <span class="hljs-comment">// 记号处理器</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> TokenHandler handler; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">GenericTokenParser</span><span class="hljs-params">(String openToken, String closeToken, TokenHandler handler)</span> &#123;<br>    <span class="hljs-built_in">this</span>.openToken = openToken;<br>    <span class="hljs-built_in">this</span>.closeToken = closeToken;<br>    <span class="hljs-built_in">this</span>.handler = handler;<br>  &#125; <br><br>  <span class="hljs-comment">// 这里是自己实现了一个简单的正则匹配</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">parse</span><span class="hljs-params">(String text)</span> &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    <span class="hljs-keyword">if</span> (text != <span class="hljs-literal">null</span> &amp;&amp; text.length() &gt; <span class="hljs-number">0</span>) &#123;<br>      <span class="hljs-type">char</span>[] src = text.toCharArray();<br>      <span class="hljs-type">int</span> <span class="hljs-variable">offset</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>      <span class="hljs-type">int</span> <span class="hljs-variable">start</span> <span class="hljs-operator">=</span> text.indexOf(openToken, offset);<br>      <span class="hljs-comment">// #&#123;favouriteSection,jdbcType=VARCHAR&#125;</span><br>      <span class="hljs-comment">// 这里是循环解析参数，参考GenericTokenParserTest,</span><br>      <span class="hljs-comment">// 比如可以解析$&#123;first_name&#125; $&#123;initial&#125; $&#123;last_name&#125; reporting.</span><br>      <span class="hljs-comment">// 这样的字符串,里面有3个 $&#123;&#125;</span><br>      <span class="hljs-keyword">while</span> (start &gt; -<span class="hljs-number">1</span>) &#123;<br>    	<span class="hljs-comment">// 判断一下 $&#123;(openToken) 前面是否是反斜杠，这个逻辑在老版的mybatis中（如3.1.0）</span><br>        <span class="hljs-comment">// 是没有的</span><br>        <span class="hljs-comment">// 这里相当于转义，openToken当成一般字符处理</span><br>        <span class="hljs-keyword">if</span> (start &gt; <span class="hljs-number">0</span> &amp;&amp; src[start - <span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;\\&#x27;</span>) &#123;<br>          <span class="hljs-comment">// the variable is escaped. remove the backslash.</span><br>      	  <span class="hljs-comment">// 新版已经没有调用substring了，改为调用如下的offset方式，提高了效率</span><br>          <span class="hljs-comment">// issue #760</span><br>          builder.append(src, offset, start - offset - <span class="hljs-number">1</span>).append(openToken);<br>          offset = start + openToken.length();<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          <span class="hljs-type">int</span> <span class="hljs-variable">end</span> <span class="hljs-operator">=</span> text.indexOf(closeToken, start);<br>          <span class="hljs-comment">// openToken没有对应的closeToken，也当成普通字符处理</span><br>          <span class="hljs-keyword">if</span> (end == -<span class="hljs-number">1</span>) &#123;<br>            builder.append(src, offset, src.length - offset);<br>            offset = src.length;<br>          &#125; <span class="hljs-keyword">else</span> &#123;<br>            builder.append(src, offset, start - offset);<br>            offset = start + openToken.length();<br>            <span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(src, offset, end - offset);<br>            <span class="hljs-comment">// 得到一对大括号里的字符串后，调用handler.handleToken,比如替换变量这种功能</span><br>            builder.append(handler.handleToken(content));<br>            offset = end + closeToken.length();<br>          &#125;<br>        &#125;<br>        <span class="hljs-comment">// 获取下一个openToken的下标</span><br>        start = text.indexOf(openToken, offset);<br>      &#125;<br>      <span class="hljs-comment">// 处理剩下的字符</span><br>      <span class="hljs-keyword">if</span> (offset &lt; src.length) &#123;<br>        builder.append(src, offset, src.length - offset);<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> builder.toString();<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="PropertyParser"><a href="#PropertyParser" class="headerlink" title="PropertyParser"></a>PropertyParser</h4><p>     实现了一个根据Properties中的key和value替换 ${}$ ${}$包裹的内容</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PropertyParser</span> &#123; <br><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">PropertyParser</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// Prevent Instantiation</span><br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title function_">parse</span><span class="hljs-params">(String string, Properties variables)</span> &#123;<br>    <span class="hljs-type">VariableTokenHandler</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">VariableTokenHandler</span>(variables);<br>    <span class="hljs-type">GenericTokenParser</span> <span class="hljs-variable">parser</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">GenericTokenParser</span>(<span class="hljs-string">&quot;$&#123;&quot;</span>, <span class="hljs-string">&quot;&#125;&quot;</span>, handler);<br>    <span class="hljs-keyword">return</span> parser.parse(string);<br>  &#125; <br><br>  <span class="hljs-comment">// 用相应的value替换key</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VariableTokenHandler</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">TokenHandler</span> &#123;<br>    <span class="hljs-keyword">private</span> Properties variables;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">VariableTokenHandler</span><span class="hljs-params">(Properties variables)</span> &#123;<br>      <span class="hljs-built_in">this</span>.variables = variables;<br>    &#125; <br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> String <span class="hljs-title function_">handleToken</span><span class="hljs-params">(String content)</span> &#123;<br>      <span class="hljs-keyword">if</span> (variables != <span class="hljs-literal">null</span> &amp;&amp; variables.containsKey(content)) &#123;<br>        <span class="hljs-keyword">return</span> variables.getProperty(content);<br>      &#125;<br>      <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;$&#123;&quot;</span> + content + <span class="hljs-string">&quot;&#125;&quot;</span>;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="XPathParser"><a href="#XPathParser" class="headerlink" title="XPathParser"></a>XPathParser</h4><p>      XPath解析器，用的都是JDK的类包,封装了一下，使得使用起来更方便</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">XPathParser</span> &#123; <br>  <span class="hljs-keyword">private</span> Document document;<br>  <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> validation;<br>  <span class="hljs-keyword">private</span> EntityResolver entityResolver;<br>  <span class="hljs-keyword">private</span> Properties variables;<br>  <span class="hljs-keyword">private</span> XPath xpath; <br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">commonConstructor</span><span class="hljs-params">(<span class="hljs-type">boolean</span> validation, Properties variables, EntityResolver entityResolver)</span> &#123;<br>    <span class="hljs-built_in">this</span>.validation = validation;<br>    <span class="hljs-built_in">this</span>.entityResolver = entityResolver;<br>    <span class="hljs-built_in">this</span>.variables = variables;<br>	<span class="hljs-comment">// 共通构造函数，除了把参数都设置到实例变量里面去以外，还初始化了XPath</span><br>    <span class="hljs-type">XPathFactory</span> <span class="hljs-variable">factory</span> <span class="hljs-operator">=</span> XPathFactory.newInstance();<br>    <span class="hljs-built_in">this</span>.xpath = factory.newXPath();<br>  &#125; <br><br>  <span class="hljs-comment">// 一些构造函数,全部调用commonConstructor以及createDocument</span><br>  <span class="hljs-comment">// 1~4,默认不需要验证</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(String xml)</span> &#123;<br>    commonConstructor(<span class="hljs-literal">false</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringReader</span>(xml)));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Reader reader)</span> &#123;<br>    commonConstructor(<span class="hljs-literal">false</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(reader));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(InputStream inputStream)</span> &#123;<br>    commonConstructor(<span class="hljs-literal">false</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(inputStream));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Document document)</span> &#123;<br>    commonConstructor(<span class="hljs-literal">false</span>, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = document;<br>  &#125; <br><br>  <span class="hljs-comment">// 5~8,传入是否需要验证参数</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(String xml, <span class="hljs-type">boolean</span> validation)</span> &#123;<br>    commonConstructor(validation, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringReader</span>(xml)));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Reader reader, <span class="hljs-type">boolean</span> validation)</span> &#123;<br>    commonConstructor(validation, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(reader));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(InputStream inputStream, <span class="hljs-type">boolean</span> validation)</span> &#123;<br>    commonConstructor(validation, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(inputStream));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Document document, <span class="hljs-type">boolean</span> validation)</span> &#123;<br>    commonConstructor(validation, <span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = document;<br>  &#125; <br><br>  <span class="hljs-comment">// 9~12,传入是否需要验证参数,Properties</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(String xml, <span class="hljs-type">boolean</span> validation, Properties variables)</span> &#123;<br>    commonConstructor(validation, variables, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringReader</span>(xml)));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Reader reader, <span class="hljs-type">boolean</span> validation, Properties variables)</span> &#123;<br>    commonConstructor(validation, variables, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(reader));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(InputStream inputStream, <span class="hljs-type">boolean</span> validation, Properties variables)</span> &#123;<br>    commonConstructor(validation, variables, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(inputStream));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Document document, <span class="hljs-type">boolean</span> validation, Properties variables)</span> &#123;<br>    commonConstructor(validation, variables, <span class="hljs-literal">null</span>);<br>    <span class="hljs-built_in">this</span>.document = document;<br>  &#125; <br><br>  <span class="hljs-comment">// 13~16,传入是否需要验证参数,Properties,EntityResolver</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(String xml, <span class="hljs-type">boolean</span> validation, Properties variables, EntityResolver entityResolver)</span> &#123;<br>    commonConstructor(validation, variables, entityResolver);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringReader</span>(xml)));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Reader reader, <span class="hljs-type">boolean</span> validation, Properties variables, EntityResolver entityResolver)</span> &#123;<br>    commonConstructor(validation, variables, entityResolver);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(reader));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(InputStream inputStream, <span class="hljs-type">boolean</span> validation, Properties variables, EntityResolver entityResolver)</span> &#123;<br>    commonConstructor(validation, variables, entityResolver);<br>    <span class="hljs-built_in">this</span>.document = createDocument(<span class="hljs-keyword">new</span> <span class="hljs-title class_">InputSource</span>(inputStream));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XPathParser</span><span class="hljs-params">(Document document, <span class="hljs-type">boolean</span> validation, Properties variables, EntityResolver entityResolver)</span> &#123;<br>    commonConstructor(validation, variables, entityResolver);<br>    <span class="hljs-built_in">this</span>.document = document;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setVariables</span><span class="hljs-params">(Properties variables)</span> &#123;<br>    <span class="hljs-built_in">this</span>.variables = variables;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">evalString</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalString(document, expression);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">evalString</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>	<span class="hljs-comment">// 1.先用xpath解析</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span> (String) evaluate(expression, root, XPathConstants.STRING);<br>	<span class="hljs-comment">// 2.再调用PropertyParser去解析,也就是替换 $&#123;&#125; 这种格式的字符串</span><br>    result = PropertyParser.parse(result, variables);<br>    <span class="hljs-keyword">return</span> result;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">evalBoolean</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalBoolean(document, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">evalBoolean</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> (Boolean) evaluate(expression, root, XPathConstants.BOOLEAN);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Short <span class="hljs-title function_">evalShort</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalShort(document, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Short <span class="hljs-title function_">evalShort</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> Short.valueOf(evalString(root, expression));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Integer <span class="hljs-title function_">evalInteger</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalInteger(document, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Integer <span class="hljs-title function_">evalInteger</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> Integer.valueOf(evalString(root, expression));<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">evalLong</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalLong(document, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">evalLong</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> Long.valueOf(evalString(root, expression));<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Float <span class="hljs-title function_">evalFloat</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalFloat(document, expression);<br>  &#125;<br><br>  <span class="hljs-comment">// ??这里有点疑问，为何Float用evalString,Double用evaluate XPathConstants.NUMBER</span><br>  <span class="hljs-keyword">public</span> Float <span class="hljs-title function_">evalFloat</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> Float.valueOf(evalString(root, expression));<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">evalDouble</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalDouble(document, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">evalDouble</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> (Double) evaluate(expression, root, XPathConstants.NUMBER);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> List&lt;XNode&gt; <span class="hljs-title function_">evalNodes</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalNodes(document, expression);<br>  &#125; <br><br>  <span class="hljs-comment">// 返回节点List</span><br>  <span class="hljs-keyword">public</span> List&lt;XNode&gt; <span class="hljs-title function_">evalNodes</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    List&lt;XNode&gt; xnodes = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;XNode&gt;();<br>    <span class="hljs-type">NodeList</span> <span class="hljs-variable">nodes</span> <span class="hljs-operator">=</span> (NodeList) evaluate(expression, root, XPathConstants.NODESET);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; nodes.getLength(); i++) &#123;<br>      xnodes.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">XNode</span>(<span class="hljs-built_in">this</span>, nodes.item(i), variables));<br>    &#125;<br>    <span class="hljs-keyword">return</span> xnodes;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> XNode <span class="hljs-title function_">evalNode</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> evalNode(document, expression);<br>  &#125; <br><br>  <span class="hljs-comment">// 返回节点</span><br>  <span class="hljs-keyword">public</span> XNode <span class="hljs-title function_">evalNode</span><span class="hljs-params">(Object root, String expression)</span> &#123;<br>    <span class="hljs-type">Node</span> <span class="hljs-variable">node</span> <span class="hljs-operator">=</span> (Node) evaluate(expression, root, XPathConstants.NODE);<br>    <span class="hljs-keyword">if</span> (node == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">XNode</span>(<span class="hljs-built_in">this</span>, node, variables);<br>  &#125; <br><br>  <span class="hljs-keyword">private</span> Object <span class="hljs-title function_">evaluate</span><span class="hljs-params">(String expression, Object root, QName returnType)</span> &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// 最终合流到这儿，直接调用XPath.evaluate</span><br>      <span class="hljs-keyword">return</span> xpath.evaluate(expression, root, returnType);<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BuilderException</span>(<span class="hljs-string">&quot;Error evaluating XPath.  Cause: &quot;</span> + e, e);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">private</span> Document <span class="hljs-title function_">createDocument</span><span class="hljs-params">(InputSource inputSource)</span> &#123;<br>    <span class="hljs-comment">// important: this must only be called AFTER common constructor</span><br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// 这个是DOM解析方式</span><br>      <span class="hljs-type">DocumentBuilderFactory</span> <span class="hljs-variable">factory</span> <span class="hljs-operator">=</span> DocumentBuilderFactory.newInstance();<br>      factory.setValidating(validation);<br><br>      <span class="hljs-comment">// 名称空间</span><br>      factory.setNamespaceAware(<span class="hljs-literal">false</span>);<br>      <span class="hljs-comment">// 忽略注释</span><br>      factory.setIgnoringComments(<span class="hljs-literal">true</span>);<br>      <span class="hljs-comment">// 忽略空白</span><br>      factory.setIgnoringElementContentWhitespace(<span class="hljs-literal">false</span>);<br>      <span class="hljs-comment">// 把 CDATA 节点转换为 Text 节点</span><br>      factory.setCoalescing(<span class="hljs-literal">false</span>);<br>      <span class="hljs-comment">// 扩展实体引用</span><br>      factory.setExpandEntityReferences(<span class="hljs-literal">true</span>);<br><br>      <span class="hljs-type">DocumentBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> factory.newDocumentBuilder();<br>      <span class="hljs-comment">// 需要注意的就是定义了EntityResolver(XMLMapperEntityResolver)，这样不用联网去获取DTD，</span><br>      <span class="hljs-comment">// 将DTD放在org\apache\ibatis\builder\xml\mybatis-3-config.dtd,来达到验证xml合法性的目的</span><br>      builder.setEntityResolver(entityResolver);<br>      builder.setErrorHandler(<span class="hljs-keyword">new</span> <span class="hljs-title class_">ErrorHandler</span>() &#123;<br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">error</span><span class="hljs-params">(SAXParseException exception)</span> <span class="hljs-keyword">throws</span> SAXException &#123;<br>          <span class="hljs-keyword">throw</span> exception;<br>        &#125;<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">fatalError</span><span class="hljs-params">(SAXParseException exception)</span> <span class="hljs-keyword">throws</span> SAXException &#123;<br>          <span class="hljs-keyword">throw</span> exception;<br>        &#125;<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">warning</span><span class="hljs-params">(SAXParseException exception)</span> <span class="hljs-keyword">throws</span> SAXException &#123;<br>        &#125;<br>      &#125;);<br>      <span class="hljs-keyword">return</span> builder.parse(inputSource);<br>    &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BuilderException</span>(<span class="hljs-string">&quot;Error creating document instance.  Cause: &quot;</span> + e, e);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="XNode"><a href="#XNode" class="headerlink" title="XNode"></a>XNode</h4><p>    对<code>org.w3c.dom.Node</code>的包装</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">XNode</span> &#123; <br>  <span class="hljs-comment">// org.w3c.dom.Node</span><br>  <span class="hljs-keyword">private</span> Node node; <br><br>  <span class="hljs-comment">// 以下都是预先把信息都解析好，放到map等数据结构中（内存中）</span><br>  <span class="hljs-keyword">private</span> String name;<br>  <span class="hljs-keyword">private</span> String body;<br>  <span class="hljs-keyword">private</span> Properties attributes;<br>  <span class="hljs-keyword">private</span> Properties variables;<br>  <span class="hljs-comment">// XPathParser方便xpath解析</span><br>  <span class="hljs-keyword">private</span> XPathParser xpathParser; <br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">XNode</span><span class="hljs-params">(XPathParser xpathParser, Node node, Properties variables)</span> &#123;<br>    <span class="hljs-built_in">this</span>.xpathParser = xpathParser;<br>    <span class="hljs-built_in">this</span>.node = node;<br>    <span class="hljs-built_in">this</span>.name = node.getNodeName();<br>    <span class="hljs-built_in">this</span>.variables = variables;<br>    <span class="hljs-built_in">this</span>.attributes = parseAttributes(node);<br>    <span class="hljs-built_in">this</span>.body = parseBody(node);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> XNode <span class="hljs-title function_">newXNode</span><span class="hljs-params">(Node node)</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">XNode</span>(xpathParser, node, variables);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> XNode <span class="hljs-title function_">getParent</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// 调用Node.getParentNode,如果取到，包装一下，返回XNode</span><br>    <span class="hljs-type">Node</span> <span class="hljs-variable">parent</span> <span class="hljs-operator">=</span> node.getParentNode();<br>    <span class="hljs-keyword">if</span> (parent == <span class="hljs-literal">null</span> || !(parent <span class="hljs-keyword">instanceof</span> Element)) &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">XNode</span>(xpathParser, parent, variables);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 取得完全的path (a/b/c)</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getPath</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// 循环依次取得节点的父节点，然后倒序打印,也可以用一个堆栈实现</span><br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    <span class="hljs-type">Node</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> node;<br>    <span class="hljs-keyword">while</span> (current != <span class="hljs-literal">null</span> &amp;&amp; current <span class="hljs-keyword">instanceof</span> Element) &#123;<br>      <span class="hljs-keyword">if</span> (current != node) &#123;<br>        builder.insert(<span class="hljs-number">0</span>, <span class="hljs-string">&quot;/&quot;</span>);<br>      &#125;<br>      builder.insert(<span class="hljs-number">0</span>, current.getNodeName());<br>      current = current.getParentNode();<br>    &#125;<br>    <span class="hljs-keyword">return</span> builder.toString();<br>  &#125; <br><br>  <span class="hljs-comment">// 取得标示符   (&quot;resultMap[authorResult]&quot;)</span><br>  <span class="hljs-comment">// XMLMapperBuilder.resultMapElement调用</span><br>  <span class="hljs-comment">//	&lt;resultMap id=&quot;authorResult&quot; type=&quot;Author&quot;&gt;</span><br>  <span class="hljs-comment">//	  &lt;id property=&quot;id&quot; column=&quot;author_id&quot;/&gt;</span><br>  <span class="hljs-comment">//	  &lt;result property=&quot;username&quot; column=&quot;author_username&quot;/&gt;</span><br>  <span class="hljs-comment">//	  &lt;result property=&quot;password&quot; column=&quot;author_password&quot;/&gt;</span><br>  <span class="hljs-comment">//	  &lt;result property=&quot;email&quot; column=&quot;author_email&quot;/&gt;</span><br>  <span class="hljs-comment">//	  &lt;result property=&quot;bio&quot; column=&quot;author_bio&quot;/&gt;</span><br>  <span class="hljs-comment">//	&lt;/resultMap&gt;</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getValueBasedIdentifier</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    <span class="hljs-type">XNode</span> <span class="hljs-variable">current</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>;<br>    <span class="hljs-keyword">while</span> (current != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">if</span> (current != <span class="hljs-built_in">this</span>) &#123;<br>        builder.insert(<span class="hljs-number">0</span>, <span class="hljs-string">&quot;_&quot;</span>);<br>      &#125;<br>      <span class="hljs-comment">// 先拿id，拿不到再拿value,再拿不到拿property</span><br>      <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> current.getStringAttribute(<span class="hljs-string">&quot;id&quot;</span>,<br>          current.getStringAttribute(<span class="hljs-string">&quot;value&quot;</span>,<br>              current.getStringAttribute(<span class="hljs-string">&quot;property&quot;</span>, <span class="hljs-literal">null</span>)));<br>      <span class="hljs-keyword">if</span> (value != <span class="hljs-literal">null</span>) &#123;<br>        value = value.replace(<span class="hljs-string">&#x27;.&#x27;</span>, <span class="hljs-string">&#x27;_&#x27;</span>);<br>        builder.insert(<span class="hljs-number">0</span>, <span class="hljs-string">&quot;]&quot;</span>);<br>        builder.insert(<span class="hljs-number">0</span>,<br>            value);<br>        builder.insert(<span class="hljs-number">0</span>, <span class="hljs-string">&quot;[&quot;</span>);<br>      &#125;<br>      builder.insert(<span class="hljs-number">0</span>, current.getName());<br>      current = current.getParent();<br>    &#125;<br>    <span class="hljs-keyword">return</span> builder.toString();<br>  &#125; <br><br>  <span class="hljs-comment">// 以下方法都是委托给XPathParser实现</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">evalString</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> xpathParser.evalString(node, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">evalBoolean</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> xpathParser.evalBoolean(node, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">evalDouble</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> xpathParser.evalDouble(node, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> List&lt;XNode&gt; <span class="hljs-title function_">evalNodes</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> xpathParser.evalNodes(node, expression);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> XNode <span class="hljs-title function_">evalNode</span><span class="hljs-params">(String expression)</span> &#123;<br>    <span class="hljs-keyword">return</span> xpathParser.evalNode(node, expression);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Node <span class="hljs-title function_">getNode</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> node;<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getName</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> name;<br>  &#125; <br><br>  <span class="hljs-comment">// 以下是一些getBody的方法</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getStringBody</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> getStringBody(<span class="hljs-literal">null</span>);<br>  &#125; <br><br>  <span class="hljs-comment">// body为空返回def，下面类似</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getStringBody</span><span class="hljs-params">(String def)</span> &#123;<br>    <span class="hljs-keyword">if</span> (body == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> body;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">getBooleanBody</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> getBooleanBody(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">getBooleanBody</span><span class="hljs-params">(Boolean def)</span> &#123;<br>    <span class="hljs-keyword">if</span> (body == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Boolean.valueOf(body);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Integer <span class="hljs-title function_">getIntBody</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> getIntBody(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Integer <span class="hljs-title function_">getIntBody</span><span class="hljs-params">(Integer def)</span> &#123;<br>    <span class="hljs-keyword">if</span> (body == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Integer.parseInt(body);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">getLongBody</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> getLongBody(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">getLongBody</span><span class="hljs-params">(Long def)</span> &#123;<br>    <span class="hljs-keyword">if</span> (body == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Long.parseLong(body);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">getDoubleBody</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> getDoubleBody(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">getDoubleBody</span><span class="hljs-params">(Double def)</span> &#123;<br>    <span class="hljs-keyword">if</span> (body == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Double.parseDouble(body);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Float <span class="hljs-title function_">getFloatBody</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> getFloatBody(<span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Float <span class="hljs-title function_">getFloatBody</span><span class="hljs-params">(Float def)</span> &#123;<br>    <span class="hljs-keyword">if</span> (body == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Float.parseFloat(body);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 以下是一些getAttribute的方法</span><br>  <span class="hljs-keyword">public</span> &lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Enum</span>&lt;T&gt;&gt; T <span class="hljs-title function_">getEnumAttribute</span><span class="hljs-params">(Class&lt;T&gt; enumType, String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getEnumAttribute(enumType, name, <span class="hljs-literal">null</span>);<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> &lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Enum</span>&lt;T&gt;&gt; T <span class="hljs-title function_">getEnumAttribute</span><span class="hljs-params">(Class&lt;T&gt; enumType, String name, T def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> getStringAttribute(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Enum.valueOf(enumType, value);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getStringAttribute</span><span class="hljs-params">(String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getStringAttribute(name, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">getStringAttribute</span><span class="hljs-params">(String name, String def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> attributes.getProperty(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> value;<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">getBooleanAttribute</span><span class="hljs-params">(String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getBooleanAttribute(name, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Boolean <span class="hljs-title function_">getBooleanAttribute</span><span class="hljs-params">(String name, Boolean def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> attributes.getProperty(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Boolean.valueOf(value);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Integer <span class="hljs-title function_">getIntAttribute</span><span class="hljs-params">(String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getIntAttribute(name, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Integer <span class="hljs-title function_">getIntAttribute</span><span class="hljs-params">(String name, Integer def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> attributes.getProperty(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Integer.parseInt(value);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">getLongAttribute</span><span class="hljs-params">(String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getLongAttribute(name, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Long <span class="hljs-title function_">getLongAttribute</span><span class="hljs-params">(String name, Long def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> attributes.getProperty(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Long.parseLong(value);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">getDoubleAttribute</span><span class="hljs-params">(String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getDoubleAttribute(name, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Double <span class="hljs-title function_">getDoubleAttribute</span><span class="hljs-params">(String name, Double def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> attributes.getProperty(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Double.parseDouble(value);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-keyword">public</span> Float <span class="hljs-title function_">getFloatAttribute</span><span class="hljs-params">(String name)</span> &#123;<br>    <span class="hljs-keyword">return</span> getFloatAttribute(name, <span class="hljs-literal">null</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> Float <span class="hljs-title function_">getFloatAttribute</span><span class="hljs-params">(String name, Float def)</span> &#123;<br>    <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> attributes.getProperty(name);<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">return</span> def;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-keyword">return</span> Float.parseFloat(value);<br>    &#125;<br>  &#125; <br><br>  <span class="hljs-comment">// 得到孩子，原理是调用Node.getChildNodes</span><br>  <span class="hljs-keyword">public</span> List&lt;XNode&gt; <span class="hljs-title function_">getChildren</span><span class="hljs-params">()</span> &#123;<br>    List&lt;XNode&gt; children = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;XNode&gt;();<br>    <span class="hljs-type">NodeList</span> <span class="hljs-variable">nodeList</span> <span class="hljs-operator">=</span> node.getChildNodes();<br>    <span class="hljs-keyword">if</span> (nodeList != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>, n = nodeList.getLength(); i &lt; n; i++) &#123;<br>        <span class="hljs-type">Node</span> <span class="hljs-variable">node</span> <span class="hljs-operator">=</span> nodeList.item(i);<br>        <span class="hljs-keyword">if</span> (node.getNodeType() == Node.ELEMENT_NODE) &#123;<br>          children.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">XNode</span>(xpathParser, node, variables));<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> children;<br>  &#125; <br><br>  <span class="hljs-comment">// 得到孩子，返回Properties，从子节点中提取name和value作为属性</span><br>  <span class="hljs-keyword">public</span> Properties <span class="hljs-title function_">getChildrenAsProperties</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">Properties</span> <span class="hljs-variable">properties</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();<br>    <span class="hljs-keyword">for</span> (XNode child : getChildren()) &#123;<br>      <span class="hljs-type">String</span> <span class="hljs-variable">name</span> <span class="hljs-operator">=</span> child.getStringAttribute(<span class="hljs-string">&quot;name&quot;</span>);<br>      <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> child.getStringAttribute(<span class="hljs-string">&quot;value&quot;</span>);<br>      <span class="hljs-keyword">if</span> (name != <span class="hljs-literal">null</span> &amp;&amp; value != <span class="hljs-literal">null</span>) &#123;<br>        properties.setProperty(name, value);<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> properties;<br>  &#125; <br><br>  <span class="hljs-comment">// 打印信息，为了调试用</span><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    builder.append(<span class="hljs-string">&quot;&lt;&quot;</span>);<br>    builder.append(name);<br>    <span class="hljs-keyword">for</span> (Map.Entry&lt;Object, Object&gt; entry : attributes.entrySet()) &#123;<br>      builder.append(<span class="hljs-string">&quot; &quot;</span>);<br>      builder.append(entry.getKey());<br>      builder.append(<span class="hljs-string">&quot;=\&quot;&quot;</span>);<br>      builder.append(entry.getValue());<br>      builder.append(<span class="hljs-string">&quot;\&quot;&quot;</span>);<br>    &#125;<br>    List&lt;XNode&gt; children = getChildren();<br>    <span class="hljs-keyword">if</span> (!children.isEmpty()) &#123;<br>      builder.append(<span class="hljs-string">&quot;&gt;\n&quot;</span>);<br>      <span class="hljs-keyword">for</span> (XNode node : children) &#123;<br>        <span class="hljs-comment">//递归取得孩子的toString</span><br>        builder.append(node.toString());<br>      &#125;<br>      builder.append(<span class="hljs-string">&quot;&lt;/&quot;</span>);<br>      builder.append(name);<br>      builder.append(<span class="hljs-string">&quot;&gt;&quot;</span>);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (body != <span class="hljs-literal">null</span>) &#123;<br>      builder.append(<span class="hljs-string">&quot;&gt;&quot;</span>);<br>      builder.append(body);<br>      builder.append(<span class="hljs-string">&quot;&lt;/&quot;</span>);<br>      builder.append(name);<br>      builder.append(<span class="hljs-string">&quot;&gt;&quot;</span>);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      builder.append(<span class="hljs-string">&quot;/&gt;&quot;</span>);<br>    &#125;<br>    builder.append(<span class="hljs-string">&quot;\n&quot;</span>);<br>    <span class="hljs-keyword">return</span> builder.toString();<br>  &#125; <br><br>  <span class="hljs-comment">// 以下2个方法在构造时就解析</span><br>  <span class="hljs-keyword">private</span> Properties <span class="hljs-title function_">parseAttributes</span><span class="hljs-params">(Node n)</span> &#123;<br>    <span class="hljs-type">Properties</span> <span class="hljs-variable">attributes</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Properties</span>();<br>    <span class="hljs-type">NamedNodeMap</span> <span class="hljs-variable">attributeNodes</span> <span class="hljs-operator">=</span> n.getAttributes();<br>    <span class="hljs-keyword">if</span> (attributeNodes != <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; attributeNodes.getLength(); i++) &#123;<br>        <span class="hljs-type">Node</span> <span class="hljs-variable">attribute</span> <span class="hljs-operator">=</span> attributeNodes.item(i);<br>        <span class="hljs-comment">// 解析属性节点value中的 $&#123;content&#125; 内容</span><br>        <span class="hljs-type">String</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> PropertyParser.parse(attribute.getNodeValue(), variables);<br>        attributes.put(attribute.getNodeName(), value);<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> attributes;<br>  &#125; <br><br>  <span class="hljs-keyword">private</span> String <span class="hljs-title function_">parseBody</span><span class="hljs-params">(Node node)</span> &#123;<br>    <span class="hljs-comment">// 取不到body，循环取孩子的body，只要取到第一个，立即返回</span><br>    <span class="hljs-type">String</span> <span class="hljs-variable">data</span> <span class="hljs-operator">=</span> getBodyData(node);<br>    <span class="hljs-keyword">if</span> (data == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-type">NodeList</span> <span class="hljs-variable">children</span> <span class="hljs-operator">=</span> node.getChildNodes();<br>      <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; children.getLength(); i++) &#123;<br>        <span class="hljs-type">Node</span> <span class="hljs-variable">child</span> <span class="hljs-operator">=</span> children.item(i);<br>        data = getBodyData(child);<br>        <span class="hljs-keyword">if</span> (data != <span class="hljs-literal">null</span>) &#123;<br>          <span class="hljs-keyword">break</span>;<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> data;<br>  &#125; <br><br>  <span class="hljs-keyword">private</span> String <span class="hljs-title function_">getBodyData</span><span class="hljs-params">(Node child)</span> &#123;<br>    <span class="hljs-keyword">if</span> (child.getNodeType() == Node.CDATA_SECTION_NODE<br>        || child.getNodeType() == Node.TEXT_NODE) &#123;<br>      <span class="hljs-type">String</span> <span class="hljs-variable">data</span> <span class="hljs-operator">=</span> ((CharacterData) child).getData();<br>      data = PropertyParser.parse(data, variables);<br>      <span class="hljs-keyword">return</span> data;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">Mybatis源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Mybatis/">#Mybatis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>4-parsing</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/06/09/mybatis-source-code/4-parsing/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年6月9日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/06/11/Spring/SpringBoot/SpringBoot%E8%87%AA%E5%8A%A8%E9%85%8D%E7%BD%AE%E6%B5%85%E6%9E%90/" title="SpringBoot自动配置浅析">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SpringBoot自动配置浅析</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/06/03/java-source-code/ReentrantReadWriteLock%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" title="ReentrantReadWriteLock源码解析">
+                        <span class="hidden-mobile">ReentrantReadWriteLock源码解析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

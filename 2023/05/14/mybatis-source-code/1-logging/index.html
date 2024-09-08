@@ -1,0 +1,683 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="logging（日志模块）LogException首先看 LogException 类（其中 PersistenceException 为自定义异常，封装方法完全一致） 123456789101112131415161718192021public class LogException extends PersistenceException &amp;#123;  private static fina">
+<meta property="og:type" content="article">
+<meta property="og:title" content="1-logging">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2023/05/14/mybatis-source-code/1-logging/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="logging（日志模块）LogException首先看 LogException 类（其中 PersistenceException 为自定义异常，封装方法完全一致） 123456789101112131415161718192021public class LogException extends PersistenceException &amp;#123;  private static fina">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-05-14T13:15:21.000Z">
+<meta property="article:modified_time" content="2023-05-14T16:08:50.400Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Mybatis">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>1-logging - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/poem/">
+                <i class="iconfont icon-user-fill"></i>
+                古诗词
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/thinking/">
+                <i class="iconfont icon-user-fill"></i>
+                思考ing
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="1-logging"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-05-14 21:15" pubdate>
+          2023年5月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          17k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          143 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">1-logging</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="logging（日志模块）"><a href="#logging（日志模块）" class="headerlink" title="logging（日志模块）"></a>logging（日志模块）</h3><h4 id="LogException"><a href="#LogException" class="headerlink" title="LogException"></a>LogException</h4><p>首先看 LogException 类（其中 PersistenceException 为自定义异常，封装方法完全一致）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LogException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">PersistenceException</span> &#123;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">long</span> <span class="hljs-variable">serialVersionUID</span> <span class="hljs-operator">=</span> <span class="hljs-number">1022924004852350942L</span>;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">LogException</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-built_in">super</span>();<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">LogException</span><span class="hljs-params">(String message)</span> &#123;<br>    <span class="hljs-built_in">super</span>(message);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">LogException</span><span class="hljs-params">(String message, Throwable cause)</span> &#123;<br>    <span class="hljs-built_in">super</span>(message, cause);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">LogException</span><span class="hljs-params">(Throwable cause)</span> &#123;<br>    <span class="hljs-built_in">super</span>(cause);<br>  &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Log"><a href="#Log" class="headerlink" title="Log"></a>Log</h4><p>然后是自定义日志接口 Log</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Log</span> &#123;<br><br>  <span class="hljs-comment">// 和一般的log4j很像，提供日志接口的一些方法,error, debug, warn。</span><br>  <span class="hljs-comment">// 用自己的日志类恐怕是为了通用，不绑死在某个特定的日志框架中</span><br>  <span class="hljs-comment">// 但不是也有类似的slf4j吗？为何还要自己写？</span><br>  <span class="hljs-comment">// 可能是不想引入额外的jar包（我觉得是为了适配各种日志框架）</span><br>  <span class="hljs-type">boolean</span> <span class="hljs-title function_">isDebugEnabled</span><span class="hljs-params">()</span>;<br><br>  <span class="hljs-type">boolean</span> <span class="hljs-title function_">isTraceEnabled</span><span class="hljs-params">()</span>;<br><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">error</span><span class="hljs-params">(String s, Throwable e)</span>;<br><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">error</span><span class="hljs-params">(String s)</span>;<br><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">debug</span><span class="hljs-params">(String s)</span>;<br><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">trace</span><span class="hljs-params">(String s)</span>;<br><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">warn</span><span class="hljs-params">(String s)</span>;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="LogFactory-日志工厂"><a href="#LogFactory-日志工厂" class="headerlink" title="LogFactory 日志工厂"></a>LogFactory 日志工厂</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"> <span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Marker to be used by logging implementations that support markers</span><br><span class="hljs-comment"> */</span><br><span class="hljs-comment">// 给支持marker功能的logger使用(目前有slf4j, log4j2)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">MARKER</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;MYBATIS&quot;</span>;<br><br><span class="hljs-comment">// 具体究竟用哪个日志框架，那个框架所对应logger的构造函数</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Constructor&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Log</span>&gt; logConstructor;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> &#123;<br>    <span class="hljs-comment">// 这里单纯用的lambda表达式，没有多线程</span><br>    <span class="hljs-comment">// 这段代码是一直找可用的日志实现直到找到一个可用的</span><br>    <span class="hljs-comment">// 日志实现，找到后跳过后面的查找</span><br>    <span class="hljs-comment">// slf4j</span><br>    tryImplementation(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        useSlf4jLogging();<br>      &#125;<br>    &#125;);<br>    <span class="hljs-comment">// common logging</span><br>    tryImplementation(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        useCommonsLogging();<br>      &#125;<br>    &#125;);<br>    <span class="hljs-comment">// log4j2</span><br>    tryImplementation(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        useLog4J2Logging();<br>      &#125;<br>    &#125;);<br>    <span class="hljs-comment">// log4j</span><br>    tryImplementation(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        useLog4JLogging();<br>      &#125;<br>    &#125;);<br>    <span class="hljs-comment">// jdk logging</span><br>    tryImplementation(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        useJdkLogging();<br>      &#125;<br>    &#125;);<br>    <span class="hljs-comment">// 没有日志</span><br>    tryImplementation(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>      <span class="hljs-meta">@Override</span><br>      <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>        useNoLogging();<br>      &#125;<br>    &#125;);<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>看一下 <code>tryImplementation </code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">tryImplementation</span><span class="hljs-params">(Runnable runnable)</span> &#123;<br>    <span class="hljs-comment">// 先判断是否找到可用的日志实现</span><br>    <span class="hljs-keyword">if</span> (logConstructor == <span class="hljs-literal">null</span>) &#123;<br>      <span class="hljs-keyword">try</span> &#123;<br>        runnable.run();<br>      &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>        <span class="hljs-comment">// ignore</span><br>      &#125;<br>    &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>下面以 <code>useSlf4jLogging()</code> 为例讲解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">useSlf4jLogging</span><span class="hljs-params">()</span> &#123;<br>    setImplementation(org.apache.ibatis.logging.slf4j.Slf4jImpl.class);<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">setImplementation</span><span class="hljs-params">(Class&lt;? extends Log&gt; implClass)</span> &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      Constructor&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Log</span>&gt; candidate = implClass.getConstructor(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[] &#123; String.class &#125;);<br>      <span class="hljs-type">Log</span> <span class="hljs-variable">log</span> <span class="hljs-operator">=</span> candidate.newInstance(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[] &#123; LogFactory.class.getName() &#125;);<br>      log.debug(<span class="hljs-string">&quot;Logging initialized using &#x27;&quot;</span> + implClass + <span class="hljs-string">&quot;&#x27; adapter.&quot;</span>);<br>      <span class="hljs-comment">// 设置logConstructor,一旦设上，表明找到相应的log的jar包了，那后面别的log就不找了。</span><br>      logConstructor = candidate;<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">LogException</span>(<span class="hljs-string">&quot;Error setting Log implementation.  Cause: &quot;</span> + t, t);<br>    &#125;<br>  &#125;<br></code></pre></td></tr></table></figure>
+
+<p>后面 <code>useCommonsLogging()、useLog4J2Logging()、useLog4JLogging()、useJdkLogging()、useNoLogging()</code> 类似</p>
+<p>最后是剩下的一些方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 单例模式，不得自己new实例</span><br><span class="hljs-keyword">private</span> <span class="hljs-title function_">LogFactory</span><span class="hljs-params">()</span> &#123;<br>  <span class="hljs-comment">// disable construction</span><br>&#125;<br><br><span class="hljs-comment">// 根据传入的类来构建Log</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Log <span class="hljs-title function_">getLog</span><span class="hljs-params">(Class&lt;?&gt; aClass)</span> &#123;<br>  <span class="hljs-keyword">return</span> getLog(aClass.getName());<br>&#125;<br><br><span class="hljs-comment">// 根据传入的类名来构建Log</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Log <span class="hljs-title function_">getLog</span><span class="hljs-params">(String logger)</span> &#123;<br>  <span class="hljs-keyword">try</span> &#123;<br>    <span class="hljs-comment">//构造函数，参数必须是一个，为String型，指明logger的名称</span><br>    <span class="hljs-keyword">return</span> logConstructor.newInstance(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Object</span>[] &#123; logger &#125;);<br>  &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">LogException</span>(<span class="hljs-string">&quot;Error creating logger for logger &quot;</span> + logger + <span class="hljs-string">&quot;.  Cause: &quot;</span> + t, t);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// 提供一个扩展功能，如果以上log都不满意，可以使用自定义的log</span><br><span class="hljs-comment">// 这个方法在 Configuration 类的 setLogImpl(Class&lt;?&gt; logImpl) 方法使用</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">useCustomLogging</span><span class="hljs-params">(Class&lt;? extends Log&gt; clazz)</span> &#123;<br>  setImplementation(clazz);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="JakartaCommonsLoggingImpl"><a href="#JakartaCommonsLoggingImpl" class="headerlink" title="JakartaCommonsLoggingImpl"></a>JakartaCommonsLoggingImpl</h4><p>适配 <code>commons logging</code> 里的 Log 和 LogFactory</p>
+<p>可以看到全是委托给特定的 log 和 LogFactory来实现</p>
+<p>这里使用了适配器模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">JakartaCommonsLoggingImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">org</span>.apache.ibatis.logging.Log &#123;<br><br>  <span class="hljs-keyword">private</span> Log log;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">JakartaCommonsLoggingImpl</span><span class="hljs-params">(String clazz)</span> &#123;<br>    log = LogFactory.getLog(clazz);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isDebugEnabled</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> log.isDebugEnabled();<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isTraceEnabled</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> log.isTraceEnabled();<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">error</span><span class="hljs-params">(String s, Throwable e)</span> &#123;<br>    log.error(s, e);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">error</span><span class="hljs-params">(String s)</span> &#123;<br>    log.error(s);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">debug</span><span class="hljs-params">(String s)</span> &#123;<br>    log.debug(s);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">trace</span><span class="hljs-params">(String s)</span> &#123;<br>    log.trace(s);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">warn</span><span class="hljs-params">(String s)</span> &#123;<br>    log.warn(s);<br>  &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p> <code>Jdk14LoggingImpl、Log4jImpl、NoLoggingImpl、StdOutImpl</code> 大同小异</p>
+<h4 id="Log4j2Impl"><a href="#Log4j2Impl" class="headerlink" title="Log4j2Impl"></a>Log4j2Impl</h4><p>Log4j2Impl 根据从 LogManager获取的Logger的类型，分别委托给 Log4j2AbstractLoggerImpl 和 Log4j2LoggerImpl 实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-title function_">Log4j2Impl</span><span class="hljs-params">(String clazz)</span> &#123;<br>  <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LogManager.getLogger(clazz);<br><br>  <span class="hljs-keyword">if</span> (logger <span class="hljs-keyword">instanceof</span> AbstractLogger) &#123;<br>    log = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Log4j2AbstractLoggerImpl</span>((AbstractLogger) logger);<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    log = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Log4j2LoggerImpl</span>(logger);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="Slf4jImpl"><a href="#Slf4jImpl" class="headerlink" title="Slf4jImpl"></a>Slf4jImpl</h4><p>Slf4jImpl 类似</p>
+<p>Slf4jImpl 和 上面的 Log4j2Impl都使用了代理模式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-title function_">Slf4jImpl</span><span class="hljs-params">(String clazz)</span> &#123;<br>  <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> LoggerFactory.getLogger(clazz);<br><br>  <span class="hljs-keyword">if</span> (logger <span class="hljs-keyword">instanceof</span> LocationAwareLogger) &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// check for slf4j &gt;= 1.6 method signature</span><br>      logger.getClass().getMethod(<span class="hljs-string">&quot;log&quot;</span>, Marker.class, String.class, <span class="hljs-type">int</span>.class, String.class, Object[].class, Throwable.class);<br>      log = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Slf4jLocationAwareLoggerImpl</span>((LocationAwareLogger) logger);<br>      <span class="hljs-keyword">return</span>;<br>    &#125; <span class="hljs-keyword">catch</span> (SecurityException e) &#123;<br>      <span class="hljs-comment">// fail-back to Slf4jLoggerImpl</span><br>    &#125; <span class="hljs-keyword">catch</span> (NoSuchMethodException e) &#123;<br>      <span class="hljs-comment">// fail-back to Slf4jLoggerImpl</span><br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// Logger is not LocationAwareLogger or slf4j version &lt; 1.6</span><br>  log = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Slf4jLoggerImpl</span>(logger);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="BaseJdbcLogger"><a href="#BaseJdbcLogger" class="headerlink" title="BaseJdbcLogger"></a>BaseJdbcLogger</h4><p>用于代理（做日志）的基类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// SET_METHODS 包含java类型转jdbc类型的方法</span><br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Set&lt;String&gt; SET_METHODS = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;String&gt;();<br><span class="hljs-comment">// EXECUTE_METHODS 包含 execute、executeUpdate、</span><br><span class="hljs-comment">// executeQuery、addBatch方法</span><br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Set&lt;String&gt; EXECUTE_METHODS = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;String&gt;();<br><br><span class="hljs-comment">// 自用的列的相关属性</span><br><span class="hljs-keyword">private</span> Map&lt;Object, Object&gt; columnMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;Object, Object&gt;();<br><br><span class="hljs-keyword">private</span> List&lt;Object&gt; columnNames = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Object&gt;();<br><span class="hljs-keyword">private</span> List&lt;Object&gt; columnValues = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Object&gt;();<br><br><span class="hljs-comment">// 打日志</span><br><span class="hljs-keyword">protected</span> Log statementLog;<br><span class="hljs-comment">// 查询栈（输出时用）</span><br><span class="hljs-keyword">protected</span> <span class="hljs-type">int</span> queryStack;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * Default constructor</span><br><span class="hljs-comment"> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-title function_">BaseJdbcLogger</span><span class="hljs-params">(Log log, <span class="hljs-type">int</span> queryStack)</span> &#123;<br>  <span class="hljs-built_in">this</span>.statementLog = log;<br>  <span class="hljs-keyword">if</span> (queryStack == <span class="hljs-number">0</span>) &#123;<br>    <span class="hljs-built_in">this</span>.queryStack = <span class="hljs-number">1</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-built_in">this</span>.queryStack = queryStack;<br>    &#125;<br>&#125;<br><span class="hljs-comment">// 类初始化时为SET_METHODS和EXECUTE_METHODS赋值</span><br><span class="hljs-keyword">static</span> &#123;<br>  SET_METHODS.add(<span class="hljs-string">&quot;seString&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setInt&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setByte&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setShort&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setLong&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setDouble&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setFloat&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setTimestamp&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setDate&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setTime&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setArray&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setBigDecimal&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setAsciiStream&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setBinaryStream&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setBlob&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setBoolean&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setBytes&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setCharacterStream&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setClob&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setObject&quot;</span>);<br>  SET_METHODS.add(<span class="hljs-string">&quot;setNull&quot;</span>);<br><br>  EXECUTE_METHODS.add(<span class="hljs-string">&quot;execute&quot;</span>);<br>  EXECUTE_METHODS.add(<span class="hljs-string">&quot;executeUpdate&quot;</span>);<br>  EXECUTE_METHODS.add(<span class="hljs-string">&quot;executeQuery&quot;</span>);<br>  EXECUTE_METHODS.add(<span class="hljs-string">&quot;addBatch&quot;</span>);<br>&#125;<br><br><span class="hljs-comment">// 获取参数值 这里好像是调用的Object的toString方法?</span><br><span class="hljs-keyword">protected</span> String <span class="hljs-title function_">getParameterValueString</span><span class="hljs-params">()</span> &#123;<br>  List&lt;Object&gt; typeList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Object&gt;(columnValues.size());<br>  <span class="hljs-keyword">for</span> (Object value : columnValues) &#123;<br>    <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>      typeList.add(<span class="hljs-string">&quot;null&quot;</span>);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>      typeList.add(value + <span class="hljs-string">&quot;(&quot;</span> + value.getClass().getSimpleName() + <span class="hljs-string">&quot;)&quot;</span>);<br>    &#125;<br>  &#125;<br>  <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">parameters</span> <span class="hljs-operator">=</span> typeList.toString();<br>  <span class="hljs-keyword">return</span> parameters.substring(<span class="hljs-number">1</span>, parameters.length() - <span class="hljs-number">1</span>);<br>&#125;<br><br><span class="hljs-comment">// 移除 original 里的&quot; \t\n\r\f&quot;字符，统一用&quot; &quot;替代</span><br><span class="hljs-keyword">protected</span> String <span class="hljs-title function_">removeBreakingWhitespace</span><span class="hljs-params">(String original)</span> &#123;<br>  <span class="hljs-type">StringTokenizer</span> <span class="hljs-variable">whitespaceStripper</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringTokenizer</span>(original);<br>  <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>  <span class="hljs-keyword">while</span> (whitespaceStripper.hasMoreTokens()) &#123;<br>    builder.append(whitespaceStripper.nextToken());<br>    builder.append(<span class="hljs-string">&quot; &quot;</span>);<br>  &#125;<br>  <span class="hljs-keyword">return</span> builder.toString();<br>&#125;<br><br><span class="hljs-comment">// 根据queryStack 返回 ===&gt; 或 &lt;===</span><br><span class="hljs-keyword">private</span> String <span class="hljs-title function_">prefix</span><span class="hljs-params">(<span class="hljs-type">boolean</span> isInput)</span> &#123;<br>  <span class="hljs-type">char</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-title class_">char</span>[queryStack * <span class="hljs-number">2</span> + <span class="hljs-number">2</span>];<br>  Arrays.fill(buffer, <span class="hljs-string">&#x27;=&#x27;</span>);<br>  buffer[queryStack * <span class="hljs-number">2</span> + <span class="hljs-number">1</span>] = <span class="hljs-string">&#x27; &#x27;</span>;<br>  <span class="hljs-keyword">if</span> (isInput) &#123;<br>    buffer[queryStack * <span class="hljs-number">2</span>] = <span class="hljs-string">&#x27;&gt;&#x27;</span>;<br>  &#125; <span class="hljs-keyword">else</span> &#123;<br>    buffer[<span class="hljs-number">0</span>] = <span class="hljs-string">&#x27;&lt;&#x27;</span>;<br>  &#125;<br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(buffer);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="ResultSetLogger"><a href="#ResultSetLogger" class="headerlink" title="ResultSetLogger"></a>ResultSetLogger</h4><p>添加了日志的ResultSet代理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ResultSetLogger</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseJdbcLogger</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">InvocationHandler</span> &#123;<br>  <span class="hljs-comment">// BLOB type 类型为BLOB的值打印时做特殊处理</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Set&lt;Integer&gt; BLOB_TYPES = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;Integer&gt;();<br>  <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> <span class="hljs-variable">first</span> <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>;<br>  <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">rows</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br>  <span class="hljs-keyword">private</span> ResultSet rs;<br>  <span class="hljs-keyword">private</span> Set&lt;Integer&gt; blobColumns = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;Integer&gt;();<br><br>  <span class="hljs-keyword">static</span> &#123;<br>    BLOB_TYPES.add(Types.BINARY);<br>    BLOB_TYPES.add(Types.BLOB);<br>    BLOB_TYPES.add(Types.CLOB);<br>    BLOB_TYPES.add(Types.LONGNVARCHAR);<br>    BLOB_TYPES.add(Types.LONGVARBINARY);<br>    BLOB_TYPES.add(Types.LONGVARCHAR);<br>    BLOB_TYPES.add(Types.NCLOB);<br>    BLOB_TYPES.add(Types.VARBINARY);<br>  &#125;<br><br>  <span class="hljs-comment">// 不向外提供构造函数</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">ResultSetLogger</span><span class="hljs-params">(ResultSet rs, Log statementLog, <span class="hljs-type">int</span> queryStack)</span> &#123;<br>    <span class="hljs-built_in">super</span>(statementLog, queryStack);<br>    <span class="hljs-built_in">this</span>.rs = rs;<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] params)</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-comment">// 不代理Object类的方法</span><br>      <span class="hljs-keyword">if</span> (Object.class.equals(method.getDeclaringClass())) &#123;<br>        <span class="hljs-keyword">return</span> method.invoke(<span class="hljs-built_in">this</span>, params);<br>      &#125;<br>      <span class="hljs-comment">// 先执行代理方法</span><br>      <span class="hljs-type">Object</span> <span class="hljs-variable">o</span> <span class="hljs-operator">=</span> method.invoke(rs, params);<br>      <span class="hljs-comment">// 如果要代理的方法是 next</span><br>      <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;next&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-keyword">if</span> (((Boolean) o)) &#123;<br>          rows++;<br>          <span class="hljs-comment">// 打印获取到的结果数据</span><br>          <span class="hljs-keyword">if</span> (isTraceEnabled()) &#123;<br>            <span class="hljs-type">ResultSetMetaData</span> <span class="hljs-variable">rsmd</span> <span class="hljs-operator">=</span> rs.getMetaData();<br>            <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-variable">columnCount</span> <span class="hljs-operator">=</span> rsmd.getColumnCount();<br>            <span class="hljs-keyword">if</span> (first) &#123;<br>              first = <span class="hljs-literal">false</span>;<br>              printColumnHeaders(rsmd, columnCount);<br>            &#125;<br>            printColumnValues(columnCount);<br>          &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          <span class="hljs-comment">// 没有下一行了</span><br>          debug(<span class="hljs-string">&quot;     Total: &quot;</span> + rows, <span class="hljs-literal">false</span>);<br>        &#125;<br>      &#125;<br>      clearColumnInfo();<br>      <span class="hljs-keyword">return</span> o;<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>      <span class="hljs-keyword">throw</span> ExceptionUtil.unwrapThrowable(t);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">// 打印列名</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printColumnHeaders</span><span class="hljs-params">(ResultSetMetaData rsmd, <span class="hljs-type">int</span> columnCount)</span> <span class="hljs-keyword">throws</span> SQLException &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">row</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    row.append(<span class="hljs-string">&quot;   Columns: &quot;</span>);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>; i &lt;= columnCount; i++) &#123;<br>      <span class="hljs-keyword">if</span> (BLOB_TYPES.contains(rsmd.getColumnType(i))) &#123;<br>        blobColumns.add(i);<br>      &#125;<br>      <span class="hljs-type">String</span> <span class="hljs-variable">colname</span> <span class="hljs-operator">=</span> rsmd.getColumnLabel(i);<br>      row.append(colname);<br>      <span class="hljs-keyword">if</span> (i != columnCount) &#123;<br>        row.append(<span class="hljs-string">&quot;, &quot;</span>);<br>      &#125;<br>    &#125;<br>    trace(row.toString(), <span class="hljs-literal">false</span>);<br>  &#125;<br><br>  <span class="hljs-comment">// 打印每一行对应列的值</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printColumnValues</span><span class="hljs-params">(<span class="hljs-type">int</span> columnCount)</span> &#123;<br>    <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">row</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br>    row.append(<span class="hljs-string">&quot;       Row: &quot;</span>);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>; i &lt;= columnCount; i++) &#123;<br>      String colname;<br>      <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-comment">// 类型为BLOB的值统一返回 &lt;&lt;BLOB&gt;&gt;</span><br>        <span class="hljs-keyword">if</span> (blobColumns.contains(i)) &#123;<br>          colname = <span class="hljs-string">&quot;&lt;&lt;BLOB&gt;&gt;&quot;</span>;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          colname = rs.getString(i);<br>        &#125;<br>      &#125; <span class="hljs-keyword">catch</span> (SQLException e) &#123;<br>        <span class="hljs-comment">// generally can&#x27;t call getString() on a BLOB column</span><br>        colname = <span class="hljs-string">&quot;&lt;&lt;Cannot Display&gt;&gt;&quot;</span>;<br>      &#125;<br>      row.append(colname);<br>      <span class="hljs-keyword">if</span> (i != columnCount) &#123;<br>        row.append(<span class="hljs-string">&quot;, &quot;</span>);<br>      &#125;<br>    &#125;<br>    trace(row.toString(), <span class="hljs-literal">false</span>);<br>  &#125;<br><br>  <span class="hljs-comment">/*</span><br><span class="hljs-comment">   * Creates a logging version of a ResultSet</span><br><span class="hljs-comment">   * 提供静态方法用于创建代理类</span><br><span class="hljs-comment">   * @param rs - the ResultSet to proxy</span><br><span class="hljs-comment">   * @return - the ResultSet with logging</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> ResultSet <span class="hljs-title function_">newInstance</span><span class="hljs-params">(ResultSet rs, Log statementLog, <span class="hljs-type">int</span> queryStack)</span> &#123;<br>    <span class="hljs-type">InvocationHandler</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ResultSetLogger</span>(rs, statementLog, queryStack);<br>    <span class="hljs-type">ClassLoader</span> <span class="hljs-variable">cl</span> <span class="hljs-operator">=</span> ResultSet.class.getClassLoader();<br>    <span class="hljs-keyword">return</span> (ResultSet) Proxy.newProxyInstance(cl, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Class</span>[]&#123;ResultSet.class&#125;, handler);<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="StatementLogger"><a href="#StatementLogger" class="headerlink" title="StatementLogger"></a>StatementLogger</h4><p>添加了日志的 Statement代理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StatementLogger</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseJdbcLogger</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">InvocationHandler</span> &#123;<br>  <br>  <span class="hljs-keyword">private</span> Statement statement;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">StatementLogger</span><span class="hljs-params">(Statement stmt, Log statementLog, <span class="hljs-type">int</span> queryStack)</span> &#123;<br>    <span class="hljs-built_in">super</span>(statementLog, queryStack);<br>    <span class="hljs-built_in">this</span>.statement = stmt;<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] params)</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>    <span class="hljs-keyword">try</span> &#123; <br>      <span class="hljs-comment">// 同上</span><br>      <span class="hljs-keyword">if</span> (Object.class.equals(method.getDeclaringClass())) &#123;<br>        <span class="hljs-keyword">return</span> method.invoke(<span class="hljs-built_in">this</span>, params);<br>      &#125;<br>      <span class="hljs-keyword">if</span> (EXECUTE_METHODS.contains(method.getName())) &#123;<br>        <span class="hljs-comment">// 如果是 execute、executeUpdate、executeQuery、addBatch等方法</span><br>        <span class="hljs-keyword">if</span> (isDebugEnabled()) &#123;<br>          debug(<span class="hljs-string">&quot; Executing: &quot;</span> + removeBreakingWhitespace((String) params[<span class="hljs-number">0</span>]), <span class="hljs-literal">true</span>);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;executeQuery&quot;</span>.equals(method.getName())) &#123;<br>          <span class="hljs-comment">// 如果是查询方法返回 ResultSet 代理</span><br>          <span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> (ResultSet) method.invoke(statement, params);<br>          <span class="hljs-keyword">return</span> rs == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : ResultSetLogger.newInstance(rs, statementLog, queryStack);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          <span class="hljs-comment">// 其他方法直接执行</span><br>          <span class="hljs-keyword">return</span> method.invoke(statement, params);<br>        &#125;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;getResultSet&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-comment">// getResultSet 也是返回 ResultSet 代理</span><br>        <span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> (ResultSet) method.invoke(statement, params);<br>        <span class="hljs-keyword">return</span> rs == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : ResultSetLogger.newInstance(rs, statementLog, queryStack);<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;equals&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-comment">// equals 要判断代理类是否相同</span><br>        <span class="hljs-type">Object</span> <span class="hljs-variable">ps</span> <span class="hljs-operator">=</span> params[<span class="hljs-number">0</span>];<br>        <span class="hljs-keyword">return</span> ps <span class="hljs-keyword">instanceof</span> Proxy &amp;&amp; proxy == ps;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;hashCode&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-comment">// 返回代理类的hashCode</span><br>        <span class="hljs-keyword">return</span> proxy.hashCode();<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 执行原方法</span><br>        <span class="hljs-keyword">return</span> method.invoke(statement, params);<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>      <span class="hljs-keyword">throw</span> ExceptionUtil.unwrapThrowable(t);<br>    &#125;<br>  &#125;  <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="PreparedStatementLogger"><a href="#PreparedStatementLogger" class="headerlink" title="PreparedStatementLogger"></a>PreparedStatementLogger</h4><p>添加了日志的 PreparedStatement 代理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PreparedStatementLogger</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseJdbcLogger</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">InvocationHandler</span> &#123;<br>  <span class="hljs-keyword">private</span> PreparedStatement statement;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">PreparedStatementLogger</span><span class="hljs-params">(PreparedStatement stmt, Log statementLog, <span class="hljs-type">int</span> queryStack)</span> &#123;<br>    <span class="hljs-built_in">super</span>(statementLog, queryStack);<br>    <span class="hljs-built_in">this</span>.statement = stmt;<br>  &#125;<br> <br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] params)</span> <span class="hljs-keyword">throws</span> Throwable &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">if</span> (Object.class.equals(method.getDeclaringClass())) &#123;<br>        <span class="hljs-keyword">return</span> method.invoke(<span class="hljs-built_in">this</span>, params);<br>      &#125;          <br>      <span class="hljs-keyword">if</span> (EXECUTE_METHODS.contains(method.getName())) &#123;<br>        <span class="hljs-keyword">if</span> (isDebugEnabled()) &#123;<br>          <span class="hljs-comment">// 这里的信息似乎可读性不高</span><br>          debug(<span class="hljs-string">&quot;Parameters: &quot;</span> + getParameterValueString(), <span class="hljs-literal">true</span>);<br>        &#125; <br>        <span class="hljs-comment">// 清除之前存储的列信息</span><br>        clearColumnInfo();<br>        <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;executeQuery&quot;</span>.equals(method.getName())) &#123;<br>          <span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> (ResultSet) method.invoke(statement, params);<br>          <span class="hljs-keyword">return</span> rs == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : ResultSetLogger.newInstance(rs, statementLog, queryStack);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          <span class="hljs-keyword">return</span> method.invoke(statement, params);<br>        &#125;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (SET_METHODS.contains(method.getName())) &#123;<br>        <span class="hljs-comment">// 调用SET_METHODS 包含的方法时先将保存列信息再调用原方法</span><br>        <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;setNull&quot;</span>.equals(method.getName())) &#123;<br>          setColumn(params[<span class="hljs-number">0</span>], <span class="hljs-literal">null</span>);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          setColumn(params[<span class="hljs-number">0</span>], params[<span class="hljs-number">1</span>]);<br>        &#125;<br>        <span class="hljs-keyword">return</span> method.invoke(statement, params);<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;getResultSet&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-type">ResultSet</span> <span class="hljs-variable">rs</span> <span class="hljs-operator">=</span> (ResultSet) method.invoke(statement, params);<br>        <span class="hljs-keyword">return</span> rs == <span class="hljs-literal">null</span> ? <span class="hljs-literal">null</span> : ResultSetLogger.newInstance(rs, statementLog, queryStack);<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;getUpdateCount&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">updateCount</span> <span class="hljs-operator">=</span> (Integer) method.invoke(statement, params);<br>        <span class="hljs-keyword">if</span> (updateCount != -<span class="hljs-number">1</span>) &#123;<br>          <span class="hljs-comment">// 调用 getUpdateCount 方法时打印 更新数量 信息</span><br>          debug(<span class="hljs-string">&quot;   Updates: &quot;</span> + updateCount, <span class="hljs-literal">false</span>);<br>        &#125;<br>        <span class="hljs-keyword">return</span> updateCount;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">return</span> method.invoke(statement, params);<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>      <span class="hljs-keyword">throw</span> ExceptionUtil.unwrapThrowable(t);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="ConnectionLogger"><a href="#ConnectionLogger" class="headerlink" title="ConnectionLogger"></a>ConnectionLogger</h4><p>添加了日志的 Connection 代理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ConnectionLogger</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">BaseJdbcLogger</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">InvocationHandler</span> &#123;<br>  <span class="hljs-keyword">private</span> Connection connection;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">ConnectionLogger</span><span class="hljs-params">(Connection conn, Log statementLog, <span class="hljs-type">int</span> queryStack)</span> &#123;<br>    <span class="hljs-built_in">super</span>(statementLog, queryStack);<br>    <span class="hljs-built_in">this</span>.connection = conn;<br>  &#125;<br> <br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> Object <span class="hljs-title function_">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] params)</span><br>      <span class="hljs-keyword">throws</span> Throwable &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      <span class="hljs-keyword">if</span> (Object.class.equals(method.getDeclaringClass())) &#123;<br>        <span class="hljs-keyword">return</span> method.invoke(<span class="hljs-built_in">this</span>, params);<br>      &#125;    <br>      <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;prepareStatement&quot;</span>.equals(method.getName())) &#123; <br>        <span class="hljs-comment">// 调用 prepareStatement 或者 prepareCall 方法时</span><br>        <span class="hljs-comment">// 返回 PreparedStatement的代理</span><br>        <span class="hljs-keyword">if</span> (isDebugEnabled()) &#123;<br>          debug(<span class="hljs-string">&quot; Preparing: &quot;</span> + removeBreakingWhitespace((String) params[<span class="hljs-number">0</span>]), <span class="hljs-literal">true</span>);<br>        &#125;        <br>        <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">stmt</span> <span class="hljs-operator">=</span> (PreparedStatement) method.invoke(connection, params);<br>        stmt = PreparedStatementLogger.newInstance(stmt, statementLog, queryStack);<br>        <span class="hljs-keyword">return</span> stmt;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;prepareCall&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-keyword">if</span> (isDebugEnabled()) &#123;<br>          debug(<span class="hljs-string">&quot; Preparing: &quot;</span> + removeBreakingWhitespace((String) params[<span class="hljs-number">0</span>]), <span class="hljs-literal">true</span>);<br>        &#125;        <br>        <span class="hljs-type">PreparedStatement</span> <span class="hljs-variable">stmt</span> <span class="hljs-operator">=</span> (PreparedStatement) method.invoke(connection, params);<br>        stmt = PreparedStatementLogger.newInstance(stmt, statementLog, queryStack);<br>        <span class="hljs-keyword">return</span> stmt;<br>      &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;createStatement&quot;</span>.equals(method.getName())) &#123;<br>        <span class="hljs-comment">// 调用 createStatement 时返回 Statement的代理</span><br>        <span class="hljs-type">Statement</span> <span class="hljs-variable">stmt</span> <span class="hljs-operator">=</span> (Statement) method.invoke(connection, params);<br>        stmt = StatementLogger.newInstance(stmt, statementLog, queryStack);<br>        <span class="hljs-keyword">return</span> stmt;<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">return</span> method.invoke(connection, params);<br>      &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable t) &#123;<br>      <span class="hljs-keyword">throw</span> ExceptionUtil.unwrapThrowable(t);<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>日志模块的代码就讲解完了</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Mybatis%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">Mybatis源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Mybatis/">#Mybatis</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>1-logging</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2023/05/14/mybatis-source-code/1-logging/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年5月14日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/05/20/mybatis-source-code/2-exceptions/" title="2-exceptions.md">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">2-exceptions.md</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/05/02/mybatis-source-code/0-%E5%89%8D%E8%A8%80/" title="0-前言">
+                        <span class="hidden-mobile">0-前言</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

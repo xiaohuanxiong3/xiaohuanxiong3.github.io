@@ -1,0 +1,676 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.jpeg">
+  <link rel="icon" href="/img/avatar.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Handsome Young">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="在SpringMVC中,可以通过使用@ControllerAdvice注解修饰类及@ExceptionHandler,@InitBinder,@ModelAttribute注解修饰方法对Controller进行全局的异常处理,注册自定义的参数解析器,以及将Controller的方法参数和ControllerAdviceBean的方法返回值绑定 用法及如何注册    下面是具体的用法 123">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC-@ControllerAdvice注解学习">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2024/05/08/Spring/SpringMVC/SpringMVC-ControllerAdvice%E6%B3%A8%E8%A7%A3%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="在SpringMVC中,可以通过使用@ControllerAdvice注解修饰类及@ExceptionHandler,@InitBinder,@ModelAttribute注解修饰方法对Controller进行全局的异常处理,注册自定义的参数解析器,以及将Controller的方法参数和ControllerAdviceBean的方法返回值绑定 用法及如何注册    下面是具体的用法 123">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://xiaohuanxiong3.github.io/2024/05/08/Spring/SpringMVC/SpringMVC-ControllerAdvice%E6%B3%A8%E8%A7%A3%E5%AD%A6%E4%B9%A0/137083072664200.png">
+<meta property="article:published_time" content="2024-05-08T14:20:19.000Z">
+<meta property="article:modified_time" content="2024-09-08T12:30:26.858Z">
+<meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="SpringMVC">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://xiaohuanxiong3.github.io/2024/05/08/Spring/SpringMVC/SpringMVC-ControllerAdvice%E6%B3%A8%E8%A7%A3%E5%AD%A6%E4%B9%A0/137083072664200.png">
+  
+  
+  
+  <title>SpringMVC-@ControllerAdvice注解学习 - 小浣熊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xiaohuanxiong3.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>小浣熊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/poem/">
+                <i class="iconfont icon-user-fill"></i>
+                古诗词
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/thinking/">
+                <i class="iconfont icon-user-fill"></i>
+                思考ing
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="SpringMVC-@ControllerAdvice注解学习"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-08 22:20" pubdate>
+          2024年5月8日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          11k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          88 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">SpringMVC-@ControllerAdvice注解学习</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>    在SpringMVC中,可以通过使用@ControllerAdvice注解修饰类及@ExceptionHandler,@InitBinder,@ModelAttribute注解修饰方法对Controller进行全局的异常处理,注册自定义的参数解析器,以及将Controller的方法参数和ControllerAdviceBean的方法返回值绑定</p>
+<h4 id="用法及如何注册"><a href="#用法及如何注册" class="headerlink" title="用法及如何注册"></a>用法及如何注册</h4><p>    下面是具体的用法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@ControllerAdvice</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CustomControllerAdvice</span> &#123;<br><br>    <span class="hljs-meta">@ResponseBody</span><br>    <span class="hljs-meta">@ExceptionHandler(TestException.class)</span><br>    <span class="hljs-comment">// 这里表示Controller抛出的 TestException 异常由此方法处理</span><br>    <span class="hljs-keyword">public</span> Result <span class="hljs-title function_">testException</span><span class="hljs-params">(TestException e)</span> &#123;<br>        <span class="hljs-keyword">return</span> Result.error(e.getMessage());<br>    &#125;<br><br>    <span class="hljs-meta">@ModelAttribute(&quot;MockUser&quot;)</span><br>    <span class="hljs-comment">// 这个方法会在Controller方法之前执行,将名称(MockUser)和返回值(MockUser()对象)</span><br>    <span class="hljs-comment">// 塞到modelAndViewContainer中,在解析Controller方法的参数时会根据参数上是否有</span><br>    <span class="hljs-comment">// @ModelAttribute注解进行相应的处理</span><br>    <span class="hljs-keyword">public</span> MockUser <span class="hljs-title function_">getMockUser</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MockUser</span>(<span class="hljs-number">1</span>, <span class="hljs-string">&quot;Handsome Young&quot;</span>, <span class="hljs-number">0</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@ModelAttribute(&quot;MockUserContrast&quot;)</span><br>    <span class="hljs-comment">// 和上面的方法类似</span><br>    <span class="hljs-keyword">public</span> MockUser <span class="hljs-title function_">getMockUserContrast</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">MockUser</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Handsome Young Shadow&quot;</span>, <span class="hljs-number">0</span>);<br>    &#125;<br><br>    <span class="hljs-meta">@InitBinder</span><br>    <span class="hljs-comment">// @InitBinder注解标注的initBinder()方法表示注册一个Date类型的类型转换器，用于将类似这样的2024-05-08</span><br>    <span class="hljs-comment">// 日期格式的字符串转换成Date对象</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">initBinder</span><span class="hljs-params">(WebDataBinder binder)</span> &#123;<br>        <span class="hljs-type">SimpleDateFormat</span> <span class="hljs-variable">dateFormat</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleDateFormat</span>(<span class="hljs-string">&quot;yyyy-MM-dd&quot;</span>);<br>        dateFormat.setLenient(<span class="hljs-literal">false</span>);<br>        binder.registerCustomEditor(Date.class, <span class="hljs-keyword">new</span> <span class="hljs-title class_">CustomDateEditor</span>(dateFormat,<span class="hljs-literal">false</span>));<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>    再看下SpringMVC是如何注册被@ControllerAdvice注解修饰的类及被@ExceptionHandler,@InitBinder,@ModelAttribute注解修饰的方法</p>
+<p>    首先前端控制器DispatcherServlet对象在创建时会初始化一系列的对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">initStrategies</span><span class="hljs-params">(ApplicationContext context)</span> &#123;<br>    initMultipartResolver(context);<br>    initLocaleResolver(context);<br>    initThemeResolver(context);<br>    initHandlerMappings(context);<br>    initHandlerAdapters(context);<br>    initHandlerExceptionResolvers(context);<br>    initRequestToViewNameTranslator(context);<br>    initViewResolvers(context);<br>    initFlashMapManager(context);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>    对于今天关注的@ControllerAdvice注解,我们只需要关注 initHandlerAdapters 和 initHandlerExceptionResolvers方法</p>
+<p>    initHandlerAdapters(context)方法会取得所有实现了HandlerAdapter接口的bean并保存起来，其中就有一个类型为RequestMappingHandlerAdapter的bean，这个bean就是@RequestMapping注解能起作用的关键，这个bean在应用启动过程中会获取所有被@ControllerAdvice注解标注的bean对象做进一步处理，关键代码在这里：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">afterPropertiesSet</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// Do this first, it may add ResponseBody advice beans</span><br>    initControllerAdviceCache();<br><br>    ......<br>&#125; <br><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">initControllerAdviceCache</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">if</span> (getApplicationContext() == <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    List&lt;ControllerAdviceBean&gt; adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());<br><br>    List&lt;Object&gt; requestResponseBodyAdviceBeans = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br><br>    <span class="hljs-keyword">for</span> (ControllerAdviceBean adviceBean : adviceBeans) &#123;<br>        Class&lt;?&gt; beanType = adviceBean.getBeanType();<br>        <span class="hljs-keyword">if</span> (beanType == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Unresolvable type for ControllerAdviceBean: &quot;</span> + adviceBean);<br>        &#125; <br>        <span class="hljs-comment">// 找到所有ModelAttribute注解标注的方法并缓存起来</span><br>        Set&lt;Method&gt; attrMethods = MethodIntrospector.selectMethods(beanType, MODEL_ATTRIBUTE_METHODS);<br>        <span class="hljs-keyword">if</span> (!attrMethods.isEmpty()) &#123;<br>            <span class="hljs-built_in">this</span>.modelAttributeAdviceCache.put(adviceBean, attrMethods);<br>        &#125; <br>        <span class="hljs-comment">// 找到所有InitBinder注解标注的方法并缓存起来</span><br>        Set&lt;Method&gt; binderMethods = MethodIntrospector.selectMethods(beanType, INIT_BINDER_METHODS);<br>        <span class="hljs-keyword">if</span> (!binderMethods.isEmpty()) &#123;<br>            <span class="hljs-built_in">this</span>.initBinderAdviceCache.put(adviceBean, binderMethods);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (RequestBodyAdvice.class.isAssignableFrom(beanType) || ResponseBodyAdvice.class.isAssignableFrom(beanType)) &#123;<br>            requestResponseBodyAdviceBeans.add(adviceBean);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!requestResponseBodyAdviceBeans.isEmpty()) &#123;<br>        <span class="hljs-built_in">this</span>.requestResponseBodyAdvice.addAll(<span class="hljs-number">0</span>, requestResponseBodyAdviceBeans);<br>    &#125; <br><br>    ......<br>&#125;    <br></code></pre></td></tr></table></figure>
+
+<p>经过这里处理之后，@ModelAttribute和@InitBinder就能起作用了</p>
+<p>    再来看DispatcherServlet的initHandlerExceptionResolvers(context)方法，方法会取得所有实现了HandlerExceptionResolver接口的bean并保存起来，其中就有一个类型为ExceptionHandlerExceptionResolver的bean，这个bean在应用启动过程中会获取所有被@ControllerAdvice注解标注的bean对象做进一步处理，关键代码在这里：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">afterPropertiesSet</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-comment">// Do this first, it may add ResponseBodyAdvice beans</span><br>    initExceptionHandlerAdviceCache();<br><br>    ......<br>&#125; <br><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">initExceptionHandlerAdviceCache</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">if</span> (getApplicationContext() == <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br><br>    List&lt;ControllerAdviceBean&gt; adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());<br>    <span class="hljs-keyword">for</span> (ControllerAdviceBean adviceBean : adviceBeans) &#123;<br>        Class&lt;?&gt; beanType = adviceBean.getBeanType();<br>        <span class="hljs-keyword">if</span> (beanType == <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Unresolvable type for ControllerAdviceBean: &quot;</span> + adviceBean);<br>        &#125;<br>        <span class="hljs-type">ExceptionHandlerMethodResolver</span> <span class="hljs-variable">resolver</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ExceptionHandlerMethodResolver</span>(beanType);<br>        <span class="hljs-keyword">if</span> (resolver.hasExceptionMappings()) &#123;<br>            <span class="hljs-built_in">this</span>.exceptionHandlerAdviceCache.put(adviceBean, resolver);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (ResponseBodyAdvice.class.isAssignableFrom(beanType)) &#123;<br>            <span class="hljs-built_in">this</span>.responseBodyAdvice.add(adviceBean);<br>        &#125;<br>    &#125;<br><br>    ......<br>&#125;    <br></code></pre></td></tr></table></figure>
+
+<p>当Controller抛出异常时，DispatcherServlet通过ExceptionHandlerExceptionResolver来解析异常，而ExceptionHandlerExceptionResolver又通过ExceptionHandlerMethodResolver 来解析异常， ExceptionHandlerMethodResolver 最终解析异常找到适用的@ExceptionHandler标注的方法是这里</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ExceptionHandlerMethodResolver</span> &#123;<br>    <span class="hljs-comment">// ......</span><br>    <span class="hljs-keyword">private</span> Method <span class="hljs-title function_">getMappedMethod</span><span class="hljs-params">(Class&lt;? extends Throwable&gt; exceptionType)</span> &#123;<br>        List&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Throwable</span>&gt;&gt; matches = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Throwable</span>&gt;&gt;();<br>        <span class="hljs-comment">// 找到所有适用于Controller抛出异常的处理方法,例如Controller抛出的异常</span><br>        <span class="hljs-comment">// 是BizException(继承自RuntimeException),那么@ExceptionHandler(BizException.class)和</span><br>        <span class="hljs-comment">// @ExceptionHandler(Exception.class)标注的方法都适用此异常</span><br>        <span class="hljs-keyword">for</span> (Class&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Throwable</span>&gt; mappedException : <span class="hljs-built_in">this</span>.mappedMethods.keySet()) &#123;<br>            <span class="hljs-keyword">if</span> (mappedException.isAssignableFrom(exceptionType)) &#123;<br>                matches.add(mappedException);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (!matches.isEmpty()) &#123;<br>            <span class="hljs-comment">// 这里通过排序找到最适用的方法,排序的规则依据抛出异常相对于声明异常的深度,例如</span><br>            <span class="hljs-comment">// Controller抛出的异常是BizException(继承自RuntimeException),那么BizException</span><br>            <span class="hljs-comment">// 相对于@ExceptionHandler(BizException.class)声明的BizException.class其深度是0,</span><br>            <span class="hljs-comment">// 相对于@ExceptionHandler(Exception.class)声明的Exception.class其深度是2,所以</span><br>            <span class="hljs-comment">// @ExceptionHandler(BizException.class)标注的方法会排在前面</span><br>            Collections.sort(matches, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ExceptionDepthComparator</span>(exceptionType));<br>            <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.mappedMethods.get(matches.get(<span class="hljs-number">0</span>));<br>        &#125;<br>        <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// ......</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>    下面根据自己扒源码的成果做进一步说明</p>
+<h4 id="ExceptionHandler"><a href="#ExceptionHandler" class="headerlink" title="@ExceptionHandler"></a>@ExceptionHandler</h4><p>    首先是@ExceptionHandler注解生效时的调用堆栈</p>
+<p><img src="/2024/05/08/Spring/SpringMVC/SpringMVC-ControllerAdvice%E6%B3%A8%E8%A7%A3%E5%AD%A6%E4%B9%A0/137083072664200.png" srcset="/img/loading.gif" lazyload></p>
+<p>    主要逻辑如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">doDispatch</span><span class="hljs-params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>    ......<br>			<span class="hljs-keyword">try</span> &#123;<br>				processedRequest = checkMultipart(request);<br>				multipartRequestParsed = (processedRequest != request);<br><br>				<span class="hljs-comment">// Determine handler for the current request.</span><br>				mappedHandler = getHandler(processedRequest);<br>				<span class="hljs-keyword">if</span> (mappedHandler == <span class="hljs-literal">null</span>) &#123;<br>					noHandlerFound(processedRequest, response);<br>					<span class="hljs-keyword">return</span>;<br>				&#125;<br><br>				<span class="hljs-comment">// Determine handler adapter for the current request.</span><br>				<span class="hljs-type">HandlerAdapter</span> <span class="hljs-variable">ha</span> <span class="hljs-operator">=</span> getHandlerAdapter(mappedHandler.getHandler());<br><br>				<span class="hljs-comment">// Process last-modified header, if supported by the handler.</span><br>				<span class="hljs-type">String</span> <span class="hljs-variable">method</span> <span class="hljs-operator">=</span> request.getMethod();<br>				<span class="hljs-type">boolean</span> <span class="hljs-variable">isGet</span> <span class="hljs-operator">=</span> HttpMethod.GET.matches(method);<br>				<span class="hljs-keyword">if</span> (isGet || HttpMethod.HEAD.matches(method)) &#123;<br>					<span class="hljs-type">long</span> <span class="hljs-variable">lastModified</span> <span class="hljs-operator">=</span> ha.getLastModified(request, mappedHandler.getHandler());<br>					<span class="hljs-keyword">if</span> (<span class="hljs-keyword">new</span> <span class="hljs-title class_">ServletWebRequest</span>(request, response).checkNotModified(lastModified) &amp;&amp; isGet) &#123;<br>						<span class="hljs-keyword">return</span>;<br>					&#125;<br>				&#125;<br><br>				<span class="hljs-keyword">if</span> (!mappedHandler.applyPreHandle(processedRequest, response)) &#123;<br>					<span class="hljs-keyword">return</span>;<br>				&#125;<br><br>				<span class="hljs-comment">// Actually invoke the handler.</span><br>				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());<br><br>				<span class="hljs-keyword">if</span> (asyncManager.isConcurrentHandlingStarted()) &#123;<br>					<span class="hljs-keyword">return</span>;<br>				&#125;<br><br>				applyDefaultViewName(processedRequest, mv);<br>				mappedHandler.applyPostHandle(processedRequest, response, mv);<br>			&#125;<br>			<span class="hljs-keyword">catch</span> (Exception ex) &#123;<br>				dispatchException = ex;<br>			&#125;<br>			<span class="hljs-keyword">catch</span> (Throwable err) &#123;<br>				<span class="hljs-comment">// As of 4.3, we&#x27;re processing Errors thrown from handler methods as well,</span><br>				<span class="hljs-comment">// making them available for @ExceptionHandler methods and other scenarios.</span><br>				dispatchException = <span class="hljs-keyword">new</span> <span class="hljs-title class_">NestedServletException</span>(<span class="hljs-string">&quot;Handler dispatch failed&quot;</span>, err);<br>			&#125;<br>			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException); <br>    ......   <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在上面的try-catch块执行的过程中抛出的异常会被捕获,然后在processDispatchResult方法中进行处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">processDispatchResult</span><span class="hljs-params">(HttpServletRequest request, HttpServletResponse response,</span><br><span class="hljs-params">		<span class="hljs-meta">@Nullable</span> HandlerExecutionChain mappedHandler, <span class="hljs-meta">@Nullable</span> ModelAndView mv,</span><br><span class="hljs-params">		<span class="hljs-meta">@Nullable</span> Exception exception)</span> <span class="hljs-keyword">throws</span> Exception&#123;<br>	<span class="hljs-type">boolean</span> <span class="hljs-variable">errorView</span> <span class="hljs-operator">=</span> <span class="hljs-literal">false</span>;<br><br>	<span class="hljs-keyword">if</span> (exception != <span class="hljs-literal">null</span>) &#123;<br>		<span class="hljs-keyword">if</span> (exception <span class="hljs-keyword">instanceof</span> ModelAndViewDefiningException) &#123;<br>			logger.debug(<span class="hljs-string">&quot;ModelAndViewDefiningException encountered&quot;</span>, exception);<br>			mv = ((ModelAndViewDefiningException) exception).getModelAndView();<br>		&#125;<br>		<span class="hljs-keyword">else</span> &#123;<br>			<span class="hljs-type">Object</span> <span class="hljs-variable">handler</span> <span class="hljs-operator">=</span> (mappedHandler != <span class="hljs-literal">null</span> ? mappedHandler.getHandler() : <span class="hljs-literal">null</span>);<br>			mv = processHandlerException(request, response, handler, exception);<br>			errorView = (mv != <span class="hljs-literal">null</span>);<br>		&#125;<br>	&#125;	 <br>    ......   <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>具体处理的细节可以参考上面的调用堆栈自己debug看下</p>
+<h4 id="ModelAttribute"><a href="#ModelAttribute" class="headerlink" title="@ModelAttribute"></a>@ModelAttribute</h4><p>    然后是@ModelAttribute注解的处理方式</p>
+<p>    在RequestMappingHandlerAdapter(这里只考虑这个adapter)的invokeHandlerMethod中,有一行语句</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">modelFactory.initModel(webRequest, mavContainer, invocableMethod);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">initModel</span><span class="hljs-params">(NativeWebRequest request, ModelAndViewContainer container, HandlerMethod handlerMethod)</span><br>		<span class="hljs-keyword">throws</span> Exception &#123;<br><br>	Map&lt;String, ?&gt; sessionAttributes = <span class="hljs-built_in">this</span>.sessionAttributesHandler.retrieveAttributes(request);<br>	container.mergeAttributes(sessionAttributes);<br>	invokeModelAttributeMethods(request, container);<br><br>	<span class="hljs-keyword">for</span> (String name : findSessionAttributeArguments(handlerMethod)) &#123;<br>		<span class="hljs-keyword">if</span> (!container.containsAttribute(name)) &#123;<br>			<span class="hljs-type">Object</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span> <span class="hljs-built_in">this</span>.sessionAttributesHandler.retrieveAttribute(request, name);<br>			<span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) &#123;<br>				<span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">HttpSessionRequiredException</span>(<span class="hljs-string">&quot;Expected session attribute &#x27;&quot;</span> + name + <span class="hljs-string">&quot;&#x27;&quot;</span>, name);<br>			&#125;<br>			container.addAttribute(name, value);<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这个方法里我们主要关注  invokeModelAttributeMethods 方法,这个方法做的事是执行所有的符合条件的被@ModelAttribute注解修饰的方法并将返回值及返回值名称作为属性塞到ModelAndViewContainer中</p>
+<p>然后是在 ServletInvocableHandlerMethod 执行方法时会获取并解析方法参数,对于Controller中被@ModelAttribute注解修饰的参数会委托给 ModelAttributeMethodProcessor 进行解析,而ModelAttributeMethodProcessor在解析参数时会先从ModelAndViewContainer中找</p>
+<p>    总结一下就是每次执行请求前先执行所有的@ModelAttribute注解修饰的方法,将结果缓存,在执行方法解析参数时看需要从缓存中取相应的返回值(PS:感觉这样实现不太优雅)</p>
+<h4 id="InitBinder"><a href="#InitBinder" class="headerlink" title="@InitBinder"></a>@InitBinder</h4><p>    具体的处理逻辑在AbstractNamedValueMethodArgumentResolver类的 resolveArgument 方法中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-meta">@Override</span><br><span class="hljs-meta">@Nullable</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> Object <span class="hljs-title function_">resolveArgument</span><span class="hljs-params">(MethodParameter parameter, <span class="hljs-meta">@Nullable</span> ModelAndViewContainer mavContainer,</span><br><span class="hljs-params">		NativeWebRequest webRequest, <span class="hljs-meta">@Nullable</span> WebDataBinderFactory binderFactory)</span> <span class="hljs-keyword">throws</span> Exception &#123;<br>    ......<br>    <span class="hljs-keyword">if</span> (binderFactory != <span class="hljs-literal">null</span>) &#123;<br>		<span class="hljs-type">WebDataBinder</span> <span class="hljs-variable">binder</span> <span class="hljs-operator">=</span> binderFactory.createBinder(webRequest, <span class="hljs-literal">null</span>, namedValueInfo.name);<br>		<span class="hljs-keyword">try</span> &#123;<br>			arg = binder.convertIfNecessary(arg, parameter.getParameterType(), parameter);<br>		&#125;<br>    ......<br>&#125; <br></code></pre></td></tr></table></figure>
+
+<p>   <br>    在Spring MVC中，<code>@InitBinder</code>注解用于注册自定义的属性编辑器，这些编辑器主要用于将请求参数（通常是字符串）转换为特定的Java类型]。然而，<code>@RequestBody</code>注解用于处理HTTP请求体中的JSON数据，并将其映射到对应的Java对象.</p>
+<h5 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h5><p>(<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/73087879">Spring的@ControllerAdvice注解作用原理探究 - 知乎 (zhihu.com)</a>)</p>
+<p>(<a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_37343985/article/details/84438039">SpringMVC之ModelFactory_modelfactory spring-CSDN博客</a>)</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="category-chain-item">源码解析</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/SpringMVC/">#SpringMVC</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>SpringMVC-@ControllerAdvice注解学习</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2024/05/08/Spring/SpringMVC/SpringMVC-ControllerAdvice注解学习/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月8日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/11/Spring/SpringBoot/SpringBoot%E6%95%B4%E5%90%88hibernate-validator%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B/" title="SpringBoot整合hibernate-validator请求流程">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SpringBoot整合hibernate-validator请求流程</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/20/Spring/SpringMVC/SpringMVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E5%9B%BE/" title="SpringMVC请求流程图">
+                        <span class="hidden-mobile">SpringMVC请求流程图</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div>小浣熊的博客 ｜ 记录有趣的收获</div> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
