@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>post</title>
+    <link href="/2024/10/08/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-2/"/>
+    <url>/2024/10/08/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-2/</url>
+    
+    <content type="html"><![CDATA[<p>    演示视频见 <a href="https://www.bilibili.com/video/BV1mE2JYsEjm/?spm_id_from=333.1365.list.card_archive.click">IDEA AI编码助手阶段性成果-2_哔哩哔哩_bilibili</a></p><h3 id="已实现功能"><a href="#已实现功能" class="headerlink" title="已实现功能"></a>已实现功能</h3><ul><li><p>带上下文的聊天、中断正在进行的聊天、清空上下文并新建聊天</p></li><li><p>通过 <code>/</code> 唤起 内置命令框并实现 <code>/tab</code>、<code>/clear</code>命令</p></li><li><p>AI 回复中代码区域功能性按钮（复制等）实现</p></li></ul><h3 id="待实现功能"><a href="#待实现功能" class="headerlink" title="待实现功能"></a>待实现功能</h3><p>    后续的工作主要是代码优化、更多上下文的添加以及很重要的将回复中的代码应用到现有代码功能调研</p><p>    还有更长远的工作如代码索引（暂时不清楚为什么要做以及怎么做）、与IDEA 平台的更加深度地集成</p><h3 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h3><p>    本项目前端页面由 cursor（第一版） 和 github copilot（第二版）大力赞助！🤗</p><blockquote><p>对于大型Java 项目（Spring），如果文件命名规范的话，感觉可以考虑 使用 &#x2F;Controller、&#x2F;PO等内置命令用于快速选择相关上下文。</p><p>更准确、更方便的上下文组织以及选择的形式和实现需要更多的思考</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>个人项目</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Jetbrains IDE</tag>
+      
+      <tag>Plugin</tag>
+      
+      <tag>Personal Projects</tag>
+      
+      <tag>AI</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>AI编码助手阶段性成果-1</title>
     <link href="/2024/09/21/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-1/"/>
     <url>/2024/09/21/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-1/</url>
