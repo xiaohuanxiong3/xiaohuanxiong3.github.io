@@ -4,6 +4,37 @@
   
   
   <entry>
+    <title>AI编码助手阶段性成果-3</title>
+    <link href="/2024/10/19/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-3/"/>
+    <url>/2024/10/19/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-3/</url>
+    
+    <content type="html"><![CDATA[<p>    演示视频见：</p><h3 id="已实现功能"><a href="#已实现功能" class="headerlink" title="已实现功能"></a>已实现功能</h3><ul><li><p>带上下文的聊天、中断正在进行的聊天、清空上下文并新建聊天</p></li><li><p>通过 <code>/</code> 唤起 内置命令框</p><p>目前已实现命令如下：</p><ol><li><p><code>/tab</code>：将当前文件添加到聊天上下文中</p></li><li><p><code>/clear</code>：清空聊天上下文和现有所有聊天记录</p></li></ol></li></ul><ul><li><p>AI 回复中代码区域功能性按钮</p><p>目前已实现的功能性按钮如下：</p><ol><li><p>复制：复制代码区域的内容到剪切板</p></li><li><p>应用：将代码区域的内容合并到当前文件中（后续只能期待大模型的推理速度更快或者大模型能根据我的提示词准确地进行代码合并😎）</p><blockquote><p>PS：现有的代码合并功能还很不稳定，但是经过我不断地优化提示词，目前只能说勉强能用</p></blockquote></li></ol></li></ul><h3 id="待实现功能"><a href="#待实现功能" class="headerlink" title="待实现功能"></a>待实现功能</h3><ul><li><p>代码补全</p></li><li><p>内联对话框（这个我打算抄<code>Continue</code>的）</p></li><li><p>……</p></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>个人项目</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Jetbrains IDE</tag>
+      
+      <tag>Plugin</tag>
+      
+      <tag>Personal Projects</tag>
+      
+      <tag>AI</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>AI编码助手阶段性成果-2</title>
     <link href="/2024/10/08/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-2/"/>
     <url>/2024/10/08/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-2/</url>

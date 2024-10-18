@@ -16,21 +16,35 @@
   <meta name="author" content="Handsome Young">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="website">
-<meta property="og:title" content="归档">
-<meta property="og:url" content="https://xiaohuanxiong3.github.io/archives/2024/04/index.html">
+    <meta name="description" content="演示视频见： 已实现功能 带上下文的聊天、中断正在进行的聊天、清空上下文并新建聊天  通过 &#x2F; 唤起 内置命令框 目前已实现命令如下：  &#x2F;tab：将当前文件添加到聊天上下文中  &#x2F;clear：清空聊天上下文和现有所有聊天记录      AI 回复中代码区域功能性按钮 目前已实现的功能性按钮如下：  复制：复制代码区域的内容到剪切板  应用：将代码区域的内容合并到当前文件中（后续只能期待大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI编码助手阶段性成果-3">
+<meta property="og:url" content="https://xiaohuanxiong3.github.io/2024/10/19/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-3/index.html">
 <meta property="og:site_name" content="小浣熊的个人博客">
+<meta property="og:description" content="演示视频见： 已实现功能 带上下文的聊天、中断正在进行的聊天、清空上下文并新建聊天  通过 &#x2F; 唤起 内置命令框 目前已实现命令如下：  &#x2F;tab：将当前文件添加到聊天上下文中  &#x2F;clear：清空聊天上下文和现有所有聊天记录      AI 回复中代码区域功能性按钮 目前已实现的功能性按钮如下：  复制：复制代码区域的内容到剪切板  应用：将代码区域的内容合并到当前文件中（后续只能期待大">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-18T16:19:15.000Z">
+<meta property="article:modified_time" content="2024-10-18T16:36:17.301Z">
 <meta property="article:author" content="Handsome Young">
+<meta property="article:tag" content="Jetbrains IDE">
+<meta property="article:tag" content="Plugin">
+<meta property="article:tag" content="Personal Projects">
+<meta property="article:tag" content="AI">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>归档 - 小浣熊的个人博客</title>
+  <title>AI编码助手阶段性成果-3 - 小浣熊的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
 
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
 
 
 
@@ -80,7 +94,7 @@
   <header>
     
 
-<div class="header-inner" style="height: 60vh;">
+<div class="header-inner" style="height: 70vh;">
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -209,9 +223,49 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="归档"></span>
+            <span id="subtitle" data-typed-text="AI编码助手阶段性成果-3"></span>
           
         </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-19 00:19" pubdate>
+          2024年10月19日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          280 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          3 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
 
         
       </div>
@@ -227,40 +281,214 @@
 
   <main>
     
-      <div class="container nopadding-x-md">
-        <div id="board"
-          >
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
-
-<div class="list-group">
-  <p class="h4">共计 44 篇文章</p>
-  <hr>
-  
-  
-    
       
-      <p class="h5">2024</p>
-    
-    <a href="/2024/04/20/Spring/SpringMVC/SpringMVC%E8%AF%B7%E6%B1%82%E6%B5%81%E7%A8%8B%E5%9B%BE/" class="list-group-item list-group-item-action">
-      <time>04-20</time>
-      <div class="list-group-item-title">SpringMVC请求流程图</div>
-    </a>
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">AI编码助手阶段性成果-3</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>    演示视频见：</p>
+<h3 id="已实现功能"><a href="#已实现功能" class="headerlink" title="已实现功能"></a>已实现功能</h3><ul>
+<li><p>带上下文的聊天、中断正在进行的聊天、清空上下文并新建聊天</p>
+</li>
+<li><p>通过 <code>/</code> 唤起 内置命令框</p>
+<p>目前已实现命令如下：</p>
+<ol>
+<li><p><code>/tab</code>：将当前文件添加到聊天上下文中</p>
+</li>
+<li><p><code>/clear</code>：清空聊天上下文和现有所有聊天记录</p>
+</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li><p>AI 回复中代码区域功能性按钮</p>
+<p>目前已实现的功能性按钮如下：</p>
+<ol>
+<li><p>复制：复制代码区域的内容到剪切板</p>
+</li>
+<li><p>应用：将代码区域的内容合并到当前文件中（后续只能期待大模型的推理速度更快或者大模型能根据我的提示词准确地进行代码合并😎）</p>
+<blockquote>
+<p>PS：现有的代码合并功能还很不稳定，但是经过我不断地优化提示词，目前只能说勉强能用</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="待实现功能"><a href="#待实现功能" class="headerlink" title="待实现功能"></a>待实现功能</h3><ul>
+<li><p>代码补全</p>
+</li>
+<li><p>内联对话框（这个我打算抄<code>Continue</code>的）</p>
+</li>
+<li><p>……</p>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E4%B8%AA%E4%BA%BA%E9%A1%B9%E7%9B%AE/" class="category-chain-item">个人项目</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Jetbrains-IDE/">#Jetbrains IDE</a>
+      
+        <a href="/tags/Plugin/">#Plugin</a>
+      
+        <a href="/tags/Personal-Projects/">#Personal Projects</a>
+      
+        <a href="/tags/AI/">#AI</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+<!--    <div class="license-title">-->
+<!--      <div>AI编码助手阶段性成果-3</div>-->
+<!--      <div>https://xiaohuanxiong3.github.io/2024/10/19/personal-projects/ai-code-assistant/AI编码助手阶段性成果-3/</div>-->
+<!--    </div>-->
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Handsome Young</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月19日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            MIT
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/08/personal-projects/ai-code-assistant/AI%E7%BC%96%E7%A0%81%E5%8A%A9%E6%89%8B%E9%98%B6%E6%AE%B5%E6%80%A7%E6%88%90%E6%9E%9C-2/" title="AI编码助手阶段性成果-2">
+                        <span class="hidden-mobile">AI编码助手阶段性成果-2</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
 </div>
 
 
 
 
 
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
     
 
     
@@ -354,6 +582,72 @@
 
 
 
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
 
   <script  src="/js/local-search.js" ></script>
 
